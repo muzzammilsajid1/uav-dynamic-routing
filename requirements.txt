@@ -1,0 +1,5 @@
+numpy
+networkx
+gymnasium
+stable-baselines3[extra]
+matplotlib
