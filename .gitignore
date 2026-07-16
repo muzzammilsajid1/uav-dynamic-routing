@@ -1,6 +1,48 @@
 __pycache__/
 *.py[cod]
+*$py.class
+
+# Virtual environments and local config
 venv/
 .venv/
+env/
+.env
+*.env
+.env.*
+!.env.example
+
+# Secrets and credentials
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+credentials.json
+token.json
+secrets.json
+
+# Notebooks and OS/editor files
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Training artifacts and generated outputs
 *.zip
 *.pt
+*.pth
+*.pkl
+*.h5
+*.onnx
+runs/
+logs/
+wandb/
+checkpoints/
+models/
+
+# Local data/results that may contain private experiment details
+*.csv
+*.xlsx
+*.xls
