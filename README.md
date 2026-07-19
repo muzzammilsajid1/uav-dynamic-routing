@@ -25,3 +25,8 @@ python -m unittest discover -s tests
 python experiments/run_static_baseline.py
 ```
 
+## Run Static Q-Learning
+
+```bash
+python experiments/train_q_learning_static.py
+```
