@@ -811,3 +811,15 @@ Here is the sampled progression of the mean episode rewards (`ep_rew_mean`) logg
 *   **~180,000 steps:** `0.614`
 *   **~190,000 steps:** `0.576`
 *   **~200,000 steps:** `0.617`
+
+---
+
+## 6. Unseen Map Generalization Test (seed=999)
+
+A generalization test was conducted using an unseen grid layout (`seed=999`). Out of 50 episodes, the agent achieved 47 successes (94%), 0 crashes, and 3 timeouts.
+
+Trace analysis of the timeouts revealed a distinct failure mode: the agent navigates correctly for most of the episode until it makes a wrong turn into an unfamiliar obstacle configuration not seen during training (since training used `fixed_grid=True`, which exposes the agent to a single fixed map). Getting structurally cut off from a direct route, the agent settles into a mild 2-cell oscillation (e.g., repeatedly alternating between two adjacent cells) rather than exploring to find the correct detour.
+
+It is important to note explicitly that this is distinct from the earlier Q-value divergence bug (which was fixed via the `SafeHerReplayBuffer`). Reward magnitudes in these timeout traces are healthy and correctly scaled (with small values like -0.02 to -0.17). This confirms the issue is a pure generalization limitation (lack of exposure to varied obstacle geometries), not a residual value-estimation bug. 
+
+**Future Task:** Retraining with `fixed_grid=False` to expose the agent to varied obstacle layouts across episodes. This is noted as a scoped future task and not an immediate blocker for the current milestone.
