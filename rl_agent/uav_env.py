@@ -44,10 +44,10 @@ CELL_OBSTACLE: int = 1           # physical obstacle (building, terrain, etc.)
 CELL_NO_FLY: int = 2             # regulatory no-fly zone (TFR / geofence)
 
 # Reward shaping (energy-budget framing)
-REWARD_STEP: float = -0.1        # continuous energy/battery consumption
-REWARD_GOAL: float = 1000.0      # successful mission payload delivery/waypoint reached
-REWARD_COLLISION: float = -50.0 # catastrophic airframe loss
-REWARD_NO_FLY: float = -20.0     # regulated airspace violation
+REWARD_STEP: float = -0.1         # continuous energy/battery consumption
+REWARD_GOAL: float = 1.0         # successful mission payload delivery/waypoint reached
+REWARD_COLLISION: float = -1.0   # catastrophic airframe loss
+REWARD_NO_FLY: float = 0.0       # regulated airspace violation
 
 # Maximum episode length — prevents infinite wandering
 MAX_STEPS: int = GRID_SIZE * GRID_SIZE  # 225 steps should be generous
@@ -95,7 +95,7 @@ class UAVRoutingEnv(gym.Env):
         self,
         grid_size: int = GRID_SIZE,
         obstacle_density: float = 0.20,
-        no_fly_density: float = 0.05,
+        no_fly_density: float = 0.0,
         render_mode: str | None = None,
         seed: int | None = None,
         curriculum_enabled: bool = False,
@@ -133,6 +133,7 @@ class UAVRoutingEnv(gym.Env):
         self.episode_count = 0
         self.fixed_grid = fixed_grid
         self._initial_grid = None
+        self.max_dist = math.sqrt((self.grid_size - 1)**2 + (self.grid_size - 1)**2)
 
         # ---- Action space: 8 discrete heading commands -----------------------
         self.action_space = spaces.Discrete(8)
@@ -151,10 +152,10 @@ class UAVRoutingEnv(gym.Env):
                 dtype=np.float32,
             ),
             "achieved_goal": spaces.Box(
-                low=0.0, high=float(grid_size - 1), shape=(2,), dtype=np.float32
+                low=0.0, high=float(grid_size - 1), shape=(4,), dtype=np.float32
             ),
             "desired_goal": spaces.Box(
-                low=0.0, high=float(grid_size - 1), shape=(2,), dtype=np.float32
+                low=0.0, high=float(grid_size - 1), shape=(4,), dtype=np.float32
             ),
         })
 
@@ -313,7 +314,7 @@ class UAVRoutingEnv(gym.Env):
         # ---- Evaluate transition and determine reward / termination ----------
         terminated = False
         truncated = False
-        sparse_reward = 0.0
+        sparse_reward = REWARD_STEP
         self._last_crashed = False
 
         prev_pos = self.uav_pos.copy()
@@ -323,7 +324,7 @@ class UAVRoutingEnv(gym.Env):
         valid_next_positions = [tuple(n[0]) for n in neighbors]
 
         if tuple(next_pos) not in valid_next_positions:
-            sparse_reward = -1.0
+            sparse_reward = REWARD_COLLISION
             terminated = True
             self._last_crashed = True
             # UAV crashed, physical position does not update
@@ -334,7 +335,7 @@ class UAVRoutingEnv(gym.Env):
 
             # 4. Goal reached (mission success)
             if np.array_equal(self.uav_pos, self.goal_pos):
-                sparse_reward = 1.0
+                sparse_reward = REWARD_GOAL
                 terminated = True
 
         # 5. Episode truncation: battery / flight-time budget exceeded
@@ -390,10 +391,11 @@ class UAVRoutingEnv(gym.Env):
             
         obs_array = np.concatenate([pos_obs, local_grid, last_action_onehot], dtype=np.float32)
 
+        prev_pos = self._last_prev_pos if hasattr(self, "_last_prev_pos") else self.uav_pos
         return {
             "observation": obs_array,
-            "achieved_goal": self.uav_pos.astype(np.float32),
-            "desired_goal": self.goal_pos.astype(np.float32),
+            "achieved_goal": np.concatenate([self.uav_pos, prev_pos]).astype(np.float32),
+            "desired_goal": np.concatenate([self.goal_pos, self.goal_pos]).astype(np.float32),
         }
 
     def _get_local_observation(self) -> np.ndarray:
@@ -560,7 +562,11 @@ class UAVRoutingEnv(gym.Env):
         Potential function for reward shaping (Ng et al. 1999).
         Phi(state, goal) = -distance(state, goal)
         """
-        return -self._bfs_distance(pos, goal)
+        phi = -self._bfs_distance(pos, goal) / self.max_dist
+        if not hasattr(self, '_printed_phi'):
+            print(f"[DEBUG uav_env] Raw Phi value at first potential call: {phi:.3f}")
+            self._printed_phi = True
+        return phi
 
     # ------------------------------------------------------------------
     #  Internal utilities
@@ -579,6 +585,8 @@ class UAVRoutingEnv(gym.Env):
         prev_pos = self._last_prev_pos if hasattr(self, "_last_prev_pos") else self.uav_pos
         crashed = getattr(self, "_last_crashed", False)
         
+        is_success = bool(np.array_equal(self.uav_pos, self.goal_pos))
+        
         return {
             "uav_pos": self.uav_pos.tolist(),
             "previous_uav_pos": prev_pos.tolist(),
@@ -586,6 +594,7 @@ class UAVRoutingEnv(gym.Env):
             "goal_pos": self.goal_pos.tolist(),
             "manhattan_distance": manhattan,
             "step": self.current_step,
+            "is_success": is_success,
         }
 
     # ------------------------------------------------------------------
@@ -614,33 +623,31 @@ class UAVRoutingEnv(gym.Env):
             ag = np.round(achieved_goal[i]).astype(np.int32)
             dg = np.round(desired_goal[i]).astype(np.int32)
             
-            # Extract state before the transition to compute Phi(state)
-            prev_pos = ag
+            if len(ag) == 4:
+                current_pos = ag[0:2]
+                prev_pos = ag[2:4]
+                goal_pos = dg[0:2]
+            else:
+                current_pos = ag
+                prev_pos = ag
+                goal_pos = dg
+                
             crashed = False
-            
             if isinstance(info, list) and len(info) > i:
                 inf = info[i]
-                if "previous_uav_pos" in inf:
-                    prev_pos = np.round(inf["previous_uav_pos"]).astype(np.int32)
                 if "crashed" in inf:
                     crashed = inf["crashed"]
-            elif isinstance(info, dict):
-                # Handle vectorized env info dict format
-                if "previous_uav_pos" in info:
-                    prev_pos = np.round(info["previous_uav_pos"][i]).astype(np.int32)
-                if "crashed" in info:
-                    crashed = info["crashed"][i]
 
-            # 1. Sparse reward term (Precedence matches step() exactly)
+            # 1. Sparse reward term
             if crashed:
-                sparse_reward = -1.0
-            elif np.array_equal(ag, dg):
-                sparse_reward = 1.0
+                sparse_reward = REWARD_COLLISION
+            elif np.array_equal(current_pos, goal_pos):
+                sparse_reward = REWARD_GOAL
             else:
-                sparse_reward = 0.0
+                sparse_reward = REWARD_STEP
 
             # 2. Shaping term: gamma * Phi(next_state, goal) - Phi(state, goal)
-            rewards[i] = sparse_reward + gamma * self._potential(ag, dg) - self._potential(prev_pos, dg)
+            rewards[i] = sparse_reward + gamma * self._potential(current_pos, goal_pos) - self._potential(prev_pos, goal_pos)
 
         if is_single:
             return float(rewards[0])

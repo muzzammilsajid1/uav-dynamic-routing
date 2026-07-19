@@ -31,7 +31,7 @@ print(f"Drive save directory: {DRIVE_SAVE_DIR}")
 #   the rest of the cell verbatim to disk with zero string-escaping.
 # ------------------------------------------------------------------------------
 
-# %%writefile /content/uav_env.py
+%%writefile /content/uav_env.py
 """
 uav_env.py — Gymnasium wrapper for UAV grid-world routing.
 
@@ -78,10 +78,10 @@ CELL_OBSTACLE: int = 1           # physical obstacle (building, terrain, etc.)
 CELL_NO_FLY: int = 2             # regulatory no-fly zone (TFR / geofence)
 
 # Reward shaping (energy-budget framing)
-REWARD_STEP: float = -0.1        # continuous energy/battery consumption
-REWARD_GOAL: float = 1000.0      # successful mission payload delivery/waypoint reached
-REWARD_COLLISION: float = -50.0 # catastrophic airframe loss
-REWARD_NO_FLY: float = -20.0     # regulated airspace violation
+REWARD_STEP: float = -0.1         # continuous energy/battery consumption
+REWARD_GOAL: float = 1.0         # successful mission payload delivery/waypoint reached
+REWARD_COLLISION: float = -1.0   # catastrophic airframe loss
+REWARD_NO_FLY: float = 0.0       # regulated airspace violation
 
 # Maximum episode length — prevents infinite wandering
 MAX_STEPS: int = GRID_SIZE * GRID_SIZE  # 225 steps should be generous
@@ -129,7 +129,7 @@ class UAVRoutingEnv(gym.Env):
         self,
         grid_size: int = GRID_SIZE,
         obstacle_density: float = 0.20,
-        no_fly_density: float = 0.05,
+        no_fly_density: float = 0.0,
         render_mode: str | None = None,
         seed: int | None = None,
         curriculum_enabled: bool = False,
@@ -167,6 +167,7 @@ class UAVRoutingEnv(gym.Env):
         self.episode_count = 0
         self.fixed_grid = fixed_grid
         self._initial_grid = None
+        self.max_dist = math.sqrt((self.grid_size - 1)**2 + (self.grid_size - 1)**2)
 
         # ---- Action space: 8 discrete heading commands -----------------------
         self.action_space = spaces.Discrete(8)
@@ -185,10 +186,10 @@ class UAVRoutingEnv(gym.Env):
                 dtype=np.float32,
             ),
             "achieved_goal": spaces.Box(
-                low=0.0, high=float(grid_size - 1), shape=(2,), dtype=np.float32
+                low=0.0, high=float(grid_size - 1), shape=(4,), dtype=np.float32
             ),
             "desired_goal": spaces.Box(
-                low=0.0, high=float(grid_size - 1), shape=(2,), dtype=np.float32
+                low=0.0, high=float(grid_size - 1), shape=(4,), dtype=np.float32
             ),
         })
 
@@ -347,7 +348,7 @@ class UAVRoutingEnv(gym.Env):
         # ---- Evaluate transition and determine reward / termination ----------
         terminated = False
         truncated = False
-        sparse_reward = 0.0
+        sparse_reward = REWARD_STEP
         self._last_crashed = False
 
         prev_pos = self.uav_pos.copy()
@@ -357,7 +358,7 @@ class UAVRoutingEnv(gym.Env):
         valid_next_positions = [tuple(n[0]) for n in neighbors]
 
         if tuple(next_pos) not in valid_next_positions:
-            sparse_reward = -1.0
+            sparse_reward = REWARD_COLLISION
             terminated = True
             self._last_crashed = True
             # UAV crashed, physical position does not update
@@ -368,7 +369,7 @@ class UAVRoutingEnv(gym.Env):
 
             # 4. Goal reached (mission success)
             if np.array_equal(self.uav_pos, self.goal_pos):
-                sparse_reward = 1.0
+                sparse_reward = REWARD_GOAL
                 terminated = True
 
         # 5. Episode truncation: battery / flight-time budget exceeded
@@ -424,10 +425,11 @@ class UAVRoutingEnv(gym.Env):
             
         obs_array = np.concatenate([pos_obs, local_grid, last_action_onehot], dtype=np.float32)
 
+        prev_pos = self._last_prev_pos if hasattr(self, "_last_prev_pos") else self.uav_pos
         return {
             "observation": obs_array,
-            "achieved_goal": self.uav_pos.astype(np.float32),
-            "desired_goal": self.goal_pos.astype(np.float32),
+            "achieved_goal": np.concatenate([self.uav_pos, prev_pos]).astype(np.float32),
+            "desired_goal": np.concatenate([self.goal_pos, self.goal_pos]).astype(np.float32),
         }
 
     def _get_local_observation(self) -> np.ndarray:
@@ -594,7 +596,11 @@ class UAVRoutingEnv(gym.Env):
         Potential function for reward shaping (Ng et al. 1999).
         Phi(state, goal) = -distance(state, goal)
         """
-        return -self._bfs_distance(pos, goal)
+        phi = -self._bfs_distance(pos, goal) / self.max_dist
+        if not hasattr(self, '_printed_phi'):
+            print(f"[DEBUG uav_env] Raw Phi value at first potential call: {phi:.3f}")
+            self._printed_phi = True
+        return phi
 
     # ------------------------------------------------------------------
     #  Internal utilities
@@ -613,6 +619,8 @@ class UAVRoutingEnv(gym.Env):
         prev_pos = self._last_prev_pos if hasattr(self, "_last_prev_pos") else self.uav_pos
         crashed = getattr(self, "_last_crashed", False)
         
+        is_success = bool(np.array_equal(self.uav_pos, self.goal_pos))
+        
         return {
             "uav_pos": self.uav_pos.tolist(),
             "previous_uav_pos": prev_pos.tolist(),
@@ -620,6 +628,7 @@ class UAVRoutingEnv(gym.Env):
             "goal_pos": self.goal_pos.tolist(),
             "manhattan_distance": manhattan,
             "step": self.current_step,
+            "is_success": is_success,
         }
 
     # ------------------------------------------------------------------
@@ -648,33 +657,31 @@ class UAVRoutingEnv(gym.Env):
             ag = np.round(achieved_goal[i]).astype(np.int32)
             dg = np.round(desired_goal[i]).astype(np.int32)
             
-            # Extract state before the transition to compute Phi(state)
-            prev_pos = ag
+            if len(ag) == 4:
+                current_pos = ag[0:2]
+                prev_pos = ag[2:4]
+                goal_pos = dg[0:2]
+            else:
+                current_pos = ag
+                prev_pos = ag
+                goal_pos = dg
+                
             crashed = False
-            
             if isinstance(info, list) and len(info) > i:
                 inf = info[i]
-                if "previous_uav_pos" in inf:
-                    prev_pos = np.round(inf["previous_uav_pos"]).astype(np.int32)
                 if "crashed" in inf:
                     crashed = inf["crashed"]
-            elif isinstance(info, dict):
-                # Handle vectorized env info dict format
-                if "previous_uav_pos" in info:
-                    prev_pos = np.round(info["previous_uav_pos"][i]).astype(np.int32)
-                if "crashed" in info:
-                    crashed = info["crashed"][i]
 
-            # 1. Sparse reward term (Precedence matches step() exactly)
+            # 1. Sparse reward term
             if crashed:
-                sparse_reward = -1.0
-            elif np.array_equal(ag, dg):
-                sparse_reward = 1.0
+                sparse_reward = REWARD_COLLISION
+            elif np.array_equal(current_pos, goal_pos):
+                sparse_reward = REWARD_GOAL
             else:
-                sparse_reward = 0.0
+                sparse_reward = REWARD_STEP
 
             # 2. Shaping term: gamma * Phi(next_state, goal) - Phi(state, goal)
-            rewards[i] = sparse_reward + gamma * self._potential(ag, dg) - self._potential(prev_pos, dg)
+            rewards[i] = sparse_reward + gamma * self._potential(current_pos, goal_pos) - self._potential(prev_pos, goal_pos)
 
         if is_single:
             return float(rewards[0])
@@ -709,6 +716,33 @@ class UAVRoutingEnv(gym.Env):
 
 
 # %% ---------------------------------------------------------------------------
+# CELL 2.5: Write safe_her_buffer.py to /content/safe_her_buffer.py
+# ------------------------------------------------------------------------------
+
+# %%writefile /content/safe_her_buffer.py
+import torch
+import numpy as np
+from stable_baselines3.her import HerReplayBuffer
+
+class SafeHerReplayBuffer(HerReplayBuffer):
+    def sample(self, batch_size, env=None):
+        samples = super().sample(batch_size, env)
+        
+        # Force dones=1.0 for transitions where the achieved goal matches the desired goal
+        ag = np.round(samples.next_observations["achieved_goal"].cpu().numpy()).astype(np.int32)
+        dg = np.round(samples.observations["desired_goal"].cpu().numpy()).astype(np.int32)
+        
+        # Check spatial equivalence (first 2 elements)
+        goal_reached = np.all(ag[:, 0:2] == dg[:, 0:2], axis=1)
+        
+        # Update dones inplace
+        if np.any(goal_reached):
+            # Since samples.dones is a PyTorch tensor, we modify it in-place
+            samples.dones[goal_reached] = 1.0
+            
+        return samples
+
+# %% ---------------------------------------------------------------------------
 # CELL 3: Train DQN + HER (with checkpointing every 50k steps)
 # ------------------------------------------------------------------------------
 
@@ -716,14 +750,14 @@ import os
 import time
 import numpy as np
 from stable_baselines3 import DQN
-from stable_baselines3.her import HerReplayBuffer
+from safe_her_buffer import SafeHerReplayBuffer
 from stable_baselines3.common.callbacks import CheckpointCallback, BaseCallback
 from uav_env import UAVRoutingEnv
 
 # ---- Config ------------------------------------------------------------------
 GRID_SIZE        = 15
 OBSTACLE_DENSITY = 0.20
-NO_FLY_DENSITY   = 0.05
+NO_FLY_DENSITY   = 0.0
 TOTAL_TIMESTEPS  = 300_000
 SEED             = 42
 
@@ -792,8 +826,49 @@ env = UAVRoutingEnv(
 env = Monitor(env)
 
 
+
+import torch
+import torch.nn.functional as F
+
+class DoubleDQN(DQN):
+    """Subclass of SB3\'s DQN that implements Double DQN."""
+    def train(self, gradient_steps: int, batch_size: int = 100) -> None:
+        self.policy.set_training_mode(True)
+        self._update_learning_rate(self.policy.optimizer)
+        losses = []
+        for _ in range(gradient_steps):
+            replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env)
+            discounts = replay_data.discounts if replay_data.discounts is not None else self.gamma
+            
+            with torch.no_grad():
+                # 1. Select action with highest value from ONLINE network
+                next_q_values_online = self.q_net(replay_data.next_observations)
+                next_actions = next_q_values_online.argmax(dim=1, keepdim=True)
+                
+                # 2. Evaluate that action\'s value using TARGET network
+                next_q_values_target = self.q_net_target(replay_data.next_observations)
+                next_q_values = torch.gather(next_q_values_target, dim=1, index=next_actions)
+                
+                # 1-step TD target
+                target_q_values = replay_data.rewards + (1 - replay_data.dones) * discounts * next_q_values
+
+            current_q_values = self.q_net(replay_data.observations)
+            current_q_values = torch.gather(current_q_values, dim=1, index=replay_data.actions.long())
+
+            loss = F.smooth_l1_loss(current_q_values, target_q_values)
+            losses.append(loss.item())
+
+            self.policy.optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
+            self.policy.optimizer.step()
+
+        self._n_updates += gradient_steps
+        self.logger.record("train/n_updates", self._n_updates, exclude="tensorboard")
+        self.logger.record("train/loss", np.mean(losses))
+
 # ---- Model -------------------------------------------------------------------
-model = DQN(
+model = DoubleDQN(
     policy="MultiInputPolicy",
     env=env,
     learning_rate=1e-3,
@@ -809,11 +884,12 @@ model = DQN(
     exploration_initial_eps=1.0,
     exploration_final_eps=0.05,
     policy_kwargs=dict(net_arch=[128, 128]),
-    replay_buffer_class=HerReplayBuffer,
+    replay_buffer_class=SafeHerReplayBuffer,
     replay_buffer_kwargs=dict(n_sampled_goal=4, goal_selection_strategy="future"),
     verbose=1,
     seed=SEED,
     device="auto",
+    tensorboard_log=os.path.join(DRIVE_SAVE_DIR, "tensorboard_logs"),
 )
 
 # ---- Callbacks ---------------------------------------------------------------
@@ -833,6 +909,11 @@ print(f"  Grid: {GRID_SIZE}x{GRID_SIZE}  |  seed={SEED}")
 print(f"  Reward: potential-based (Ng 1999) + sparse +/-1")
 print(f"  Distance table: precomputed (O(1) lookups)")
 print("=" * 60)
+
+from stable_baselines3.common.logger import configure
+# Configure logger to save to Drive (CSV + Stdout + TensorBoard)
+drive_logger = configure(os.path.join(DRIVE_SAVE_DIR, "sb3_logs"), ["stdout", "csv", "tensorboard"])
+model.set_logger(drive_logger)
 
 t_start = time.perf_counter()
 model.learn(
@@ -862,20 +943,59 @@ env.close()
 # ------------------------------------------------------------------------------
 
 import numpy as np
+import torch
+import torch.nn.functional as F
 from stable_baselines3 import DQN
 from uav_env import UAVRoutingEnv
+
+class DoubleDQN(DQN):
+    """Subclass of SB3's DQN that implements Double DQN."""
+    def train(self, gradient_steps: int, batch_size: int = 100) -> None:
+        self.policy.set_training_mode(True)
+        self._update_learning_rate(self.policy.optimizer)
+        losses = []
+        for _ in range(gradient_steps):
+            replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env)
+            discounts = replay_data.discounts if replay_data.discounts is not None else self.gamma
+            
+            with torch.no_grad():
+                # 1. Select action with highest value from ONLINE network
+                next_q_values_online = self.q_net(replay_data.next_observations)
+                next_actions = next_q_values_online.argmax(dim=1, keepdim=True)
+                
+                # 2. Evaluate that action's value using TARGET network
+                next_q_values_target = self.q_net_target(replay_data.next_observations)
+                next_q_values = torch.gather(next_q_values_target, dim=1, index=next_actions)
+                
+                # 1-step TD target
+                target_q_values = replay_data.rewards + (1 - replay_data.dones) * discounts * next_q_values
+
+            current_q_values = self.q_net(replay_data.observations)
+            current_q_values = torch.gather(current_q_values, dim=1, index=replay_data.actions.long())
+
+            loss = F.smooth_l1_loss(current_q_values, target_q_values)
+            losses.append(loss.item())
+
+            self.policy.optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
+            self.policy.optimizer.step()
+
+        self._n_updates += gradient_steps
+        self.logger.record("train/n_updates", self._n_updates, exclude="tensorboard")
+        self.logger.record("train/loss", np.mean(losses))
 
 # Load from local (or Drive path if session restarted)
 MODEL_PATH = "/content/dqn_her_300k_final.zip"
 # MODEL_PATH = "/content/drive/MyDrive/uav_her_training/dqn_her_300k_final.zip"
 
 dummy_env = UAVRoutingEnv(
-    grid_size=15, obstacle_density=0.20, no_fly_density=0.05, fixed_grid=True
+    grid_size=15, obstacle_density=0.20, no_fly_density=0.0, fixed_grid=True
 )
-model = DQN.load(MODEL_PATH, env=dummy_env)
+model = DoubleDQN.load(MODEL_PATH, env=dummy_env)
 
 eval_env = UAVRoutingEnv(
-    grid_size=15, obstacle_density=0.20, no_fly_density=0.05,
+    grid_size=15, obstacle_density=0.20, no_fly_density=0.0,
     fixed_grid=True, seed=42
 )
 
@@ -906,7 +1026,7 @@ for ep in range(1, N_EPISODES + 1):
     if crashed:
         outcome = "CRASH"
         crashes += 1
-    elif np.array_equal(ag, dg):
+    elif np.array_equal(ag[:2], dg[:2]):
         outcome = "GOAL"
         goals += 1
     else:
@@ -921,6 +1041,232 @@ print(f"  GOAL:    {goals}/{N_EPISODES}")
 print(f"  CRASH:   {crashes}/{N_EPISODES}")
 print(f"  TIMEOUT: {timeouts}/{N_EPISODES}")
 print("=" * 60)
+
+eval_env.close()
+dummy_env.close()
+
+
+# %% ---------------------------------------------------------------------------
+# CELL 5: Trace 3 TIMEOUT Episodes
+# ------------------------------------------------------------------------------
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+from stable_baselines3 import DQN
+from uav_env import UAVRoutingEnv
+
+class DoubleDQN(DQN):
+    """Subclass of SB3's DQN that implements Double DQN."""
+    def train(self, gradient_steps: int, batch_size: int = 100) -> None:
+        self.policy.set_training_mode(True)
+        self._update_learning_rate(self.policy.optimizer)
+        losses = []
+        for _ in range(gradient_steps):
+            replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env)
+            discounts = replay_data.discounts if replay_data.discounts is not None else self.gamma
+            
+            with torch.no_grad():
+                # 1. Select action with highest value from ONLINE network
+                next_q_values_online = self.q_net(replay_data.next_observations)
+                next_actions = next_q_values_online.argmax(dim=1, keepdim=True)
+                
+                # 2. Evaluate that action's value using TARGET network
+                next_q_values_target = self.q_net_target(replay_data.next_observations)
+                next_q_values = torch.gather(next_q_values_target, dim=1, index=next_actions)
+                
+                # 1-step TD target
+                target_q_values = replay_data.rewards + (1 - replay_data.dones) * discounts * next_q_values
+
+            current_q_values = self.q_net(replay_data.observations)
+            current_q_values = torch.gather(current_q_values, dim=1, index=replay_data.actions.long())
+
+            loss = F.smooth_l1_loss(current_q_values, target_q_values)
+            losses.append(loss.item())
+
+            self.policy.optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
+            self.policy.optimizer.step()
+
+        self._n_updates += gradient_steps
+        self.logger.record("train/n_updates", self._n_updates, exclude="tensorboard")
+        self.logger.record("train/loss", np.mean(losses))
+
+# Load from local (or Drive path if session restarted)
+MODEL_PATH = "/content/dqn_her_300k_final.zip"
+
+dummy_env = UAVRoutingEnv(
+    grid_size=15, obstacle_density=0.20, no_fly_density=0.0, fixed_grid=True
+)
+model = DoubleDQN.load(MODEL_PATH, env=dummy_env)
+
+eval_env = UAVRoutingEnv(
+    grid_size=15, obstacle_density=0.20, no_fly_density=0.0,
+    fixed_grid=True, seed=42
+)
+
+TIMEOUTS_TO_TRACE = 3
+timeouts_traced = 0
+ep = 0
+
+print("=" * 60)
+print(f"  Tracing {TIMEOUTS_TO_TRACE} TIMEOUT episodes step-by-step")
+print("=" * 60)
+
+while timeouts_traced < TIMEOUTS_TO_TRACE:
+    ep += 1
+    obs, info = eval_env.reset()
+    done = False
+    
+    # Buffer the trace so we only print it if the episode is a TIMEOUT
+    trace_buffer = []
+    trace_buffer.append(f"\n--- Episode {ep} Trace ---")
+    
+    ag = np.round(obs["achieved_goal"]).astype(np.int32)
+    dg = np.round(obs["desired_goal"]).astype(np.int32)
+    # Using the underlying unwrapped environment to compute exact BFS distance
+    dist = eval_env.unwrapped._bfs_distance(ag, dg)
+    trace_buffer.append(f"Start pos: {ag.tolist()} | Goal pos: {dg.tolist()} | Initial Dist: {dist:.3f}")
+    
+    steps = 0
+    total_reward = 0.0
+    
+    while not done:
+        action, _ = model.predict(obs, deterministic=True)
+        obs, reward, terminated, truncated, info = eval_env.step(int(action))
+        
+        steps += 1
+        total_reward += float(reward)
+        ag = np.round(obs["achieved_goal"]).astype(np.int32)
+        dg = np.round(obs["desired_goal"]).astype(np.int32)
+        
+        current_dist = eval_env.unwrapped._bfs_distance(ag, dg)
+        
+        trace_buffer.append(f"  Step {steps:>3d} | Pos: {ag.tolist()} | Action: {int(action)} | Dist: {current_dist:>6.3f} | Reward: {reward:>6.3f}")
+        
+        done = terminated or truncated
+
+    crashed = info.get("crashed", False)
+    ag = np.round(obs["achieved_goal"]).astype(np.int32)
+    dg = np.round(obs["desired_goal"]).astype(np.int32)
+    
+    if crashed:
+        outcome = "CRASH"
+    elif np.array_equal(ag[:2], dg[:2]):
+        outcome = "GOAL"
+    else:
+        outcome = "TIMEOUT"
+
+    if outcome == "TIMEOUT":
+        timeouts_traced += 1
+        final_dist = eval_env.unwrapped._bfs_distance(ag, dg)
+        trace_buffer.append(f"--- Episode ended in TIMEOUT after {steps} steps ---")
+        trace_buffer.append(f"Final UAV pos: {ag.tolist()} | Goal pos: {dg.tolist()}")
+        trace_buffer.append(f"Final BFS distance to goal: {final_dist:.3f}")
+        
+        print("\n".join(trace_buffer))
+        
+    # Safety break in case the model is too perfect and we don't hit enough timeouts
+    if ep >= 100:
+        print(f"\nStopped early: Reached 100 episodes but only found {timeouts_traced} timeouts.")
+        break
+
+eval_env.close()
+dummy_env.close()
+
+# %% ---------------------------------------------------------------------------
+# CELL 6: Q-Value Inspection for specific state
+# ------------------------------------------------------------------------------
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+from stable_baselines3 import DQN
+from uav_env import UAVRoutingEnv
+
+class DoubleDQN(DQN):
+    """Subclass of SB3's DQN that implements Double DQN."""
+    def train(self, gradient_steps: int, batch_size: int = 100) -> None:
+        self.policy.set_training_mode(True)
+        self._update_learning_rate(self.policy.optimizer)
+        losses = []
+        for _ in range(gradient_steps):
+            replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env)
+            discounts = replay_data.discounts if replay_data.discounts is not None else self.gamma
+            
+            with torch.no_grad():
+                # 1. Select action with highest value from ONLINE network
+                next_q_values_online = self.q_net(replay_data.next_observations)
+                next_actions = next_q_values_online.argmax(dim=1, keepdim=True)
+                
+                # 2. Evaluate that action's value using TARGET network
+                next_q_values_target = self.q_net_target(replay_data.next_observations)
+                next_q_values = torch.gather(next_q_values_target, dim=1, index=next_actions)
+                
+                # 1-step TD target
+                target_q_values = replay_data.rewards + (1 - replay_data.dones) * discounts * next_q_values
+
+            current_q_values = self.q_net(replay_data.observations)
+            current_q_values = torch.gather(current_q_values, dim=1, index=replay_data.actions.long())
+
+            loss = F.smooth_l1_loss(current_q_values, target_q_values)
+            losses.append(loss.item())
+
+            self.policy.optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
+            self.policy.optimizer.step()
+
+        self._n_updates += gradient_steps
+        self.logger.record("train/n_updates", self._n_updates, exclude="tensorboard")
+        self.logger.record("train/loss", np.mean(losses))
+
+# Load from local (or Drive path if session restarted)
+MODEL_PATH = "/content/dqn_her_300k_final.zip"
+
+dummy_env = UAVRoutingEnv(
+    grid_size=15, obstacle_density=0.20, no_fly_density=0.0, fixed_grid=True
+)
+model = DoubleDQN.load(MODEL_PATH, env=dummy_env)
+
+eval_env = UAVRoutingEnv(
+    grid_size=15, obstacle_density=0.20, no_fly_density=0.0,
+    fixed_grid=True, seed=42
+)
+eval_env.reset()
+
+# Override positions
+eval_env.unwrapped.uav_pos = np.array([7, 4])
+eval_env.unwrapped.goal_pos = np.array([7, 5])
+
+def print_q_values_for_history(last_action_val, label):
+    eval_env.unwrapped.last_action = last_action_val
+    obs = eval_env.unwrapped._build_observation()
+    obs_tensor, _ = model.policy.obs_to_tensor(obs)
+    
+    with torch.no_grad():
+        q_values = model.q_net(obs_tensor)
+    
+    q_values_np = q_values.cpu().numpy()[0]
+    action_names = ["N", "S", "W", "E", "NW", "NE", "SW", "SE"]
+    
+    print("=" * 60)
+    print(f"  Q-Values for UAV at [7, 4] with Goal at [7, 5]")
+    print(f"  {label}")
+    print("=" * 60)
+    
+    for i, (name, q_val) in enumerate(zip(action_names, q_values_np)):
+        print(f"  Action {i} ({name:<2}) : {q_val:>8.3f}")
+    
+    best_action = int(np.argmax(q_values_np))
+    print("-" * 60)
+    print(f"  Greedy Choice : Action {best_action} ({action_names[best_action]})")
+    print("=" * 60)
+    print()
+
+print_q_values_for_history(0, "History: Arrived via Action 0 (N)")
+print_q_values_for_history(None, "History: None (Default / No History)")
 
 eval_env.close()
 dummy_env.close()
