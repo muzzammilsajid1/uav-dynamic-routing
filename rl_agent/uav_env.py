@@ -30,6 +30,8 @@ import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
 
+from envs.grid_environment import DynamicObstacle, default_dynamic_obstacles
+
 
 # ---------------------------------------------------------------------------
 # Constants — keep these module-level so they are easy to tune from notebooks
@@ -103,6 +105,8 @@ class UAVRoutingEnv(gym.Env):
         curriculum_step_episodes: int = 5000,
         curriculum_step_dist: int = 1,
         fixed_grid: bool = True,
+        dynamic_obstacles_enabled: bool = False,
+        dynamic_obstacles: list[DynamicObstacle] | None = None,
     ) -> None:
         """
         Parameters
@@ -130,6 +134,11 @@ class UAVRoutingEnv(gym.Env):
         self.curriculum_start_dist = curriculum_start_dist
         self.curriculum_step_episodes = curriculum_step_episodes
         self.curriculum_step_dist = curriculum_step_dist
+        self.dynamic_obstacles_enabled = dynamic_obstacles_enabled
+        if self.dynamic_obstacles_enabled and dynamic_obstacles is None:
+            self.dynamic_obstacles = default_dynamic_obstacles()
+        else:
+            self.dynamic_obstacles = dynamic_obstacles or []
         self.episode_count = 0
         self.fixed_grid = fixed_grid
         self._initial_grid = None
@@ -164,6 +173,7 @@ class UAVRoutingEnv(gym.Env):
         self.uav_pos: np.ndarray | None = None       # [row, col]
         self.goal_pos: np.ndarray | None = None       # [row, col]
         self.current_step: int = 0
+        self._elapsed_steps: int = 0
 
         # ---- All-pairs distance table (fixed_grid=True only) -----------------
         # When fixed_grid=True, the obstacle layout never changes between
@@ -224,6 +234,14 @@ class UAVRoutingEnv(gym.Env):
                 rows_n, cols_n = np.unravel_index(nfz_indices, self.grid.shape)
                 self.grid[rows_n, cols_n] = CELL_NO_FLY
             
+            # Ensure dynamic cells are set to their initial state
+            if self.dynamic_obstacles_enabled:
+                for obs in self.dynamic_obstacles:
+                    if obs.initial_state == "blocked":
+                        self.grid[obs.cell] = CELL_OBSTACLE
+                    else:
+                        self.grid[obs.cell] = CELL_FREE
+
             if self.fixed_grid:
                 self._initial_grid = self.grid.copy()
                 # Precompute all-pairs distances once when the fixed grid is
@@ -233,37 +251,68 @@ class UAVRoutingEnv(gym.Env):
 
         # ---- Place UAV and goal on distinct free cells -----------------------
         free_cells = np.argwhere(self.grid == CELL_FREE)
-        assert len(free_cells) >= 2, (
-            "Grid generation left fewer than 2 free cells — "
-            "reduce obstacle_density or no_fly_density."
+        candidate_cells = []
+        if self.dynamic_obstacles_enabled:
+            dyn_cells = {obs.cell for obs in self.dynamic_obstacles}
+        else:
+            dyn_cells = set()
+            
+        for c in free_cells:
+            if tuple(c) not in dyn_cells:
+                candidate_cells.append(c)
+                
+        assert len(candidate_cells) >= 2, (
+            "Grid generation left fewer than 2 valid free cells for start/goal."
         )
-        
-        # Place goal first
-        goal_idx = rng.choice(len(free_cells))
-        self.goal_pos = free_cells[goal_idx].copy()
         
         # Determine maximum starting distance for the UAV
         if self.curriculum_enabled:
             current_max_dist = self.curriculum_start_dist + (self.episode_count // self.curriculum_step_episodes) * self.curriculum_step_dist
         else:
             current_max_dist = float('inf')
+
+        MAX_RETRIES = 50
+        for _ in range(MAX_RETRIES):
+            # Place goal first
+            goal_idx = rng.choice(len(candidate_cells))
+            self.goal_pos = candidate_cells[goal_idx].copy()
             
-        # Find valid free cells within the maximum distance
-        valid_uav_cells = []
-        for cell in free_cells:
-            if not np.array_equal(cell, self.goal_pos):
-                dist = int(np.sum(np.abs(cell - self.goal_pos))) # Manhattan distance
-                if dist <= current_max_dist:
-                    valid_uav_cells.append(cell)
+            # Find valid free cells within the maximum distance
+            valid_uav_cells = []
+            for cell in candidate_cells:
+                if not np.array_equal(cell, self.goal_pos):
+                    dist = int(np.sum(np.abs(cell - self.goal_pos))) # Manhattan distance
+                    if dist <= current_max_dist:
+                        valid_uav_cells.append(cell)
+                        
+            # Fallback to any free cell if the local radius is completely boxed in
+            if not valid_uav_cells:
+                valid_uav_cells = [c for c in candidate_cells if not np.array_equal(c, self.goal_pos)]
+                
+            uav_idx = rng.choice(len(valid_uav_cells))
+            self.uav_pos = valid_uav_cells[uav_idx].copy()
+
+            # Validate that the goal is reachable even if all dynamic obstacles are active
+            if self.dynamic_obstacles_enabled and self.dynamic_obstacles:
+                original_states = {}
+                for obs in self.dynamic_obstacles:
+                    original_states[obs.cell] = self.grid[obs.cell]
+                    self.grid[obs.cell] = CELL_OBSTACLE
+                
+                is_reachable = self._is_reachable(self.uav_pos, self.goal_pos)
+                
+                for cell, state in original_states.items():
+                    self.grid[cell] = state
                     
-        # Fallback to any free cell if the local radius is completely boxed in
-        if not valid_uav_cells:
-            valid_uav_cells = [c for c in free_cells if not np.array_equal(c, self.goal_pos)]
-            
-        uav_idx = rng.choice(len(valid_uav_cells))
-        self.uav_pos = valid_uav_cells[uav_idx].copy()
+                if is_reachable:
+                    break
+            else:
+                break
+        else:
+            raise RuntimeError("Could not find a start/goal pair not sealed off by dynamic obstacles.")
 
         self.current_step = 0
+        self._elapsed_steps = 0
         self.episode_count += 1
         # Use BFS distance for reward shaping so the agent is rewarded for
         # obstacle-aware progress, not straight-line distance.
@@ -306,6 +355,8 @@ class UAVRoutingEnv(gym.Env):
         assert self.action_space.contains(action), f"Invalid action {action}"
 
         self.current_step += 1
+
+        self._toggle_dynamic_obstacles()
 
         # ---- Compute candidate next position --------------------------------
         delta = self.ACTION_DELTAS[action]
@@ -505,6 +556,26 @@ class UAVRoutingEnv(gym.Env):
         # Fallback: no path found — use Manhattan distance as safe default
         return float(abs(sr - gr) + abs(sc - gc))
 
+    def _is_reachable(self, start: np.ndarray, goal: np.ndarray) -> bool:
+        """Check if goal is reachable from start via BFS."""
+        sr, sc = int(start[0]), int(start[1])
+        gr, gc = int(goal[0]), int(goal[1])
+        if sr == gr and sc == gc:
+            return True
+            
+        pq = [(sr, sc)]
+        visited = {(sr, sc)}
+        while pq:
+            r, c = pq.pop(0)
+            if r == gr and c == gc:
+                return True
+            for neighbor_pos, _ in self.get_neighbors(np.array([r, c])):
+                nr, nc = int(neighbor_pos[0]), int(neighbor_pos[1])
+                if (nr, nc) not in visited:
+                    visited.add((nr, nc))
+                    pq.append((nr, nc))
+        return False
+
     def _build_distance_table(self) -> dict:
         """
         Precompute all-pairs shortest distances on the current (fixed) grid.
@@ -552,6 +623,17 @@ class UAVRoutingEnv(gym.Env):
                 table[(sr, sc)] = dist_from_src
 
         return table
+
+    def _toggle_dynamic_obstacles(self) -> None:
+        """Toggle designated dynamic obstacles on a fixed timer."""
+        if self.dynamic_obstacles_enabled and self.dynamic_obstacles:
+            self._elapsed_steps += 1
+            for obs in self.dynamic_obstacles:
+                if self._elapsed_steps % obs.period == 0:
+                    r, c = obs.cell
+                    if 0 <= r < self.grid_size and 0 <= c < self.grid_size:
+                        current_val = self.grid[r, c]
+                        self.grid[r, c] = CELL_FREE if current_val == CELL_OBSTACLE else CELL_OBSTACLE
 
     def _calculate_distance(self, pos1: np.ndarray, pos2: np.ndarray) -> float:
         """Calculate Euclidean distance between two 2-D coordinates."""
