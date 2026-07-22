@@ -23,9 +23,8 @@ class ReplanningResult:
 
 def run_naive_replanning(env: GridEnvironment, max_steps: int = 1000) -> ReplanningResult:
     """Naive replanning baseline (plan Section 4.1): whenever a dynamic
-    obstacle changes a cell that's still ahead of the UAV on its current
-    plan, recompute a full Dijkstra path from the UAV's CURRENT position
-    to the goal. No anticipation, no incremental replanning (e.g. D*
+    environment changes, recompute a full Dijkstra path from the UAV's
+    CURRENT position to the goal. No anticipation, no incremental replanning (e.g. D*
     Lite) — intentionally the "dumb but correct" comparison point against
     the RL agent, which reacts via a forward pass instead of a full
     graph search.
@@ -65,9 +64,8 @@ def run_naive_replanning(env: GridEnvironment, max_steps: int = 1000) -> Replann
     for step in range(1, max_steps + 1):
         changed = env.step_dynamics()
 
-        remaining_on_plan = set(plan_path[plan_index:])
-        if changed & remaining_on_plan:
-            plan = _replan(step=step, reason=f"toggle_on_path:{sorted(changed & remaining_on_plan)}")
+        if changed:
+            plan = _replan(step=step, reason=f"dynamic_change:{sorted(changed)}")
             if not plan.found:
                 return ReplanningResult(
                     realized_path, total_cost, replans, total_planning_time,

@@ -17,6 +17,14 @@ class TestGridEnvironment(unittest.TestCase):
             self.assertTrue(env.in_bounds(neighbor))
             self.assertFalse(env.is_blocked(neighbor))
 
+    def test_occupied_blocked_cell_can_still_route_out(self):
+        env = GridEnvironment(size=5, obstacle_density=0.0, blocked={(2, 2), (2, 3)})
+
+        neighbors = {neighbor for neighbor, _ in env.get_neighbors((2, 2))}
+
+        self.assertIn((1, 2), neighbors)
+        self.assertNotIn((2, 3), neighbors)
+
     def test_diagonal_movement_has_eight_neighbors_from_center(self):
         env = GridEnvironment(size=3, obstacle_density=0.0, diagonal=True)
 

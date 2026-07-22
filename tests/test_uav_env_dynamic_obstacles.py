@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 from rl_agent.uav_env import UAVRoutingEnv, CELL_FREE, CELL_OBSTACLE, LOCAL_VIEW_RADIUS
 from envs.grid_environment import DynamicObstacle
 
@@ -70,8 +69,12 @@ def test_reset_raises_runtime_error_when_sealed():
     )
     
     # reset() will attempt to place the UAV and Goal, verify reachability, fail, retry 50 times, and raise.
-    with pytest.raises(RuntimeError, match="Could not find a start/goal pair not sealed off by dynamic obstacles."):
+    try:
         env.reset()
+    except RuntimeError as exc:
+        assert "Could not find a start/goal pair not sealed off by dynamic obstacles." in str(exc)
+    else:
+        raise AssertionError("Expected reset() to raise RuntimeError for a sealed grid")
 
 
 def test_multiple_obstacles_toggle_independently():

@@ -46,3 +46,7 @@ models/
 *.csv
 *.xlsx
 *.xls
+
+# Week 3 paired evaluation artifacts
+!evaluation/week3_dynamic_baseline_results.csv
+!evaluation/week3_rl_results.csv

@@ -15,7 +15,10 @@ from evaluation.visualize import render_ascii
 
 
 def main() -> None:
-    env = GridEnvironment(obstacle_density=0.0, dynamic_obstacles=default_dynamic_obstacles())
+    env = GridEnvironment(
+        obstacle_density=0.0,
+        dynamic_obstacles=default_dynamic_obstacles(),
+    )
     result = run_naive_replanning(env)
 
     print(f"Success:              {result.success}")

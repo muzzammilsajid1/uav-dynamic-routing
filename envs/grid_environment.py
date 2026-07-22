@@ -139,7 +139,7 @@ class GridEnvironment:
         return orthogonal + diagonal if self.diagonal else orthogonal
 
     def get_neighbors(self, node: Node) -> list[tuple[Node, float]]:
-        if not self.in_bounds(node) or self.is_blocked(node):
+        if not self.in_bounds(node):
             return []
 
         row, col = node
