@@ -645,9 +645,6 @@ class UAVRoutingEnv(gym.Env):
         Phi(state, goal) = -distance(state, goal)
         """
         phi = -self._bfs_distance(pos, goal) / self.max_dist
-        if not hasattr(self, '_printed_phi'):
-            print(f"[DEBUG uav_env] Raw Phi value at first potential call: {phi:.3f}")
-            self._printed_phi = True
         return phi
 
     # ------------------------------------------------------------------
