@@ -1,0 +1,16 @@
+\section{Experimental Setup}
+
+The paired dynamic evaluation uses 50 matched scenarios. Each scenario has a fixed scenario ID, start cell, and goal cell. The same scenario list is used for both Dijkstra and RL evaluation. Pairing is important because comparing unrelated random episodes would confound method performance with scenario difficulty.
+
+The evaluation configuration is:
+\begin{itemize}
+    \item grid size: 15$\times$15;
+    \item movement: 8-connected;
+    \item orthogonal movement cost: 1.0;
+    \item diagonal movement cost: $\sqrt{2}$;
+    \item static obstacle density: 0.0;
+    \item dynamic cells: $(4,4)$, $(8,8)$, and $(12,11)$;
+    \item number of scenarios: 50.
+\end{itemize}
+
+The measured metrics are success rate, realized dynamic path cost, compute time, and paired path-cost difference. Statistical significance is evaluated using the Wilcoxon signed-rank test on paired successful scenarios.

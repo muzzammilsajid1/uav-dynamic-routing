@@ -1,0 +1,23 @@
+\section{Methodology}
+
+\subsection{Environment Model}
+
+The UAV operating area is represented as a 15$\times$15 grid. Each traversable cell is a node, and the UAV can move in eight directions: north, south, east, west, and the four diagonals. Orthogonal moves have cost 1.0, while diagonal moves have cost $\sqrt{2}$. All edge costs are non-negative, making Dijkstra's algorithm valid for shortest-path computation.
+
+Coordinates are represented as $(row, col)$, with $(0,0)$ at the top-left corner. A movement is valid only if the destination cell is inside the grid and not blocked. Both Dijkstra and RL use the same movement rules to prevent inconsistencies between the two implementations.
+
+\subsection{Dynamic Obstacles}
+
+The dynamic environment uses fixed-position obstacles that toggle between blocked and passable states. For the paired dynamic evaluation, static obstacle density is set to 0.0 on both sides. This removes seeded static-layout mismatch between the Dijkstra and RL environments. The only changing cells are the three shared dynamic cells $(4,4)$, $(8,8)$, and $(12,11)$.
+
+Neither method receives advance visibility into future toggles. Both methods observe only the current grid state after a change occurs. This keeps the Dijkstra baseline genuinely naive and ensures that the RL policy is not given predictive information unavailable to the classical planner.
+
+\subsection{Dijkstra Replanning Baseline}
+
+The classical baseline applies Dijkstra's algorithm to the current grid graph. In the dynamic case, whenever the environment changes, the planner recomputes a full shortest path from the UAV's current position to the goal. This naive replanning strategy is intentionally simple: it is correct and interpretable, but can pay the full graph-search cost multiple times during a route.
+
+With a binary heap priority queue, Dijkstra's algorithm has time complexity $O((V+E)\log V)$, where $V$ is the number of free cells and $E$ is the number of valid movement edges. In this grid, each cell has at most eight neighbors, so $E$ grows approximately linearly with $V$.
+
+\subsection{Reinforcement Learning Policy}
+
+The RL method uses the same eight movement actions as the Dijkstra environment. The dynamic RL model is trained through curriculum phases, beginning with static routing and moving toward the full three-obstacle dynamic configuration. The policy uses local grid observations and positional information to select movement actions. Unlike Dijkstra, the RL policy does not explicitly search the graph at evaluation time.

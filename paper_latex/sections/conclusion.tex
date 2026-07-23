@@ -1,0 +1,5 @@
+\section{Conclusion}
+
+This paper compared naive Dijkstra replanning and a dynamically trained RL policy for UAV routing in a shared dynamic grid environment. The evaluation used 50 matched scenarios with identical start-goal pairs and shared dynamic obstacles. Dijkstra succeeded in all scenarios, while RL succeeded in 49. On paired successful scenarios, Dijkstra produced significantly shorter or equal paths, with a Wilcoxon signed-rank result of $W=0$ and $p=5.64\times10^{-7}$. Compute-time differences were not statistically significant at $p<0.05$.
+
+The results show that, for the current 15$\times$15 setup, Dijkstra remains superior in reliability and path optimality. The RL policy demonstrates high adaptability but does not outperform Dijkstra. Future work should test whether RL's deployment-time advantages become more visible in larger and more complex dynamic environments.

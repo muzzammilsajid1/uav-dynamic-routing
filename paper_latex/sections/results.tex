@@ -1,0 +1,45 @@
+\section{Results}
+
+The scenario matching validation found 50 shared scenario IDs and zero start-goal mismatches. Dijkstra succeeded in all 50 scenarios, while the RL policy succeeded in 49 of 50 scenarios. The failed RL scenario is included in success-rate reporting but excluded from paired path-cost statistics because no valid RL path cost exists.
+
+\subsection{Success Rate}
+
+Figure~\ref{fig:success-rate} shows the success rate for both methods. Dijkstra achieved 100\% success, while RL achieved 98\% success.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/week4_success_rate.png}
+    \caption{Dynamic-routing success rate over 50 matched scenarios.}
+    \label{fig:success-rate}
+\end{figure}
+
+\subsection{Path Cost}
+
+Path-cost statistics are computed on the 49 scenarios where both methods succeeded. Dijkstra was never more expensive than RL: RL matched Dijkstra in 16 scenarios and produced a higher path cost in 33 scenarios. The mean path-cost difference, measured as RL minus Dijkstra, was +1.369441, and the median difference was +0.828427.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/week4_path_cost_comparison.png}
+    \caption{Dynamic path cost by matched scenario for Dijkstra replanning and RL.}
+    \label{fig:path-cost-comparison}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/week4_path_cost_gap.png}
+    \caption{Path-cost gap measured as RL minus Dijkstra. Positive values indicate higher RL path cost.}
+    \label{fig:path-cost-gap}
+\end{figure}
+
+A Wilcoxon signed-rank test on paired path-cost differences gave $W=0$ and $p=5.64\times10^{-7}$. This result is statistically significant, indicating that Dijkstra produced significantly shorter or equal paths than RL in the tested dynamic environment.
+
+\subsection{Compute Time}
+
+Mean cumulative Dijkstra planning time was 4.627753 ms, while mean RL evaluation time was 5.334265 ms on the paired successful scenarios. The Wilcoxon p-value for compute-time difference was 0.062865, which is not statistically significant at $p<0.05$.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/week4_compute_time_comparison.png}
+    \caption{Compute time by matched scenario. Dijkstra time is cumulative replanning time; RL time is policy evaluation time.}
+    \label{fig:compute-time}
+\end{figure}

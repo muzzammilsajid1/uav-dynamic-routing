@@ -1,0 +1,40 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\title{Dynamic UAV Routing: A Controlled Comparison of Naive Dijkstra Replanning and Reinforcement Learning}
+
+\author{
+\IEEEauthorblockN{Simra and Muzzammil}
+\IEEEauthorblockA{Department / Institution\\
+Email: add emails here}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Dynamic UAV routing requires navigation methods that can respond when environmental conditions change during flight. Classical graph-search methods such as Dijkstra's algorithm provide optimal paths on known static graphs, but they must be recomputed when obstacles change. Reinforcement learning (RL) offers an alternative policy-based approach that can react through learned action selection. This paper presents a controlled comparison of naive Dijkstra replanning and a dynamically trained RL policy in a shared 15$\times$15 grid-world UAV routing environment. Both methods are evaluated on the same 50 start-goal scenarios with identical dynamic-obstacle configurations. Static obstacle density is set to zero during paired dynamic evaluation so that only three shared dynamic cells affect the comparison. Results show that Dijkstra succeeds in all 50 scenarios, while the RL policy succeeds in 49. On the 49 paired successful scenarios, Dijkstra produces significantly shorter or equal paths than RL (Wilcoxon signed-rank $W=0$, $p=5.64\times10^{-7}$). Compute-time differences are not statistically significant at $p<0.05$. These findings support an honest trade-off framing: RL demonstrates high adaptability, but Dijkstra remains stronger in path optimality and reliability on the tested grid scale.
+\end{abstract}
+
+\begin{IEEEkeywords}
+UAV routing, Dijkstra algorithm, reinforcement learning, dynamic obstacles, path planning, grid world
+\end{IEEEkeywords}
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/methodology}
+\input{sections/experimental_setup}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,11 @@
+\section{Related Work}
+
+Classical UAV path planning methods include graph-search algorithms, sampling-based planners, and potential-field approaches. Graph-search methods such as Dijkstra and A* are widely used because they are interpretable and provide strong guarantees when the environment is represented as a known graph with non-negative edge weights. Sampling-based planners such as RRT and PRM can explore larger spaces, but their randomized nature means they do not necessarily return optimal paths and can struggle in cluttered environments \cite{ghambari2024survey,venu2025comprehensive}.
+
+Recent surveys of UAV path planning emphasize that classical planners remain important reference points because of their completeness, optimality, and predictable computational behavior \cite{mannan2023classical,ghambari2024survey,johnson2026rcsr}. Their main limitation in dynamic environments is that they generally assume a known graph. When obstacles or edge costs change, the planner must update or recompute a route.
+
+Reinforcement learning has been explored as an alternative for UAV routing and obstacle avoidance. RL methods learn policies through interaction rather than explicit shortest-path search. Deep RL methods such as DQN are particularly relevant when the state space becomes too large for tabular Q-learning \cite{guo2023uav,tu2023uav,zhao2022path}. Prior work reports that RL can improve autonomy and adaptability in complex settings, but it often trades away the guarantees of classical methods.
+
+Dynamic and online UAV routing is especially relevant to this project. Rocha et al. propose dynamic Q-planning for online UAV path planning in unknown and complex environments, comparing reinforcement-learning-based planning with classical alternatives \cite{rocha2024dynamic}. This supports the motivation for testing learning-based adaptation against a deterministic replanning baseline.
+
+This project fits into the literature as a controlled same-scenario comparison rather than a broad benchmark. Both methods are evaluated on the same grid, same dynamic cells, and same 50 start-goal pairs. This paired design allows statistical testing of path-cost and compute-time differences instead of relying on anecdotal comparisons.

@@ -1,0 +1,13 @@
+\section{Discussion}
+
+The results show that naive Dijkstra replanning remains the stronger method on the current controlled benchmark. Dijkstra succeeded on every scenario and produced shorter or equal paths than RL on all paired successful scenarios. The RL policy still demonstrates substantial adaptability, completing 49 out of 50 dynamic scenarios under the same obstacle schedule and scenario pairing. However, these results do not support a claim that RL outperforms Dijkstra in this setup.
+
+The compute-time result is also important. A common motivation for RL is that a trained policy may avoid repeated graph search during deployment. In this experiment, however, the measured compute-time difference was not statistically significant. This likely reflects the small grid size: a 15$\times$15 graph is small enough that repeated Dijkstra replanning remains cheap.
+
+The study therefore supports a trade-off framing. Dijkstra provides optimality and reliability when the current graph is known, but it must replan after changes. RL provides policy-based adaptation, but its learned decisions can be suboptimal and can fail. The current results favor Dijkstra at this scale while leaving open the possibility that RL becomes more attractive as environment size and complexity increase.
+
+\subsection{Limitations}
+
+This study has several limitations. First, the grid is small. A 15$\times$15 environment is useful for controlled development, but it may not expose the full computational burden of repeated graph search. Second, static obstacle density is set to zero in the paired dynamic evaluation. This ensures fairness between the two environments but makes the benchmark simpler than a cluttered UAV routing domain. Third, the dynamic setup uses only three fixed toggle cells. Fourth, the RL policy has one failed scenario, which should be treated as a real limitation rather than ignored.
+
+Future work should evaluate larger grids, reintroduce matched static obstacles, vary dynamic obstacle frequency, and compare against additional classical methods such as A*, D* Lite, or Lifelong Planning A*.

@@ -1,0 +1,17 @@
+\section{Introduction}
+
+Unmanned aerial vehicles (UAVs) increasingly operate in environments where routing conditions can change during flight. Obstacles may appear or disappear, restricted regions may change, and the route selected at launch may no longer be valid later in the mission. This makes dynamic path planning a central problem for autonomous UAV navigation \cite{ghambari2024survey,johnson2026rcsr}.
+
+Classical graph-search algorithms remain a strong baseline for this problem because they are deterministic, interpretable, and optimal when the graph and edge costs are known. Dijkstra's algorithm, in particular, returns a shortest path when all edge weights are non-negative. However, in a dynamic environment, each obstacle change can invalidate the previous path and require replanning from the UAV's current position. This repeated recomputation is correct but may become expensive as environment size and change frequency increase.
+
+Reinforcement learning (RL) provides a different approach. Rather than recomputing a path through explicit graph search, an RL policy maps observations to movement actions after training. This can potentially reduce deployment-time computation and allow reactive behavior under changing conditions. However, learned policies may be suboptimal, may fail in some scenarios, and do not provide the same optimality guarantees as Dijkstra \cite{mannan2023classical,tu2023uav,guo2023uav}.
+
+This paper asks whether a dynamically trained RL policy can match or outperform naive Dijkstra replanning in a controlled UAV grid-routing environment. We compare the two methods on success rate, dynamic path cost, compute time, and paired statistical significance over identical start-goal scenarios.
+
+The main contributions are:
+\begin{itemize}
+    \item a shared 15$\times$15 UAV grid environment with identical movement and dynamic-obstacle rules for both methods;
+    \item a naive Dijkstra replanning baseline that recomputes after each dynamic obstacle change;
+    \item a dynamically trained RL evaluation on the same 50 scenario IDs and start-goal pairs;
+    \item a paired statistical comparison using Wilcoxon signed-rank testing.
+\end{itemize}
