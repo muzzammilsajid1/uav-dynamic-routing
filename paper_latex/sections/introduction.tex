@@ -6,11 +6,14 @@ Classical graph-search algorithms remain a strong baseline for this problem beca
 
 Reinforcement learning (RL) provides a different approach. Rather than recomputing a path through explicit graph search, an RL policy maps observations to movement actions after training. This can potentially reduce deployment-time computation and allow reactive behavior under changing conditions. However, learned policies may be suboptimal, may fail in some scenarios, and do not provide the same optimality guarantees as Dijkstra \cite{mannan2023classical,tu2023uav,guo2023uav}.
 
-This paper asks whether a dynamically trained RL policy can match or outperform naive Dijkstra replanning in a controlled UAV grid-routing environment. We compare the two methods on success rate, dynamic path cost, compute time, and paired statistical significance over identical start-goal scenarios.
+Before testing RL's adaptability under dynamic conditions, it is necessary to establish that the trained policy performs reasonably well when the environment does not change at all; a policy that cannot approach optimal performance on a static grid is not a meaningful comparison point once obstacles start moving. We therefore evaluate both methods twice: first on a static 40-scenario benchmark that establishes a baseline for path-cost and compute-time behavior, and then on the paired 50-scenario dynamic benchmark that is this paper's primary contribution.
+
+This paper asks whether a dynamically trained RL policy can match or outperform naive Dijkstra replanning in a controlled UAV grid-routing environment. We compare the two methods on success rate, path cost, and compute time, both when the environment is static and when it changes during flight.
 
 The main contributions are:
 \begin{itemize}
     \item a shared 15$\times$15 UAV grid environment with identical movement and dynamic-obstacle rules for both methods;
+    \item a static baseline evaluation validating the trained RL policy's path quality and compute-time behavior before dynamic obstacles are introduced;
     \item a naive Dijkstra replanning baseline that recomputes after each dynamic obstacle change;
     \item a dynamically trained RL evaluation on the same 50 scenario IDs and start-goal pairs;
     \item a paired statistical comparison using Wilcoxon signed-rank testing.

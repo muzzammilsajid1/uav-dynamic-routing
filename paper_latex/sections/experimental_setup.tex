@@ -1,5 +1,11 @@
 \section{Experimental Setup}
 
+\subsection{Static Evaluation}
+
+The static evaluation uses 40 paired start-goal scenarios on the same 15$\times$15 grid, with obstacle density 0.2 and seed 42. Start-goal pairs are drawn from the free cells of a single \texttt{GridEnvironment} instance and validated against Dijkstra on that same grid; the DQN evaluation environment receives the identical obstacle layout via direct injection rather than independent seeding. No dynamic obstacles are present in this evaluation.
+
+\subsection{Dynamic Evaluation}
+
 The paired dynamic evaluation uses 50 matched scenarios. Each scenario has a fixed scenario ID, start cell, and goal cell. The same scenario list is used for both Dijkstra and RL evaluation. Pairing is important because comparing unrelated random episodes would confound method performance with scenario difficulty.
 
 The evaluation configuration is:
