@@ -1,8 +1,32 @@
 \section{Results}
 
-The scenario matching validation found 50 shared scenario IDs and zero start-goal mismatches. Dijkstra succeeded in all 50 scenarios, while the RL policy succeeded in 49 of 50 scenarios. The failed RL scenario is included in success-rate reporting but excluded from paired path-cost statistics because no valid RL path cost exists.
+\subsection{Week 2: Static Environment}
 
-\subsection{Success Rate}
+The static evaluation used 40 paired start-goal scenarios on a 15$\times$15 grid with obstacle density 0.20 and seed 42. Each start-goal pair was drawn from the same seeded random process for both the Dijkstra planner and the DQN policy, and the exact same obstacle layout was injected into both environments. Dijkstra computed a single shortest-path query per scenario; the DQN policy ran a full episode from each start to goal.
+
+\begin{table}[h]
+\centering
+\caption{Week 2 static evaluation summary (40 scenarios).}
+\label{tab:static-summary}
+\begin{tabular}{lcc}
+\hline
+\textbf{Metric} & \textbf{Dijkstra} & \textbf{DQN} \\
+\hline
+Success rate & 40/40 (100\%) & 39/40 (97.5\%) \\
+Mean path cost & --- & +0.9248 above Dijkstra \\
+Max suboptimality gap & --- & +3.6569 \\
+Mean route-level compute time & 0.78 ms & 3.20 ms (successes only) \\
+\hline
+\end{tabular}
+\end{table}
+
+DQN matched Dijkstra exactly (gap = 0) on 14 of 39 successful scenarios and produced a higher path cost on the remaining 25. The single failure (start $(12,0)$, goal $(13,10)$) was a step-limit timeout at 225 steps with no collision, indicating the policy entered a loop rather than crashing. The compute-time figures are route-level totals as defined in Section~\ref{sec:compute-time-measurement}: one Dijkstra call per scenario versus accumulated \texttt{.predict()} calls per DQN episode.
+
+\subsection{Week 3: Dynamic Environment}
+
+The dynamic evaluation used 50 paired start-goal scenarios sharing the same scenario IDs and start-goal pairs across both methods. Static obstacle density was set to 0.0 on both sides; the only changing cells were the three shared dynamic obstacles at $(4,4)$, $(8,8)$, and $(12,11)$, each toggling on a five-step period. Dijkstra succeeded in all 50 scenarios; the RL policy succeeded in 49 of 50. The failed RL scenario is included in success-rate reporting but excluded from paired path-cost statistics because no valid RL path cost exists.
+
+\subsubsection{Success Rate}
 
 Figure~\ref{fig:success-rate} shows the success rate for both methods. Dijkstra achieved 100\% success, while RL achieved 98\% success.
 
@@ -13,7 +37,7 @@ Figure~\ref{fig:success-rate} shows the success rate for both methods. Dijkstra 
     \label{fig:success-rate}
 \end{figure}
 
-\subsection{Path Cost}
+\subsubsection{Path Cost}
 
 Path-cost statistics are computed on the 49 scenarios where both methods succeeded. Dijkstra was never more expensive than RL: RL matched Dijkstra in 16 scenarios and produced a higher path cost in 33 scenarios. The mean path-cost difference, measured as RL minus Dijkstra, was +1.369441, and the median difference was +0.828427.
 
@@ -33,7 +57,7 @@ Path-cost statistics are computed on the 49 scenarios where both methods succeed
 
 A Wilcoxon signed-rank test on paired path-cost differences gave $W=0$ and $p=5.64\times10^{-7}$. This result is statistically significant, indicating that Dijkstra produced significantly shorter or equal paths than RL in the tested dynamic environment.
 
-\subsection{Compute Time}
+\subsubsection{Compute Time}
 
 Mean cumulative Dijkstra planning time was 4.627753 ms, while mean RL evaluation time was 5.334265 ms on the paired successful scenarios. The Wilcoxon p-value for compute-time difference was 0.062865, which is not statistically significant at $p<0.05$.
 
