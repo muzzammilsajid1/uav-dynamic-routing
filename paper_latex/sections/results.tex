@@ -2,7 +2,7 @@
 
 \subsection{Week 2: Static Environment}
 
-The static evaluation used 40 paired start-goal scenarios on a 15$\times$15 grid with obstacle density 0.20 and seed 42. Each start-goal pair was drawn from the same seeded random process for both the Dijkstra planner and the DQN policy, and the exact same obstacle layout was injected into both environments. Dijkstra computed a single shortest-path query per scenario; the DQN policy ran a full episode from each start to goal.
+The static evaluation used 40 paired start-goal scenarios on a 15$\times$15 grid with obstacle density 0.20 and seed 42. Start-goal pairs were drawn from the free cells of a single \texttt{GridEnvironment} instance and validated against Dijkstra on that same grid. The DQN evaluation environment had the same 15$\times$15 obstacle layout as the Dijkstra environment, achieved by directly copying \texttt{simra\_env.blocked} into the DQN grid after construction; this is a stronger guarantee than matching seeds, as it carries no dependency on RNG implementation details agreeing between the two environment classes. Dijkstra computed a single shortest-path query per scenario; the DQN policy ran a full episode from each start to goal.
 
 \begin{table}[h]
 \centering

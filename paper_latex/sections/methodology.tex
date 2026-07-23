@@ -23,6 +23,7 @@ With a binary heap priority queue, Dijkstra's algorithm has time complexity $O((
 The RL method uses the same eight movement actions as the Dijkstra environment. The dynamic RL model is trained through curriculum phases, beginning with static routing and moving toward the full three-obstacle dynamic configuration. The policy uses local grid observations and positional information to select movement actions. Unlike Dijkstra, the RL policy does not explicitly search the graph at evaluation time.
 
 \subsection{Compute Time Measurement}
+\label{sec:compute-time-measurement}
 
 Both methods report compute time as the total decision-making time required to traverse a full route, not per-decision latency. For Dijkstra, this is the cumulative wall-clock time across all \texttt{dijkstra()} calls made during a run: one initial call plus one call per dynamic change event. For the RL policy, this is the sum of wall-clock time for every \texttt{.predict()} call made during an episode; environment stepping, reward computation, and observation construction are excluded from the timer.
 
