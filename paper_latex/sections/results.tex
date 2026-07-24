@@ -7,19 +7,19 @@ The static evaluation used 40 paired start-goal scenarios on a 15$\times$15 grid
 
 \begin{table}[h]
 \centering
-\small
-\caption{Week 2 static evaluation summary (40 scenarios).}
-\label{tab:static-summary}
+\caption{Week 2 Static Evaluation Summary (40 scenarios).}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcc}
-\hline
-\textbf{Metric} & \textbf{Dijkstra} & \textbf{DQN} \\
-\hline
+\toprule
+Metric & Dijkstra & DQN \\
+\midrule
 Success rate & 40/40 (100\%) & 39/40 (97.5\%) \\
 Mean path cost & --- & +0.9248 above Dijkstra \\
 Max suboptimality gap & --- & +3.6569 \\
 Mean route-level compute time & 0.78 ms & 3.20 ms (successes only) \\
-\hline
-\end{tabular}
+\bottomrule
+\end{tabular}%
+}
 \end{table}
 
 DQN matched Dijkstra exactly (gap = 0) on 14 of 39 successful scenarios and produced a higher path cost on the remaining 25. The single failure (start $(12,0)$, goal $(13,10)$) was a step-limit timeout at 225 steps with no collision, indicating the policy entered a loop rather than crashing. The compute-time figures are route-level totals as defined in Section~\ref{sec:compute-time-measurement}: one Dijkstra call per scenario versus accumulated \texttt{.predict()} calls per DQN episode.
