@@ -11,4 +11,6 @@ The study therefore supports a trade-off framing. Dijkstra provides optimality a
 
 This study has several limitations. First, the grid is small. A 15$\times$15 environment is useful for controlled development, but it may not expose the full computational burden of repeated graph search. Second, static obstacle density is set to zero in the paired dynamic evaluation. This ensures fairness between the two environments but makes the benchmark simpler than a cluttered UAV routing domain. Third, the dynamic setup uses only three fixed toggle cells. Fourth, the RL policy has one failed scenario, which should be treated as a real limitation rather than ignored.
 
-Future work should evaluate larger grids, reintroduce matched static obstacles, vary dynamic obstacle frequency, and compare against additional classical methods such as A*, D* Lite, or Lifelong Planning A*.
+Fifth, compute-time measurements at millisecond scale can be sensitive to implementation details, hardware, and measurement method; the compute-time result here should be read as a small-scale empirical measurement rather than a universal statement about Dijkstra and RL inference speed.
+
+Future work should evaluate larger grids, reintroduce matched static obstacles, vary dynamic obstacle frequency, compare against additional classical methods such as A*, D* Lite, or Lifelong Planning A*, and test additional RL variants or larger-scale models. A richer benchmark incorporating energy budgets, no-fly zones, and partial observability would also better reflect real UAV routing constraints.
