@@ -1,0 +1,48 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\IEEEoverridecommandlockouts
+
+\title{Dynamic UAV Routing: A Controlled Comparison of Naive Dijkstra Replanning and Reinforcement Learning}
+
+\author{
+\IEEEauthorblockN{\IEEEauthorrefmark{1}Simra Imran\thanks{\IEEEauthorrefmark{1}These authors contributed equally to this work.}}
+\IEEEauthorblockA{School of Electrical Engineering and Computer Science (SEECS)\\
+National University of Sciences and Technology (NUST)\\
+Email: simraimran158@gmail.com}
+\and
+\IEEEauthorblockN{\IEEEauthorrefmark{1}Muzzammil Sajid}
+\IEEEauthorblockA{Faculty of Mechanical Engineering (FME)\\
+Ghulam Ishaq Khan Institute of Engineering Sciences and Technology (GIKI)\\
+Email: muzzammilsajid1@gmail.com}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Unmanned aerial vehicles (UAVs) operating in dynamic environments must route around obstacles that can appear, disappear, or move during flight. Classical graph-search methods such as Dijkstra's algorithm provide optimal paths on a known static graph, but must be recomputed when the graph changes; reinforcement learning (RL) offers an alternative policy-based approach that reacts through learned action selection rather than explicit search. This paper presents a controlled, paired comparison of a naive Dijkstra replanning baseline and a DQN policy trained through curriculum learning, using a shared 15$\times$15 grid-world UAV routing environment with identical movement and obstacle rules for both methods. We first validate the DQN policy on a static 40-scenario evaluation (obstacle density 0.2), where Dijkstra succeeds on 100\% of scenarios against 97.5\% for DQN, with a mean path-cost penalty of 0.92 units above optimal. We then evaluate both methods on a paired 50-scenario dynamic evaluation with three shared toggling obstacles, where Dijkstra succeeds on all 50 scenarios against 49 for RL, and produces significantly shorter or equal-cost paths on every paired comparison (Wilcoxon signed-rank $W=0$, $p=5.64\times10^{-7}$). The anticipated compute-time advantage of RL did not reach significance in the dynamic case ($p=0.063$), though the static evaluation shows a clear asymmetry: Dijkstra pays one graph search per episode while DQN pays a forward-pass cost at every step, making DQN roughly four times slower in the static setting, a gap that narrows once Dijkstra must itself replan repeatedly under dynamic conditions. These results support an honest trade-off framing: RL demonstrates substantial adaptability, but naive Dijkstra replanning remains stronger in path optimality and reliability at the tested scale.
+\end{abstract}
+
+\begin{IEEEkeywords}
+UAV routing, Dijkstra algorithm, reinforcement learning, dynamic obstacles, path planning, grid world
+\end{IEEEkeywords}
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/methodology}
+\input{sections/experimental_setup}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
