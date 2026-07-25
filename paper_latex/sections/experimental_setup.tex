@@ -1,12 +1,13 @@
 \section{Experimental Setup}
+\label{sec:experimental-setup}
 
 \subsection{Static Evaluation}
 
-The static evaluation uses 40 paired start-goal scenarios on the same 15$\times$15 grid, with obstacle density 0.2 and seed 42. Start-goal pairs are drawn from the free cells of a single \texttt{GridEnvironment} instance and validated against Dijkstra on that same grid; the DQN evaluation environment receives the identical obstacle layout via direct injection rather than independent seeding. No dynamic obstacles are present in this evaluation.
+The static evaluation uses 40 paired start-goal scenarios on the same 15$\times$15 grid, with obstacle density 0.2 and seed 42. Start-goal pairs are drawn from the free cells of a single \texttt{GridEnvironment} instance and validated against Dijkstra on that same grid; the DQN evaluation environment receives the identical obstacle layout via direct injection rather than independent seeding. No dynamic obstacles are present in this evaluation. For this revision, the static evaluation script was re-run independently to confirm the previously reported success-rate and path-cost figures, and was additionally instrumented to measure route-level compute time directly (Sec.~\ref{sec:compute-time-measurement}), since the original run did not persist raw per-scenario timing data.
 
 \subsection{Dynamic Evaluation}
 
-The paired dynamic evaluation uses 50 matched scenarios. Each scenario has a fixed scenario ID, start cell, and goal cell. The same scenario list is used for both Dijkstra and RL evaluation. Pairing is important because comparing unrelated random episodes would confound method performance with scenario difficulty.
+The paired dynamic evaluation uses 50 matched scenarios. Each scenario has a fixed scenario ID, start cell, and goal cell. The same scenario list is used for Dijkstra, A*, and RL evaluation. Pairing is important because comparing unrelated random episodes would confound method performance with scenario difficulty.
 
 The evaluation configuration is:
 \begin{itemize}
@@ -15,8 +16,12 @@ The evaluation configuration is:
     \item orthogonal movement cost: 1.0;
     \item diagonal movement cost: $\sqrt{2}$;
     \item static obstacle density: 0.0;
-    \item dynamic cells: $(4,4)$, $(8,8)$, and $(12,11)$;
-    \item number of scenarios: 50.
+    \item dynamic cells: $(4,4)$, $(8,8)$, and $(12,11)$, each toggling on a 5-step period;
+    \item number of scenarios: 50, shared across all three methods.
 \end{itemize}
 
-The measured metrics are success rate, realized dynamic path cost, compute time, and paired path-cost difference. Statistical significance is evaluated using the Wilcoxon signed-rank test on paired successful scenarios.
+The measured metrics are success rate, realized dynamic path cost, compute time, replan/node-expansion counts (for the two classical planners), and paired path-cost and compute-time differences. Statistical significance on continuous paired metrics (path cost, compute time) is evaluated using the two-sided Wilcoxon signed-rank test on paired successful scenarios. Because the success-rate comparisons involve small samples (50 or 49 scenarios), we additionally report 95\% Wilson score confidence intervals \cite{wilson1927interval} on each method's success proportion, which are more reliable than a normal approximation at this sample size and do not require a paired design.
+
+\subsection{Single-Seed Training Caveat}
+
+All RL results in this paper --- static and dynamic --- come from one trained policy (training seed 42, Table~\ref{tab:hyperparams}). Neural-network RL training is known to be sensitive to random seed, and repeating training with a different seed can shift success rate, path-cost gap, and even qualitative behavior \cite{henderson2018deep}. We did not have compute or time budget in this revision to retrain multiple seeds and report variance, and we treat this as an open limitation (Sec.~\ref{sec:limitations}) rather than implying the reported numbers characterize DQN+HER's performance ceiling or typical variance on this task. The classical baselines (Dijkstra, A*) are deterministic and have no equivalent seed sensitivity.

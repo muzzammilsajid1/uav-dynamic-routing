@@ -15,17 +15,59 @@ Neither method receives advance visibility into future toggles. Both methods obs
 
 \subsection{Dijkstra Replanning Baseline}
 
-The classical baseline applies Dijkstra's algorithm to the current grid graph. In the dynamic case, whenever the environment changes, the planner recomputes a full shortest path from the UAV's current position to the goal. This naive replanning strategy is intentionally simple: it is correct and interpretable, but can pay the full graph-search cost multiple times during a route.
+The first classical baseline applies Dijkstra's algorithm to the current grid graph. In the dynamic case, whenever the environment changes, the planner recomputes a full shortest path from the UAV's current position to the goal. This naive replanning strategy is intentionally simple: it is correct and interpretable, but can pay the full graph-search cost multiple times during a route, expanding nodes in all directions regardless of where the goal lies.
 
 With a binary heap priority queue, Dijkstra's algorithm has time complexity $O((V+E)\log V)$, where $V$ is the number of free cells and $E$ is the number of valid movement edges. In this grid, each cell has at most eight neighbors, so $E$ grows approximately linearly with $V$.
 
-\subsection{Reinforcement Learning Policy}
+\subsection{A* Replanning Baseline}
+\label{sec:astar-baseline}
 
-The RL method uses the same eight movement actions as the Dijkstra environment. The dynamic RL model is trained through curriculum phases, beginning with static routing and moving toward the full three-obstacle dynamic configuration. The policy uses local grid observations and positional information to select movement actions. Unlike Dijkstra, the RL policy does not explicitly search the graph at evaluation time.
+The second classical baseline applies A* \cite{hart1968astar} to the same grid graph, using the octile distance (the natural admissible heuristic for 8-connected grids with unit and $\sqrt{2}$ move costs) as the heuristic function. A* is triggered by exactly the same replanning events as Dijkstra --- one initial plan plus one replan per dynamic obstacle toggle --- and returns a path over the same graph with the same edge costs. The only difference from the Dijkstra baseline is that A* prioritizes expanding nodes that appear closer to the goal, so on a non-negative-weight grid the two algorithms are guaranteed to return paths of identical cost; A* simply reaches that answer by expanding fewer nodes. This baseline exists specifically to separate two effects that a single naive-Dijkstra comparison conflates: whether classical graph search is expensive because it is \emph{search}, or expensive because it is \emph{unpruned} search. Section~\ref{sec:results} reports both the node-expansion count and the wall-clock time for A*, alongside the same metrics for Dijkstra, on the identical 50 dynamic scenarios.
+
+\subsection{Reinforcement Learning Policy}
+\label{sec:rl-policy}
+
+The RL method uses the same eight movement actions and the same grid, obstacle, and edge-cost rules as both classical baselines. The agent is a Double DQN \cite{vanhasselt2016double} trained with Hindsight Experience Replay (HER) \cite{andrychowicz2017her}, implemented on top of Stable-Baselines3's DQN using a custom \texttt{SafeHerReplayBuffer} that forces the terminal-done flag when a HER-relabeled achieved goal coincides with the relabeled desired goal, and a custom training step that computes the Double DQN target (action selection from the online network, action evaluation from the target network) rather than the single-network max used by vanilla DQN \cite{mnih2015human}. Double DQN was adopted after an earlier vanilla-DQN + HER run exhibited Q-value overestimation (values around 46 against an expected scale near 2.0), which Double DQN, together with a smaller per-step reward magnitude, corrected.
+
+\textbf{Observation.} The 61-dimensional observation concatenates: (i) the UAV's normalized row/col position and normalized row/col displacement to the goal (4 values); (ii) a flattened $7\times7$ local grid patch centered on the UAV, with out-of-bounds cells treated as obstacles (49 values); and (iii) a one-hot encoding of the previous action (8 values). The policy does not observe the full $15\times15$ grid, only this local window plus its own position relative to the goal.
+
+\textbf{Reward.} The reward combines a sparse terminal term (+1.0 on reaching the goal, $-1.0$ on collision, $-0.1$ per step otherwise) with potential-based shaping \cite{ng1999shaping}, $\Phi(s) = -d(s,\text{goal})/d_{\max}$, where $d(\cdot,\cdot)$ is the shortest-path distance on the current grid (precomputed once per fixed grid via an all-pairs Dijkstra table, so that HER's relabeled compute\_reward calls are $O(1)$ lookups rather than live searches) and $d_{\max}$ is the grid diagonal. Using graph distance rather than Euclidean distance for shaping ensures the agent is rewarded for obstacle-aware progress, not straight-line proximity that a wall may block.
+
+\textbf{Network and optimization.} The Q-network is a two-layer MLP with 128 units per layer. Table~\ref{tab:hyperparams} lists the full hyperparameter configuration.
+
+\begin{table}[h]
+\centering
+\caption{DQN + HER hyperparameters (identical across all curriculum phases).}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{ll}
+\toprule
+Hyperparameter & Value \\
+\midrule
+Algorithm & Double DQN \cite{vanhasselt2016double} \\
+Replay strategy & HER, \texttt{future} strategy, $k{=}4$ \cite{andrychowicz2017her} \\
+Network architecture & MLP, 2 $\times$ 128 hidden units \\
+Learning rate & $1\times10^{-3}$ \\
+Replay buffer size & 100{,}000 transitions \\
+Batch size & 256 \\
+Discount factor $\gamma$ & 0.99 \\
+Target update ($\tau$, interval) & 1.0 (hard), every 1{,}000 steps \\
+Train frequency & every 2 environment steps \\
+Gradient steps per update & 1 \\
+Exploration ($\varepsilon$-greedy, Phase 1) & $1.0 \to 0.05$ over 50\% of training \\
+Reward: goal / collision / step & $+1.0$ / $-1.0$ / $-0.1$ \\
+Reward shaping & Potential-based, $\Phi=-d/d_{\max}$ \cite{ng1999shaping} \\
+Training seed & 42 (single run; see Sec.~\ref{sec:limitations}) \\
+\bottomrule
+\end{tabular}%
+}
+\label{tab:hyperparams}
+\end{table}
+
+\textbf{Curriculum.} Training proceeds in three phases on the identical fixed $15\times15$ grid (obstacle density 0.20, seed 42) used for the static evaluation: Phase 1 trains 300{,}000 timesteps with no dynamic obstacles, establishing basic static-grid competence with the reward and observation design above; Phase 2 fine-tunes the Phase 1 checkpoint for 100{,}000 further timesteps with a single mild dynamic obstacle at $(8,8)$ toggling every 10 steps, with exploration re-opened to $\varepsilon{:}\,0.30\to0.05$ over 20\% of the phase; Phase 3 fine-tunes the Phase 2 checkpoint for a final 100{,}000 timesteps on the full three-obstacle configuration at $(4,4)$, $(8,8)$, $(12,11)$ toggling every 5 steps, matching the evaluation configuration in Section~\ref{sec:experimental-setup}. The reported dynamic-evaluation policy is therefore the Phase 3 checkpoint after 500{,}000 cumulative timesteps of training. Unlike Dijkstra and A*, the RL policy does not explicitly search the graph at evaluation time; it performs a single forward pass through the trained network per step.
 
 \subsection{Compute Time Measurement}
 \label{sec:compute-time-measurement}
 
-Both methods report compute time as the total decision-making time required to traverse a full route, not per-decision latency. For Dijkstra, this is the cumulative wall-clock time across all \texttt{dijkstra()} calls made during a run: one initial call plus one call per dynamic change event. For the RL policy, this is the sum of wall-clock time for every \texttt{.predict()} call made during an episode; environment stepping, reward computation, and observation construction are excluded from the timer.
+All three methods report compute time as the total decision-making time required to traverse a full route, not per-decision latency. For Dijkstra and A*, this is the cumulative wall-clock time across all planning calls made during a run: one initial call plus one call per dynamic change event, using the identical replanning trigger for both planners so that any timing difference reflects the search algorithm itself rather than a different number of replans. For the RL policy, this is the sum of wall-clock time for every \texttt{.predict()} call made during an episode; environment stepping, reward computation, and observation construction are excluded from the timer.
 
-Because Dijkstra resolves a route in one or a small number of full graph searches while the RL policy makes one lightweight forward pass per step, the two numbers are not directly comparable as per-decision latencies. The reported totals are comparable only as route-level decision cost: how much compute each method consumed to get from start to goal in that scenario. A single warm-up inference call is discarded before timing begins to exclude first-call framework initialization overhead from the RL measurements.
+Because the classical planners resolve a route in one or a small number of full graph searches while the RL policy makes one lightweight forward pass per step, the reported totals are comparable only as route-level decision cost: how much compute each method consumed to get from start to goal in that scenario, not as a per-decision latency. A single warm-up inference call is discarded before timing begins to exclude first-call framework initialization overhead from the RL measurements. We reiterate the caveat from the original study: millisecond-scale timings on a shared, non-dedicated evaluation machine are sensitive to implementation details, language-level overhead (both planners are pure Python; the RL policy runs through the PyTorch/Stable-Baselines3 stack), and hardware, and should be read as an internally consistent \emph{relative} comparison between methods rather than an absolute claim about algorithm speed in general.
