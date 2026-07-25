@@ -2,6 +2,13 @@
 
 Dijkstra-baseline vs reinforcement-learning UAV routing in a dynamic grid environment.
 
+## Paper
+
+The research paper lives in two versions:
+
+- [`paper_latex_v2/`](paper_latex_v2) — **current version.** Compares naive Dijkstra, A\*, and DQN+HER on static and dynamic benchmarks, with a full hyperparameter table and re-measured compute times.
+- [`paper_latex_v1/`](paper_latex_v1) — archived original version (Dijkstra-only classical baseline). Kept for reference; see `paper_latex_v2/README.md` for what changed and why.
+
 ## Week 1 Environment Contract
 
 - Coordinates: `(row, col)` everywhere.
