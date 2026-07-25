@@ -55,7 +55,9 @@ def main():
     parser.add_argument('--out', type=str, default='logs/eval_dqn_vs_dijkstra_timed.csv')
     args = parser.parse_args()
 
-    os.makedirs(os.path.dirname(args.out), exist_ok=True)
+    output_dir = os.path.dirname(args.out)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     simra_env = GridEnvironment(size=15, obstacle_density=0.2, seed=args.seed, diagonal=True)
     pairs = generate_test_pairs(simra_env, n_pairs=args.n_pairs, min_dist=args.min_dist, seed=args.seed + 100)

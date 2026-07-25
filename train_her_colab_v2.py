@@ -11,6 +11,9 @@
 # CELL 1: Install dependencies & mount Google Drive
 # ------------------------------------------------------------------------------
 
+# COLAB-ONLY: run this file in Google Colab (or paste it into a Colab
+# notebook). The notebook magic below is intentionally not valid in a normal
+# Python interpreter.
 !pip install -q "stable-baselines3[extra]>=2.0" gymnasium numpy
 
 from google.colab import drive

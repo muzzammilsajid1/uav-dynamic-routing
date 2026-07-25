@@ -31,6 +31,7 @@ def main() -> None:
         fixed_grid=True,
         seed=42,
     )
+    env.action_space.seed(42)
 
     print("Week 3 RL evaluation (UAVRoutingEnv, dynamic_obstacles_enabled=True)")
     print(f"Grid: 15x15, obstacle_density=0.0")

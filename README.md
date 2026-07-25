@@ -23,7 +23,7 @@ The research paper lives in two versions:
 ## Run Tests
 
 ```bash
-python -m unittest discover -s tests
+python -m pytest -q
 ```
 
 ## Run Static Baseline
@@ -37,3 +37,9 @@ python experiments/run_static_baseline.py
 ```bash
 python experiments/train_q_learning_static.py
 ```
+
+## Colab Training
+
+`train_her_colab_v2.py` is intended to be run in Google Colab. It contains
+Colab notebook magic for installing dependencies and is therefore not a
+standalone Python script.
