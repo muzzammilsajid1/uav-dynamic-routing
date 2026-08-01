@@ -10,8 +10,10 @@ dynamic grid environments.
   realism, and ablation benchmarks.
 - [`paper_latex_v1/`](paper_latex_v1) - archived original single-baseline paper.
 
-Generated result fragments in the current paper remain provisional until
-`evaluation/results/integrity_report.json` reports `status: passed`.
+The current release is integrity-gated. The final status is summarized in
+[`docs/RESEARCH_EXECUTION_STATUS.md`](docs/RESEARCH_EXECUTION_STATUS.md), and
+the known loopholes, claim boundaries, and future fixes are tracked in
+[`docs/LOOPHOLE_REGISTER.md`](docs/LOOPHOLE_REGISTER.md).
 
 ## Environment contract
 
@@ -31,6 +33,11 @@ Generated result fragments in the current paper remain provisional until
 ```bash
 python -m pytest -q
 ```
+
+On Windows, if a local `venv` was created with a Python installation that later
+disappeared, `venv\Scripts\python.exe` may fail before tests start. Recreate
+the environment from an installed Python, reinstall `requirements.txt`, and
+rerun the command above.
 
 ## Reproduce the classical pilot
 

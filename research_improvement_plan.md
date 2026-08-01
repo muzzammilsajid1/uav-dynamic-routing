@@ -164,3 +164,18 @@ Complete reproducibility, measurement rigor, and multi-seed evaluation before
 expanding the benchmark. Those three steps establish confidence in the current
 findings; the later studies determine where those findings do and do not
 generalize.
+
+## Final Study Outcome
+
+The ten-workstream expansion has been executed in the current repository and is
+summarized in `docs/RESEARCH_EXECUTION_STATUS.md`. The result is intentionally
+not an RL-superiority claim: A*, Dijkstra, and D* Lite remain stronger overall
+under the shared graph-routing contract. The final contribution is a
+reproducible, multi-seed boundary study that shows where learned routing works,
+where it fails, and which conclusions survive stronger baselines, distribution
+shift, scaling, ablations, and event-level adaptability analysis.
+
+Remaining loopholes are tracked in `docs/LOOPHOLE_REGISTER.md`. Items marked
+"future experiment required" are outside the current artifact set and should be
+treated as the next research phase rather than as missing analysis from the
+completed benchmark.

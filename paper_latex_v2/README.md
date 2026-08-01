@@ -13,10 +13,16 @@ The manuscript now describes:
 - event-level adaptability metrics; and
 - generated tables, figures, and evidence-bound prose.
 
-Do not treat the existing `main.pdf` as current until the expanded experiment
-queue finishes and the source is recompiled. Generated fragments under
-`generated/` are placeholders until `evaluation/results/integrity_report.json`
-reports `status: passed`.
+The final release is now bounded by the repository status file
+`docs/RESEARCH_EXECUTION_STATUS.md`. Known loopholes and follow-up experiments
+are tracked in `docs/LOOPHOLE_REGISTER.md`; those boundaries should be kept in
+sync with the discussion and conclusion before any new submission.
+
+The expanded experiment queue has completed and
+`evaluation/results/integrity_report.json` reports `status: passed`. Treat
+`output/pdf/uav_dynamic_routing_research_paper.pdf` as the release PDF. The
+in-directory `main.pdf` is a local build artifact and should be regenerated
+before use if the LaTeX source or generated fragments change.
 
 ## Regenerate evidence
 
@@ -37,7 +43,7 @@ fragments have replaced their placeholders:
 python scripts/compile_paper.py
 ```
 
-For source/layout debugging before the experiment queue finishes:
+For source/layout debugging when intentionally inspecting incomplete edits:
 
 ```bash
 python scripts/compile_paper.py --allow-incomplete

@@ -11,5 +11,6 @@
 | Generalization | `python scripts/run_full_research.py` | ID/OOD splits in benchmark v2 | Classical and RL suite CSVs | `paper_latex_v2/figures/generalization_success.png` |
 | Ablations | `python scripts/run_full_research.py --train --variants ...` | Benchmark v2 | One RL CSV per variant | Final ablation table/plot |
 
-The final paper will reference this map in its artifact appendix after the
-remaining experiments finish.
+The final paper references this evidence chain through its artifact appendix.
+See `docs/RESEARCH_EXECUTION_STATUS.md` for the final release gate summary and
+`docs/LOOPHOLE_REGISTER.md` for remaining claim boundaries.

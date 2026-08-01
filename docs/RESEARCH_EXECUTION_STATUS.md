@@ -23,3 +23,23 @@ Finalized at `2026-08-01T09:47:49.211216+00:00` after the integrity-gated artifa
 - PDF pages: `7`
 - PDF SHA-256: `2c52ae6714504a9c88e04351a5bfa118d12182c048bf2509d39c9e8b2a02049c`
 - Compiler: `Tectonic 0.16.9`
+
+## Evidence boundaries
+
+The final paper is a reproducible controlled grid-routing study, not a
+real-flight validation. Known loopholes and their status are tracked in
+[`LOOPHOLE_REGISTER.md`](LOOPHOLE_REGISTER.md). The strongest remaining
+external-validity gaps require new experiments: continuous flight dynamics,
+real map or airspace data, richer obstacle/perception models, embedded-hardware
+timing, and larger RL seed or hyperparameter studies.
+
+Historical output files such as the interim documentary and pending-claims
+checklist predate this final release. They should be treated as project history
+unless regenerated from the passed integrity report above.
+
+## Local validation
+
+- 2026-08-01: repaired the workspace `venv` launcher after it referenced a
+  missing base Python installation.
+- 2026-08-01: installed the declared test dependencies into `venv`.
+- 2026-08-01: `venv\Scripts\python.exe -m pytest -q` passed with 58 tests.
