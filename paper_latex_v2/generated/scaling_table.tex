@@ -1,0 +1,19 @@
+\begin{table}[H]
+\centering
+\caption{Scaling summary (mean $\pm$ 95\% CI). C succ. is the minimum success among A*, Dijkstra, and D* Lite; RL estimates use five policies and gap uses successful routes.}
+\scriptsize
+\setlength{\tabcolsep}{2.4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrrrr}
+\toprule
+Condition & C succ. (\%) & RL succ. (\%) & RL gap & A* ms & RL ms \\
+\midrule
+$15\times15$ & 100.0 & $98.0 \pm 5.6$ & $1.57 \pm 0.48$ & $0.32 \pm 0.12$ & $4.39 \pm 1.09$ \\
+$30\times30$ & 100.0 & $56.0 \pm 28.6$ & $2.89 \pm 2.21$ & $0.51 \pm 0.21$ & $115.57 \pm 94.04$ \\
+$50\times50$ & 100.0 & $14.0 \pm 16.7$ & $4.10 \pm 9.01$ & $0.98 \pm 0.61$ & $485.83 \pm 221.62$ \\
+$100\times100$ & 100.0 & $0.0 \pm 0.0$ & -- & $3.57 \pm 2.05$ & $932.27 \pm 1103.25$ \\
+\bottomrule
+\end{tabular}%
+}
+\label{tab:scaling-results}
+\end{table}

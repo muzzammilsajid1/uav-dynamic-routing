@@ -1,0 +1,37 @@
+\appendices
+\section{Artifact Traceability}
+\label{app:artifact-traceability}
+
+The following map links each result family to its executable command, persisted
+scenario source, raw evidence, and generated manuscript artifact.
+Every expanded-suite raw row stores the SHA-256 digest of
+\texttt{benchmark\_v2.json}; the integrity checker rejects unexpected row
+counts, duplicate run identifiers, and digest mismatches. The PDF build
+manifest additionally records the integrity-report digest, Tectonic version,
+page count, and final PDF digest.
+
+\begin{itemize}
+    \item \textbf{Classical pilot:}
+    \path{scripts/reproduce_classical.py} maps the Week-3 manifest and
+    \path{classical_dynamic_raw.csv} to its machine-readable and Markdown
+    summaries.
+    \item \textbf{Generalization, scaling, and realism:}
+    \path{scripts/run_full_research.py} maps
+    \path{benchmark_v2.json}, \path{classical_suite_raw.csv}, and each
+    \path{rl_<variant>_raw.csv} to
+    Tables~\ref{tab:generalization-results}--\ref{tab:realism-results} and the
+    scaling figures.
+    \item \textbf{RL ablations:} the same command with \texttt{--train} maps
+    variant-specific checkpoints and raw CSVs to
+    Table~\ref{tab:ablation-results}.
+    \item \textbf{Adaptability:}
+    \path{evaluation/analyze_adaptability.py} maps the route event CSVs to
+    Table~\ref{tab:adaptability-results}, paired event tests, and the recovery
+    and reaction-time figures.
+    \item \textbf{Statistics:}
+    \path{evaluation/statistical_tests.py} and the adaptability analyzer
+    produce \path{paired_tests.csv} and
+    \path{adaptability_paired_tests.csv} with effect sizes and adjusted
+    $p$-values. \path{evaluation/summarize_timing_distributions.py} produces
+    the seed-specific and aggregate timing distribution artifact.
+\end{itemize}

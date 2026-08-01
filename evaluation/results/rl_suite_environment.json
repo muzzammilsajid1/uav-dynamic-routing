@@ -1,0 +1,56 @@
+{
+  "captured_at_utc": "2026-07-30T04:40:34.950236+00:00",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
+  "operating_system": {
+    "system": "Linux",
+    "release": "6.6.122+",
+    "version": "#1 SMP Thu Apr 30 18:17:14 UTC 2026"
+  },
+  "python": {
+    "version": "3.12.13",
+    "implementation": "CPython",
+    "executable": "/usr/bin/python3"
+  },
+  "cpu": {
+    "processor": "x86_64",
+    "machine": "x86_64",
+    "logical_count": 2
+  },
+  "packages": {
+    "gymnasium": "1.3.0",
+    "matplotlib": "3.11.1",
+    "networkx": "3.6.1",
+    "numpy": "2.5.1",
+    "pytest": "9.1.1",
+    "scipy": "1.18.0",
+    "stable-baselines3": "2.9.0",
+    "torch": "2.13.0"
+  },
+  "source_tree": {
+    "sha256": "795314180e1b8f6a6561d0b7079a63b46c2de165b61fc4d45d8ab93f0ab54b9b",
+    "files_hashed": 100
+  },
+  "git_commit": "unavailable",
+  "git_worktree": {
+    "dirty": "unavailable"
+  },
+  "accelerator": {
+    "cuda_available": false,
+    "cuda_version": "13.0",
+    "gpu_count": 0,
+    "gpu_names": []
+  },
+  "experiment": {
+    "variant": "dynamic_from_scratch",
+    "policy_seeds": [
+      11,
+      22,
+      33,
+      44,
+      55
+    ],
+    "checkpoint_stage": "02_dynamic_full_final.zip",
+    "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec",
+    "repetitions": 10
+  }
+}

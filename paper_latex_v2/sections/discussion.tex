@@ -1,25 +1,67 @@
 \section{Discussion}
 \label{sec:discussion}
 
-The results show that classical replanning remains the stronger approach on the current controlled benchmark, and that this conclusion is more robust than the original single-baseline comparison suggested. Both Dijkstra and A* succeeded on every scenario and produced shorter or equal paths than RL on all paired successful scenarios; because Dijkstra and A* are both optimal on this graph, RL's path-cost disadvantage is a gap against \emph{optimality itself}, not an artifact of which classical planner was chosen as the point of comparison. The RL policy still demonstrates substantial adaptability, completing 49 out of 50 dynamic scenarios under the same obstacle schedule and scenario pairing. However, these results do not support a claim that RL outperforms classical replanning in this setup, on either path quality or reliability.
+This study is designed to distinguish three questions that a single
+Dijkstra-versus-policy comparison cannot answer: whether heuristic pruning
+changes the classical compute baseline, whether incremental reuse changes it
+again, and whether RL behavior is stable across training seeds and distribution
+shifts. The generalization, scaling, realism, and ablation tables should
+therefore be interpreted together rather than reducing performance to one
+headline average.
 
-The compute-time result is where adding A* changes the paper's conclusion rather than just reinforcing it. The original study found no significant compute-time difference between RL and naive Dijkstra and attributed this to grid size: ``a 15$\times$15 graph is small enough that repeated Dijkstra replanning remains cheap.'' That framing implicitly treated Dijkstra as representative of ``classical graph search'' in general. It is not. A* solves the identical replanning problem, with the identical optimality guarantee, roughly 16$\times$ faster than Dijkstra by pruning search toward the goal instead of expanding uniformly outward (Sec.~\ref{sec:dynamic-results}). A common motivation for RL in this literature is that a trained policy may avoid repeated graph search during deployment; here, RL was in fact the \emph{slowest} of the three methods on route-level compute time, once a properly pruned classical planner is included. This does not mean RL can never win on compute time --- a heuristic search's cost still scales with how much of the grid must be explored before the goal is found, and larger or more cluttered environments could favor a constant-cost forward pass over search of any kind --- but it does mean the earlier conclusion (``RL's expected computational advantage may only become visible on larger grids'') was drawn against an unnecessarily weak classical opponent, and should be re-tested against A* or an incremental planner such as D* Lite \cite{koenig2005dstarlite} before being treated as settled.
+Classical methods retain an important structural advantage: on the currently
+observed graph they provide an optimal route, and failures arise from future
+unobserved changes or route semantics rather than approximation by the search
+itself. A* measures how far simple heuristic pruning goes; D* Lite measures the
+additional value of reusing prior search effort. The measured data do not show
+a deployment-time crossover in favor of RL. At $100\times100$, every classical
+method succeeds on every scenario, while the learned policy succeeds on none
+and is slower than A*. The defensible scope for this policy is therefore the
+native small grid and closely related layouts, not scale-independent routing.
 
-The study therefore supports a trade-off framing, sharpened from the original: a well-implemented classical planner provides optimality, reliability, \emph{and} the faster route-level compute time at this grid size; RL provides policy-based adaptation without an explicit graph search, but its learned decisions are both slower and less optimal than either classical baseline at the tested scale, and its one failure represents a reliability gap that neither classical planner exhibited. The current results favor classical planning at this scale while leaving open, as a genuinely untested question rather than a mild caveat, whether RL's balance of tradeoffs improves as environment size, obstacle density, or replanning frequency increase to the point where even a pruned search becomes expensive.
+The multi-seed design changes how learned performance is interpreted. Scenario
+confidence intervals from one frozen policy quantify test-case variation, not
+training variance. Reporting seed-level values first ensures the uncertainty
+shown for RL reflects independently learned policies. Likewise, the ablations
+reveal interactions rather than a tidy component ranking. Double DQN and local
+observations improve markedly over vanilla DQN and full-grid input, but
+removing HER, shaping, or curriculum improves held-out-pair success from 96\%
+to 100\% under this protocol. A one-factor intervention demonstrates
+configuration sensitivity; in a nonlinear learning system it does not isolate
+a context-free causal main effect.
 
 \subsection{Limitations}
 \label{sec:limitations}
 
-This study has several limitations, some carried over from the original evaluation and some specific to this revision.
+The environment remains a two-dimensional discrete grid rather than a
+continuous flight-dynamics simulator. Movement ignores vehicle turn radius,
+altitude, acceleration, localization drift, communication constraints, and
+multi-UAV interactions. Wind and energy are represented as spatial traversal
+penalties rather than aerodynamic forces. The study therefore supports claims
+about routing algorithms under controlled graph changes, not end-to-end flight
+control.
 
-\textbf{Scale is a deliberate, acknowledged design choice, not an oversight.} The 15$\times$15 grid, zero static obstacle density in the dynamic evaluation, and three fixed toggle cells were chosen to remove confounds --- to guarantee that Dijkstra and RL (and, in this revision, A*) are compared on literally the same graph, the same replanning triggers, and the same start/goal pairs, so that any measured difference is attributable to the planning method rather than to incidental differences in problem difficulty. This buys internal validity at the cost of external validity: the benchmark is small and clean, not representative of a cluttered, large-scale UAV routing domain. Readers should treat the paper's claims as holding \emph{on this controlled benchmark}, not as claims about UAV routing at operational scale.
+The legacy contract permits departure from a cell that becomes blocked while
+occupied. This avoids instantaneous failures caused by a toggle and is applied
+equally to all methods, but it is only one possible physical interpretation.
+Future work should compare escape, collision, and safety-buffer semantics.
 
-\textbf{Single training seed.} All RL results come from one trained policy (seed 42; Sec.~\ref{sec:experimental-setup}). We did not retrain with multiple seeds to report variance, and RL training is known to be seed-sensitive \cite{henderson2018deep}: a different seed could plausibly change the success rate, the size of the path-cost gap, or the identity of the failing scenario, though a shift large enough to reverse the paper's central Wilcoxon result ($p=5.64\times10^{-7}$ against Dijkstra, $n=49$) would require a substantially different policy. We report this as an open limitation rather than treating the single run as characterizing DQN+HER's typical behavior or performance ceiling on this task.
+Training uses one fixed static layout before dynamic fine-tuning. The benchmark
+measures the resulting distribution shift explicitly, but does not establish
+the performance of policies trained over randomized layout distributions.
+The full-observation ablation is dimension-specific and cannot be applied
+unchanged to larger grids, unlike the fixed-size local observation.
 
-\textbf{No ablations.} The curriculum (Sec.~\ref{sec:rl-policy}) and the Double DQN + potential-based-shaping design were both adopted after diagnosing specific failures during development (Q-value overestimation under vanilla DQN; see Sec.~\ref{sec:rl-policy}), but this paper does not report a controlled ablation --- e.g., training without curriculum, or without HER --- that would isolate how much each design choice contributes to the final result. The development history that motivated these choices is documented in the project repository but not formally re-run as a paired experiment here.
+Only five independent policy seeds are available. Student-$t$ intervals expose
+the resulting uncertainty, but remain wide for unstable variants and cannot
+characterize rare optimization failures as precisely as a larger seed study.
+The 310-scenario suite is broad within the grid model but is not a random sample
+of all operational UAV environments.
 
-\textbf{Limited generalization evidence.} All formal evaluations use the single fixed training grid. The informal generalization probe in Sec.~\ref{sec:generalization} (94\% success on one unseen seed) is suggestive but not a rigorous benchmark, and surfaces a specific, unresolved failure mode --- oscillation when structurally blocked in an unfamiliar layout --- that the fixed-grid evaluations in this paper cannot detect at all.
-
-\textbf{Remaining scope limitations.} The RL policy has one failed scenario, which should be treated as a real limitation rather than ignored. Compute-time measurements at millisecond scale remain sensitive to implementation details, language-level overhead, and hardware (Sec.~\ref{sec:compute-time-measurement}); the relative ordering among the three methods was stable across the original and re-measured runs, but the absolute figures should not be treated as portable to other hardware. The dynamic setup still uses only three fixed toggle cells rather than dense, moving, or stochastic obstacles, wind fields, or multi-agent airspace constraints.
-
-Future work should evaluate larger grids, reintroduce matched static obstacles, vary dynamic obstacle frequency, compare against an incremental replanner such as D* Lite or Lifelong Planning A* (which, unlike Dijkstra and A* here, reuse information from the previous search rather than replanning from scratch), retrain RL across multiple seeds to report variance, run the curriculum and HER ablations motivated above, and evaluate with \texttt{fixed\_grid=False} training to test generalization formally. A richer benchmark incorporating energy budgets, no-fly zones, and partial observability would also better reflect real UAV routing constraints.
+Finally, timings describe these Python and PyTorch implementations on the
+recorded Colab runtime class. Historical per-variant machine manifests were not
+retained separately, so absolute cross-variant timing contrasts warrant extra
+caution. The pipeline now prevents that provenance loss. Timings remain
+auditable implementation-specific measurements, not hardware-independent
+constants; operational conclusions require optimized code and embedded target
+hardware.

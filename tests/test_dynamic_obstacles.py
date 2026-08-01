@@ -88,7 +88,7 @@ class TestNaiveReplanning(unittest.TestCase):
         env = GridEnvironment(
             size=8,
             obstacle_density=0.0,
-            dynamic_obstacles=[DynamicObstacle(cell=(4, 4), period=2, initial_state="passable")],
+            dynamic_obstacles=[DynamicObstacle(cell=(4, 4), period=3, initial_state="passable")],
         )
         result = run_naive_replanning(env)
         self.assertTrue(result.success)

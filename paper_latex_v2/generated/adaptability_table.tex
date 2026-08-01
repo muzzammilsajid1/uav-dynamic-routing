@@ -1,0 +1,19 @@
+\begin{table}[H]
+\centering
+\caption{Event-level adaptability across all dynamic scenarios. Values are means and 95\% confidence intervals over independent scenarios for classical planners and policy seeds for RL.}
+\scriptsize
+\setlength{\tabcolsep}{2.3pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrrrr}
+\toprule
+Method & $n$ & Post-success (\%) & Recovery (\%) & Cost shock & Reaction ms \\
+\midrule
+A* & 83 & $100.0 \pm 0.0$ & $100.0 \pm 0.0$ & $0.000 \pm 0.000$ & $0.067 \pm 0.007$ \\
+Dijkstra & 83 & $100.0 \pm 0.0$ & $100.0 \pm 0.0$ & $0.001 \pm 0.002$ & $0.442 \pm 0.062$ \\
+D* Lite & 83 & $100.0 \pm 0.0$ & $100.0 \pm 0.0$ & $0.005 \pm 0.008$ & $0.168 \pm 0.018$ \\
+DDQN+HER & 5 & $87.9 \pm 33.6$ & $100.0 \pm 0.0$ & $0.005 \pm 0.002$ & $0.521 \pm 0.050$ \\
+\bottomrule
+\end{tabular}%
+}
+\label{tab:adaptability-results}
+\end{table}

@@ -1,0 +1,48 @@
+{
+  "captured_at_utc": "2026-07-26T11:37:03.916631+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "operating_system": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200"
+  },
+  "python": {
+    "version": "3.12.13",
+    "implementation": "CPython",
+    "executable": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\.venv\\Scripts\\python.exe"
+  },
+  "cpu": {
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "machine": "AMD64",
+    "logical_count": 8
+  },
+  "packages": {
+    "gymnasium": "1.3.0",
+    "matplotlib": "3.11.1",
+    "networkx": "3.6.1",
+    "numpy": "2.5.1",
+    "pytest": "9.1.1",
+    "scipy": "1.18.0",
+    "stable-baselines3": "2.9.0",
+    "torch": "2.13.0"
+  },
+  "git_commit": "f57ae150068fbd7a00c1b37a8280cf60a5dd2ddc",
+  "accelerator": {
+    "cuda_available": false,
+    "cuda_version": null,
+    "gpu_count": 0,
+    "gpu_names": []
+  },
+  "experiment": {
+    "manifest": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\manifests\\week3_dynamic_50.json",
+    "manifest_sha256": "d60264a1ed0cc3674c7cbbb772f1d110adcdfa0448a932b167bb47d75888475e",
+    "planners": [
+      "astar",
+      "dijkstra"
+    ],
+    "repetitions": 10,
+    "max_steps": 1000,
+    "timing_protocol": "perf_counter around each planner call; route time is their cumulative sum",
+    "raw_results": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\classical_dynamic_raw.csv"
+  }
+}

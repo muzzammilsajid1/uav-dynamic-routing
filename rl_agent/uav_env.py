@@ -30,7 +30,12 @@ import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
 
-from envs.grid_environment import DynamicObstacle, default_dynamic_obstacles
+from envs.grid_environment import (
+    DynamicObstacle,
+    MovingObstacle,
+    StochasticObstacle,
+    default_dynamic_obstacles,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -107,6 +112,18 @@ class UAVRoutingEnv(gym.Env):
         fixed_grid: bool = True,
         dynamic_obstacles_enabled: bool = False,
         dynamic_obstacles: list[DynamicObstacle] | None = None,
+        potential_shaping_enabled: bool = True,
+        potential_metric: str = "octile",
+        observation_mode: str = "local",
+        max_steps: int | None = None,
+        stochastic_obstacles: list[StochasticObstacle] | None = None,
+        moving_obstacles: list[MovingObstacle] | None = None,
+        dynamics_seed: int | None = None,
+        traversal_penalties: dict[tuple[int, int], float] | None = None,
+        no_fly_mode: str = "penalty",
+        no_fly_penalty: float = 0.5,
+        sensor_noise_probability: float = 0.0,
+        dynamics_timing: str = "post_move_observed",
     ) -> None:
         """
         Parameters
@@ -135,6 +152,56 @@ class UAVRoutingEnv(gym.Env):
         self.curriculum_step_episodes = curriculum_step_episodes
         self.curriculum_step_dist = curriculum_step_dist
         self.dynamic_obstacles_enabled = dynamic_obstacles_enabled
+        self.potential_shaping_enabled = potential_shaping_enabled
+        if potential_metric not in {"octile", "shortest_path"}:
+            raise ValueError(
+                "potential_metric must be 'octile' or 'shortest_path'"
+            )
+        if dynamic_obstacles_enabled and potential_metric == "shortest_path":
+            raise ValueError(
+                "shortest_path shaping is incompatible with HER under dynamic "
+                "obstacles; use the obstacle-state-independent octile potential"
+            )
+        self.potential_metric = potential_metric
+        if observation_mode not in {"local", "full"}:
+            raise ValueError("observation_mode must be 'local' or 'full'")
+        self.observation_mode = observation_mode
+        self.max_steps = max_steps if max_steps is not None else grid_size * grid_size
+        if self.max_steps <= 0:
+            raise ValueError("max_steps must be positive")
+        self.stochastic_obstacles = stochastic_obstacles or []
+        self.moving_obstacles = moving_obstacles or []
+        if (
+            (self.stochastic_obstacles or self.moving_obstacles)
+            and potential_metric == "shortest_path"
+        ):
+            raise ValueError(
+                "shortest_path shaping is incompatible with stochastic or "
+                "moving obstacles"
+            )
+        self.dynamics_seed = seed if dynamics_seed is None else dynamics_seed
+        self._dynamics_rng = np.random.default_rng(self.dynamics_seed)
+        self._moving_indices = [
+            obstacle.initial_index for obstacle in self.moving_obstacles
+        ]
+        self.traversal_penalties = traversal_penalties or {}
+        if any(penalty < 0 for penalty in self.traversal_penalties.values()):
+            raise ValueError("traversal penalties must be non-negative")
+        if no_fly_mode not in {"penalty", "hard"}:
+            raise ValueError("no_fly_mode must be 'penalty' or 'hard'")
+        self.no_fly_mode = no_fly_mode
+        if no_fly_penalty < 0:
+            raise ValueError("no_fly_penalty must be non-negative")
+        self.no_fly_penalty = no_fly_penalty
+        if not 0.0 <= sensor_noise_probability <= 1.0:
+            raise ValueError("sensor_noise_probability must be in [0, 1]")
+        self.sensor_noise_probability = sensor_noise_probability
+        if dynamics_timing not in {"post_move_observed", "pre_move_hidden"}:
+            raise ValueError(
+                "dynamics_timing must be 'post_move_observed' or "
+                "'pre_move_hidden'"
+            )
+        self.dynamics_timing = dynamics_timing
         if self.dynamic_obstacles_enabled and dynamic_obstacles is None:
             self.dynamic_obstacles = default_dynamic_obstacles()
         else:
@@ -152,7 +219,12 @@ class UAVRoutingEnv(gym.Env):
 
         # ---- Observation space -----------------------------------------------
         # Positional components are normalised to [0, 1]. Local grid is {0, 1, 2}.
-        obs_dim = 4 + LOCAL_VIEW_SIZE * LOCAL_VIEW_SIZE + 8   # 4 + 49 + 8 = 61
+        grid_observation_size = (
+            LOCAL_VIEW_SIZE * LOCAL_VIEW_SIZE
+            if observation_mode == "local"
+            else grid_size * grid_size
+        )
+        obs_dim = 4 + grid_observation_size + 8
         self.observation_space = spaces.Dict({
             "observation": spaces.Box(
                 low=-1.0,
@@ -174,6 +246,7 @@ class UAVRoutingEnv(gym.Env):
         self.goal_pos: np.ndarray | None = None       # [row, col]
         self.current_step: int = 0
         self._elapsed_steps: int = 0
+        self._last_dynamic_changes: list[tuple[int, int]] = []
 
         # ---- All-pairs distance table (fixed_grid=True only) -----------------
         # When fixed_grid=True, the obstacle layout never changes between
@@ -211,10 +284,18 @@ class UAVRoutingEnv(gym.Env):
         """
         super().reset(seed=seed)
         rng = self.np_random   # seeded RNG from gymnasium
+        self._dynamics_rng = np.random.default_rng(self.dynamics_seed)
+        self._moving_indices = [
+            obstacle.initial_index for obstacle in self.moving_obstacles
+        ]
 
         # ---- Build the grid --------------------------------------------------
         if self.fixed_grid and self._initial_grid is not None:
             self.grid = self._initial_grid.copy()
+            self._dynamics_rng = np.random.default_rng(self.dynamics_seed)
+            self._moving_indices = [
+                obstacle.initial_index for obstacle in self.moving_obstacles
+            ]
         else:
             self.grid = np.zeros((self.grid_size, self.grid_size), dtype=np.int32)
             total_cells = self.grid_size * self.grid_size
@@ -242,12 +323,22 @@ class UAVRoutingEnv(gym.Env):
                     else:
                         self.grid[obs.cell] = CELL_FREE
 
+            for obs in self.stochastic_obstacles:
+                self.grid[obs.cell] = (
+                    CELL_OBSTACLE
+                    if obs.initial_state == "blocked"
+                    else CELL_FREE
+                )
+            for obs in self.moving_obstacles:
+                self.grid[obs.path[obs.initial_index]] = CELL_OBSTACLE
+
             if self.fixed_grid:
                 self._initial_grid = self.grid.copy()
                 # Precompute all-pairs distances once when the fixed grid is
                 # first generated. Subsequent resets reuse _initial_grid and
                 # _distance_table without re-running Dijkstra.
-                self._distance_table = self._build_distance_table()
+                if self.potential_metric == "shortest_path":
+                    self._distance_table = self._build_distance_table()
 
         # ---- Place UAV and goal on distinct free cells -----------------------
         free_cells = np.argwhere(self.grid == CELL_FREE)
@@ -256,6 +347,9 @@ class UAVRoutingEnv(gym.Env):
             dyn_cells = {obs.cell for obs in self.dynamic_obstacles}
         else:
             dyn_cells = set()
+        dyn_cells.update(obs.cell for obs in self.stochastic_obstacles)
+        for obstacle in self.moving_obstacles:
+            dyn_cells.update(obstacle.path)
             
         for c in free_cells:
             if tuple(c) not in dyn_cells:
@@ -313,10 +407,11 @@ class UAVRoutingEnv(gym.Env):
 
         self.current_step = 0
         self._elapsed_steps = 0
+        self._last_dynamic_changes = []
         self.episode_count += 1
         # Use BFS distance for reward shaping so the agent is rewarded for
         # obstacle-aware progress, not straight-line distance.
-        self.previous_distance = self._bfs_distance(self.uav_pos, self.goal_pos)
+        self.previous_distance = -self._potential(self.uav_pos, self.goal_pos) * self.max_dist
 
         self.last_action = None
         self.visited_cells.clear()
@@ -355,8 +450,9 @@ class UAVRoutingEnv(gym.Env):
         assert self.action_space.contains(action), f"Invalid action {action}"
 
         self.current_step += 1
-
-        self._toggle_dynamic_obstacles()
+        self._last_dynamic_changes = []
+        if self.dynamics_timing == "pre_move_hidden":
+            self._last_dynamic_changes = self._toggle_dynamic_obstacles()
 
         # ---- Compute candidate next position --------------------------------
         delta = self.ACTION_DELTAS[action]
@@ -367,6 +463,7 @@ class UAVRoutingEnv(gym.Env):
         truncated = False
         sparse_reward = REWARD_STEP
         self._last_crashed = False
+        self._last_energy_penalty = 0.0
 
         prev_pos = self.uav_pos.copy()
 
@@ -383,6 +480,13 @@ class UAVRoutingEnv(gym.Env):
         else:
             # ---- Valid move — update UAV position ----------------------------
             self.uav_pos = next_pos.copy()
+            energy_penalty = self.traversal_penalties.get(
+                tuple(int(value) for value in self.uav_pos), 0.0
+            )
+            if self.grid[tuple(self.uav_pos)] == CELL_NO_FLY:
+                energy_penalty += self.no_fly_penalty
+            self._last_energy_penalty = energy_penalty
+            sparse_reward -= energy_penalty
 
             # 4. Goal reached (mission success)
             if np.array_equal(self.uav_pos, self.goal_pos):
@@ -390,12 +494,29 @@ class UAVRoutingEnv(gym.Env):
                 terminated = True
 
         # 5. Episode truncation: battery / flight-time budget exceeded
-        if not terminated and self.current_step >= MAX_STEPS:
+        if not terminated and self.current_step >= self.max_steps:
             truncated = True
+
+        # Research protocol: move under the state used to select the action,
+        # then advance dynamics and expose the changed state before the next
+        # decision. Terminal transitions do not create an unobservable event.
+        if (
+            self.dynamics_timing == "post_move_observed"
+            and not terminated
+            and not truncated
+        ):
+            self._last_dynamic_changes = self._toggle_dynamic_obstacles()
 
         # Potential-based shaping (Ng, Harada, Russell 1999)
         gamma = 0.99
-        reward = sparse_reward + gamma * self._potential(next_pos, self.goal_pos) - self._potential(prev_pos, self.goal_pos)
+        if self.potential_shaping_enabled:
+            reward = (
+                sparse_reward
+                + gamma * self._potential(next_pos, self.goal_pos)
+                - self._potential(prev_pos, self.goal_pos)
+            )
+        else:
+            reward = sparse_reward
 
         self.last_action = action
         self._last_prev_pos = prev_pos
@@ -434,13 +555,20 @@ class UAVRoutingEnv(gym.Env):
             dtype=np.float32,
         )
 
-        local_grid = self._get_local_observation()
+        if self.observation_mode == "local":
+            grid_observation = self._get_local_observation()
+        else:
+            grid_observation = self._apply_sensor_noise(
+                self.grid.flatten().astype(np.float32)
+            )
         
         last_action_onehot = [0.0] * self.n_actions
         if self.last_action is not None:
             last_action_onehot[self.last_action] = 1.0
             
-        obs_array = np.concatenate([pos_obs, local_grid, last_action_onehot], dtype=np.float32)
+        obs_array = np.concatenate(
+            [pos_obs, grid_observation, last_action_onehot], dtype=np.float32
+        )
 
         prev_pos = self._last_prev_pos if hasattr(self, "_last_prev_pos") else self.uav_pos
         return {
@@ -485,7 +613,18 @@ class UAVRoutingEnv(gym.Env):
                         self.grid[gr, gc]
                     )
 
-        return local.flatten().astype(np.float32)
+        return self._apply_sensor_noise(local.flatten().astype(np.float32))
+
+    def _apply_sensor_noise(self, values: np.ndarray) -> np.ndarray:
+        if self.sensor_noise_probability == 0.0:
+            return values
+        noisy = values.copy()
+        mask = self.np_random.random(noisy.shape) < self.sensor_noise_probability
+        free_to_blocked = mask & (noisy == CELL_FREE)
+        blocked_to_free = mask & (noisy == CELL_OBSTACLE)
+        noisy[free_to_blocked] = CELL_OBSTACLE
+        noisy[blocked_to_free] = CELL_FREE
+        return noisy
 
     def get_neighbors(self, node: np.ndarray) -> list[tuple[np.ndarray, float]]:
         """
@@ -497,8 +636,15 @@ class UAVRoutingEnv(gym.Env):
         for dr, dc in self.ACTION_DELTAS:
             nr, nc = r + dr, c + dc
             if 0 <= nr < self.grid_size and 0 <= nc < self.grid_size:
-                if self.grid[nr, nc] != CELL_OBSTACLE:
+                is_hard_no_fly = (
+                    self.no_fly_mode == "hard"
+                    and self.grid[nr, nc] == CELL_NO_FLY
+                )
+                if self.grid[nr, nc] != CELL_OBSTACLE and not is_hard_no_fly:
                     cost = 1.0 if dr == 0 or dc == 0 else math.sqrt(2)
+                    cost += self.traversal_penalties.get((int(nr), int(nc)), 0.0)
+                    if self.grid[nr, nc] == CELL_NO_FLY:
+                        cost += self.no_fly_penalty
                     neighbors.append((np.array([nr, nc]), cost))
         return neighbors
 
@@ -529,7 +675,12 @@ class UAVRoutingEnv(gym.Env):
         # The table is built once in reset() when fixed_grid=True and the
         # grid is first generated. This avoids live Dijkstra calls inside
         # compute_reward() during HER relabeling.
-        if self._distance_table is not None:
+        if (
+            self._distance_table is not None
+            and not self.dynamic_obstacles_enabled
+            and not self.stochastic_obstacles
+            and not self.moving_obstacles
+        ):
             row = self._distance_table.get((sr, sc))
             if row is not None:
                 return row.get((gr, gc), float(abs(sr - gr) + abs(sc - gc)))
@@ -624,16 +775,44 @@ class UAVRoutingEnv(gym.Env):
 
         return table
 
-    def _toggle_dynamic_obstacles(self) -> None:
+    def _toggle_dynamic_obstacles(self) -> list[tuple[int, int]]:
         """Toggle designated dynamic obstacles on a fixed timer."""
-        if self.dynamic_obstacles_enabled and self.dynamic_obstacles:
+        changed: list[tuple[int, int]] = []
+        if (
+            self.dynamic_obstacles
+            or self.stochastic_obstacles
+            or self.moving_obstacles
+        ):
             self._elapsed_steps += 1
+        if self.dynamic_obstacles_enabled and self.dynamic_obstacles:
             for obs in self.dynamic_obstacles:
                 if self._elapsed_steps % obs.period == 0:
                     r, c = obs.cell
                     if 0 <= r < self.grid_size and 0 <= c < self.grid_size:
                         current_val = self.grid[r, c]
                         self.grid[r, c] = CELL_FREE if current_val == CELL_OBSTACLE else CELL_OBSTACLE
+                        changed.append((r, c))
+        for obs in self.stochastic_obstacles:
+            if self._dynamics_rng.random() < obs.toggle_probability:
+                r, c = obs.cell
+                self.grid[r, c] = (
+                    CELL_FREE
+                    if self.grid[r, c] == CELL_OBSTACLE
+                    else CELL_OBSTACLE
+                )
+                changed.append((r, c))
+        for index, obs in enumerate(self.moving_obstacles):
+            if self._elapsed_steps % obs.period != 0:
+                continue
+            old_index = self._moving_indices[index]
+            new_index = (old_index + 1) % len(obs.path)
+            old_cell = obs.path[old_index]
+            new_cell = obs.path[new_index]
+            self.grid[old_cell] = CELL_FREE
+            self.grid[new_cell] = CELL_OBSTACLE
+            self._moving_indices[index] = new_index
+            changed.extend((old_cell, new_cell))
+        return changed
 
     def _calculate_distance(self, pos1: np.ndarray, pos2: np.ndarray) -> float:
         """Calculate Euclidean distance between two 2-D coordinates."""
@@ -642,10 +821,21 @@ class UAVRoutingEnv(gym.Env):
     def _potential(self, pos: np.ndarray, goal: np.ndarray) -> float:
         """
         Potential function for reward shaping (Ng et al. 1999).
-        Phi(state, goal) = -distance(state, goal)
+
+        Octile distance is the default because it matches 8-connected movement
+        geometry while remaining independent of dynamic obstacle state. That is
+        essential for valid HER relabeling: a replayed transition must not have
+        its reward depend on the environment's obstacle state at sampling time.
         """
-        phi = -self._bfs_distance(pos, goal) / self.max_dist
-        return phi
+        if self.potential_metric == "shortest_path":
+            distance = self._bfs_distance(pos, goal)
+        else:
+            row_delta = abs(int(pos[0]) - int(goal[0]))
+            col_delta = abs(int(pos[1]) - int(goal[1]))
+            diagonal = min(row_delta, col_delta)
+            straight = max(row_delta, col_delta) - diagonal
+            distance = diagonal * math.sqrt(2) + straight
+        return -distance / self.max_dist
 
     # ------------------------------------------------------------------
     #  Internal utilities
@@ -674,6 +864,8 @@ class UAVRoutingEnv(gym.Env):
             "manhattan_distance": manhattan,
             "step": self.current_step,
             "is_success": is_success,
+            "dynamic_changes": [list(cell) for cell in self._last_dynamic_changes],
+            "energy_penalty": getattr(self, "_last_energy_penalty", 0.0),
         }
 
     # ------------------------------------------------------------------
@@ -726,7 +918,14 @@ class UAVRoutingEnv(gym.Env):
                 sparse_reward = REWARD_STEP
 
             # 2. Shaping term: gamma * Phi(next_state, goal) - Phi(state, goal)
-            rewards[i] = sparse_reward + gamma * self._potential(current_pos, goal_pos) - self._potential(prev_pos, goal_pos)
+            if self.potential_shaping_enabled:
+                rewards[i] = (
+                    sparse_reward
+                    + gamma * self._potential(current_pos, goal_pos)
+                    - self._potential(prev_pos, goal_pos)
+                )
+            else:
+                rewards[i] = sparse_reward
 
         if is_single:
             return float(rewards[0])

@@ -1,0 +1,278 @@
+{
+  "captured_at_utc": "2026-07-27T05:15:32.573746+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "operating_system": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200"
+  },
+  "python": {
+    "version": "3.12.13",
+    "implementation": "CPython",
+    "executable": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\.venv\\Scripts\\python.exe"
+  },
+  "cpu": {
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "machine": "AMD64",
+    "logical_count": 8
+  },
+  "packages": {
+    "gymnasium": "1.3.0",
+    "matplotlib": "3.11.1",
+    "networkx": "3.6.1",
+    "numpy": "2.5.1",
+    "pytest": "9.1.1",
+    "scipy": "1.18.0",
+    "stable-baselines3": "2.9.0",
+    "torch": "2.13.0"
+  },
+  "source_tree": {
+    "sha256": "c44a7cb0a80724265f70e4a666161d435c3f67f05853953a37491d560f6ec341",
+    "files_hashed": 74
+  },
+  "git_commit": "f57ae150068fbd7a00c1b37a8280cf60a5dd2ddc",
+  "git_worktree": {
+    "dirty": true,
+    "changed_paths": [
+      " M .gitignore",
+      " M README.md",
+      " M baselines/replanning.py",
+      " M envs/grid_environment.py",
+      " M paper_latex_v2/README.md",
+      " M paper_latex_v2/main.tex",
+      " M paper_latex_v2/references.bib",
+      " M paper_latex_v2/sections/conclusion.tex",
+      " M paper_latex_v2/sections/discussion.tex",
+      " M paper_latex_v2/sections/experimental_setup.tex",
+      " M paper_latex_v2/sections/introduction.tex",
+      " M paper_latex_v2/sections/methodology.tex",
+      " M paper_latex_v2/sections/related_work.tex",
+      " M paper_latex_v2/sections/results.tex",
+      " M requirements.txt",
+      " M rl_agent/uav_env.py",
+      " M tests/test_dynamic_obstacles.py",
+      " M tests/test_uav_env_dynamic_obstacles.py",
+      "?? baselines/astar.py",
+      "?? baselines/dstar_lite.py",
+      "?? configs/",
+      "?? docs/ARTIFACT_MAP.md",
+      "?? docs/EXPERIMENT_PROTOCOL.md",
+      "?? docs/RESEARCH_EXECUTION_STATUS.md",
+      "?? evaluation/analyze_adaptability.py",
+      "?? evaluation/analyze_research_results.py",
+      "?? evaluation/check_artifact_integrity.py",
+      "?? evaluation/experiment_metadata.py",
+      "?? evaluation/extract_classical_adaptability.py",
+      "?? evaluation/generate_paper_narrative.py",
+      "?? evaluation/generate_paper_tables.py",
+      "?? evaluation/generate_research_plots.py",
+      "?? evaluation/manifests/",
+      "?? evaluation/results/",
+      "?? evaluation/scenario_suite.py",
+      "?? evaluation/statistical_tests.py",
+      "?? evaluation/summarize_classical_benchmark.py",
+      "?? evaluation/summarize_timing_distributions.py",
+      "?? evaluation/validate_benchmark.py",
+      "?? experiments/evaluate_multiseed.py",
+      "?? experiments/generate_benchmark_suite.py",
+      "?? experiments/generate_week3_manifest.py",
+      "?? experiments/run_classical_benchmark.py",
+      "?? experiments/run_classical_suite.py",
+      "?? experiments/train_multiseed.py",
+      "?? paper_latex_v2/generated/",
+      "?? paper_latex_v2/sections/artifact_appendix.tex",
+      "?? research_improvement_plan.md",
+      "?? rl_agent/double_dqn.py",
+      "?? scripts/",
+      "?? tests/test_adaptability_analysis.py",
+      "?? tests/test_artifact_integrity.py",
+      "?? tests/test_astar.py",
+      "?? tests/test_dstar_lite.py",
+      "?? tests/test_evaluation_timing_contract.py",
+      "?? tests/test_experiment_metadata.py",
+      "?? tests/test_realism_factors.py",
+      "?? tests/test_scenario_suite.py",
+      "?? tests/test_tectonic_installer.py",
+      "?? tests/test_timing_summary.py",
+      "?? tests/test_uav_env_configuration.py"
+    ]
+  },
+  "accelerator": {
+    "cuda_available": false,
+    "cuda_version": null,
+    "gpu_count": 0,
+    "gpu_names": []
+  },
+  "training": {
+    "config_path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\configs\\research_experiments.json",
+    "config": {
+      "schema_version": 1,
+      "policy_seeds": [
+        11,
+        22,
+        33,
+        44,
+        55
+      ],
+      "layout_seed": 42,
+      "grid_size": 15,
+      "dynamics_timing": "post_move_observed",
+      "model": {
+        "learning_rate": 0.001,
+        "buffer_size": 100000,
+        "learning_starts": 5000,
+        "batch_size": 256,
+        "gamma": 0.99,
+        "train_freq": 2,
+        "gradient_steps": 1,
+        "target_update_interval": 1000,
+        "exploration_fraction": 0.5,
+        "exploration_initial_eps": 1.0,
+        "exploration_final_eps": 0.05,
+        "network": [
+          128,
+          128
+        ],
+        "her_sampled_goals": 4
+      },
+      "stages": [
+        {
+          "name": "static",
+          "timesteps": 300000,
+          "obstacle_density": 0.2,
+          "dynamic": "none",
+          "curriculum_enabled": true
+        },
+        {
+          "name": "dynamic_mild",
+          "timesteps": 100000,
+          "obstacle_density": 0.2,
+          "dynamic": "mild",
+          "curriculum_enabled": false
+        },
+        {
+          "name": "dynamic_full",
+          "timesteps": 100000,
+          "obstacle_density": 0.2,
+          "dynamic": "full",
+          "curriculum_enabled": false
+        }
+      ],
+      "variants": {
+        "full": {
+          "double_dqn": true,
+          "her": true,
+          "potential_shaping": true,
+          "curriculum": true,
+          "observation_mode": "local",
+          "dynamic_from_scratch": false
+        },
+        "dqn": {
+          "double_dqn": false,
+          "her": true,
+          "potential_shaping": true,
+          "curriculum": true,
+          "observation_mode": "local",
+          "dynamic_from_scratch": false
+        },
+        "no_her": {
+          "double_dqn": true,
+          "her": false,
+          "potential_shaping": true,
+          "curriculum": true,
+          "observation_mode": "local",
+          "dynamic_from_scratch": false
+        },
+        "no_shaping": {
+          "double_dqn": true,
+          "her": true,
+          "potential_shaping": false,
+          "curriculum": true,
+          "observation_mode": "local",
+          "dynamic_from_scratch": false
+        },
+        "no_curriculum": {
+          "double_dqn": true,
+          "her": true,
+          "potential_shaping": true,
+          "curriculum": false,
+          "observation_mode": "local",
+          "dynamic_from_scratch": false
+        },
+        "full_observation": {
+          "double_dqn": true,
+          "her": true,
+          "potential_shaping": true,
+          "curriculum": true,
+          "observation_mode": "full",
+          "dynamic_from_scratch": false
+        },
+        "dynamic_from_scratch": {
+          "double_dqn": true,
+          "her": true,
+          "potential_shaping": true,
+          "curriculum": false,
+          "observation_mode": "local",
+          "dynamic_from_scratch": true,
+          "stage_timesteps": {
+            "dynamic_full": 500000
+          }
+        }
+      }
+    },
+    "variant": "dqn",
+    "variant_config": {
+      "double_dqn": false,
+      "her": true,
+      "potential_shaping": true,
+      "curriculum": true,
+      "observation_mode": "local",
+      "dynamic_from_scratch": false
+    },
+    "policy_seed": 11,
+    "layout_seed": 42,
+    "smoke_test": false,
+    "stages": [
+      {
+        "stage": "static",
+        "configured_timesteps": 300000,
+        "executed_timesteps": 300000,
+        "source_checkpoint": "new",
+        "output_checkpoint": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\models\\research\\dqn\\seed_011\\00_static_final.zip",
+        "elapsed_seconds": 2214.1899949000003,
+        "steps_per_second": 135.48972793256115
+      },
+      {
+        "stage": "dynamic_mild",
+        "configured_timesteps": 100000,
+        "executed_timesteps": 100000,
+        "source_checkpoint": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\models\\research\\dqn\\seed_011\\00_static_final.zip",
+        "output_checkpoint": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\models\\research\\dqn\\seed_011\\01_dynamic_mild_final.zip",
+        "elapsed_seconds": 793.7510953999999,
+        "steps_per_second": 125.98407810650815
+      },
+      {
+        "stage": "dynamic_full",
+        "configured_timesteps": 100000,
+        "executed_timesteps": 100000,
+        "source_checkpoint": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\models\\research\\dqn\\seed_011\\01_dynamic_mild_final.zip",
+        "output_checkpoint": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\models\\research\\dqn\\seed_011\\02_dynamic_full_final.zip",
+        "elapsed_seconds": 759.4584894999998,
+        "steps_per_second": 131.67276603338308
+      }
+    ]
+  },
+  "training_source_snapshot": {
+    "captured_at_utc": "2026-07-26T18:59:53.310927+00:00",
+    "sha256": "00a4ff215b3d31f7be2a42d62f7467d19beacd3f3e78c8684efe2d233412f39d",
+    "files": {
+      "configs/research_experiments.json": "ed513c152b8d2d2a0d3e1c98f7837d2014c3c75508fa07e93de8ee852dff7e3e",
+      "envs/grid_environment.py": "1bf078461c218622bb4dca710fe4b1b92dd844d3649d818302b6ecbde094023b",
+      "experiments/train_multiseed.py": "f1f3901c74680e7dd4c85494eac4585ad4fc7f42907619c95126ecd104c3f69f",
+      "requirements.txt": "a0542267ed32d350ef8523fab9e25e5567250ceaa887f42ac333588389e2549f",
+      "rl_agent/double_dqn.py": "e0e38957338a7abb1a780ee8d65c0e7991a30ec6a47aa5535f34852d4c45fcb2",
+      "rl_agent/safe_her_buffer.py": "190bf16c118e4c3a95d92106c7a70a084548edb75ad5990706363e3f2cd48e3a",
+      "rl_agent/uav_env.py": "bacf0fdbb263ec4243afcc3a79cba5692c3278a56f9800ba41ffb41faa274b26"
+    }
+  }
+}

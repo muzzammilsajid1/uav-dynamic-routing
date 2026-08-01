@@ -2,36 +2,49 @@
 
 \usepackage{cite}
 \usepackage{amsmath,amssymb}
+\usepackage{newtxtext,newtxmath}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{float}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 
 \IEEEoverridecommandlockouts
 
-\title{Dynamic UAV Routing: A Controlled Comparison of Naive Dijkstra Replanning and Reinforcement Learning}
+\title{Dynamic UAV Routing Under Distribution Shift: A Reproducible
+Multi-Seed Comparison of Reinforcement Learning and Classical Search}
 
 \author{
-\IEEEauthorblockN{\IEEEauthorrefmark{1}Simra Imran\thanks{\IEEEauthorrefmark{1}These authors contributed equally to this work.}}
-\IEEEauthorblockA{School of Electrical Engineering and Computer Science (SEECS)\\
-National University of Sciences and Technology (NUST)\\
-Email: simraimran158@gmail.com}
-\and
-\IEEEauthorblockN{\IEEEauthorrefmark{1}Muzzammil Sajid}
-\IEEEauthorblockA{Faculty of Mechanical Engineering (FME)\\
-Ghulam Ishaq Khan Institute of Engineering Sciences and Technology (GIKI)\\
-Email: muzzammilsajid1@gmail.com}
+\IEEEauthorblockN{Simra Imran\IEEEauthorrefmark{1} and
+Muzzammil Sajid\IEEEauthorrefmark{2}}
+\IEEEauthorblockA{\IEEEauthorrefmark{1}School of Electrical Engineering and
+Computer Science, National University of Sciences and Technology\\
+Islamabad, Pakistan --- simraimran158@gmail.com}
+\IEEEauthorblockA{\IEEEauthorrefmark{2}Faculty of Mechanical Engineering,
+Ghulam Ishaq Khan Institute of Engineering Sciences and Technology\\
+Topi, Pakistan --- muzzammilsajid1@gmail.com}
 }
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Unmanned aerial vehicles (UAVs) operating in dynamic environments must route around obstacles that can appear, disappear, or move during flight. Classical graph-search methods provide optimal paths on a known static graph but must be recomputed when the graph changes; reinforcement learning (RL) offers an alternative policy-based approach that reacts through learned action selection rather than explicit search. This paper presents a controlled, paired comparison of two classical replanning baselines --- naive Dijkstra replanning and A* replanning --- against a Double DQN policy trained with Hindsight Experience Replay (HER) and curriculum learning, using a shared 15$\times$15 grid-world UAV routing environment with identical movement and obstacle rules across all three methods. We first validate the RL policy on a static 40-scenario evaluation (obstacle density 0.2), where Dijkstra succeeds on 100\% of scenarios against 97.5\% for DQN, with a mean path-cost penalty of 0.92 units above optimal and a $\sim$3.3$\times$ compute-time overhead for DQN, both figures independently reproduced for this revision. We then evaluate all three methods on a paired 50-scenario dynamic evaluation with three shared toggling obstacles. Dijkstra and A* both succeed on all 50 scenarios and, as expected for two optimal planners, produce identical path costs; RL succeeds on 49 of 50 and produces significantly higher-cost paths than both classical planners (Wilcoxon signed-rank $W=0$, $p=5.64\times10^{-7}$ vs.\ Dijkstra). The compute-time picture is more nuanced than a single Dijkstra baseline suggests: naive Dijkstra replanning shows no significant compute-time advantage over RL ($p=0.063$), but A*'s heuristic-guided search resolves the same replanning events roughly 16$\times$ faster than Dijkstra ($p=3.6\times10^{-15}$) at identical path quality, revealing that the earlier ``RL vs.\ classical'' framing conflated a naive-implementation gap with a genuine algorithmic one. These results support an honest trade-off framing: RL demonstrates substantial adaptability but does not match either classical planner in optimality, reliability, or compute cost at the tested scale, and a well-implemented classical planner (A*) is a stronger deployment baseline than naive Dijkstra replanning alone. We report all evaluations on a single trained policy (seed 42) and treat the absence of multi-seed training variance as an explicit, unresolved limitation rather than an omission.
+Claims of learned routing superiority can depend on baseline choice, training
+seed, and test distribution. We therefore compare Dijkstra, A*, D* Lite, and
+Double DQN with Hindsight Experience Replay (DDQN+HER) on one persisted
+310-scenario suite with identical movement, obstacle, information, and timing
+contracts. Seven RL configurations are trained with five policy seeds
+(35 runs; 17.5 million environment steps) and evaluated on held-out endpoints,
+layout and dynamics shifts, four grid sizes, and controlled realism factors.
+Route timings are repeated ten times, and change events are analyzed through
+cost shock, recovery, reaction work, and post-change success.
+\input{generated/abstract_results}
+All claims are traceable to raw seed/scenario/repetition artifacts.
 \end{abstract}
 
 \begin{IEEEkeywords}
-UAV routing, Dijkstra algorithm, reinforcement learning, dynamic obstacles, path planning, grid world
+UAV routing, dynamic path planning, D* Lite, A*, reinforcement learning,
+Hindsight Experience Replay, reproducibility
 \end{IEEEkeywords}
 
 \input{sections/introduction}
@@ -41,7 +54,11 @@ UAV routing, Dijkstra algorithm, reinforcement learning, dynamic obstacles, path
 \input{sections/results}
 \input{sections/discussion}
 \input{sections/conclusion}
+\input{sections/artifact_appendix}
 
+% Balance the final reference page instead of leaving only two entries in the
+% second column. IEEEtran applies this break immediately before reference 9.
+\IEEEtriggeratref{9}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 

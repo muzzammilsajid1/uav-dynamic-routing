@@ -1,7 +1,8 @@
-numpy
-networkx
-gymnasium
-stable-baselines3[extra]
-matplotlib
-scipy
-pytest
+numpy==2.5.1
+networkx==3.6.1
+gymnasium==1.3.0
+stable-baselines3[extra]==2.9.0
+torch==2.13.0
+matplotlib==3.11.1
+scipy==1.18.0
+pytest==9.1.1

@@ -1,34 +1,49 @@
-# LaTeX Paper Package — v2 (current)
+# Expanded reproducible paper package
 
-This is the **current version** of the paper. For the original submitted version, see [`paper_latex_v1/`](../paper_latex_v1).
+This is the current manuscript. It supersedes the single-seed Dijkstra/A*/RL
+revision in `paper_latex_v1/` and the earlier generated PDF in this directory.
 
-## What changed from v1
+The manuscript now describes:
 
-- **Added A\* as a second classical baseline**, alongside naive Dijkstra replanning. A\* and Dijkstra are both optimal on this graph, so they produce identical path costs (confirmed empirically); A\* resolves the same replanning events roughly 16× faster than Dijkstra (Wilcoxon p = 3.6×10⁻¹⁵). This revises the original compute-time conclusion: RL's per-step compute-time cost was not competitive with either classical planner once a properly pruned one was included.
-- **Added a full DQN + HER hyperparameter table** (network architecture, learning rate, buffer size, discount factor, curriculum phases, reward shaping) for reproducibility.
-- **Re-measured static-evaluation compute time directly** (the original run did not persist raw per-scenario timing data) and independently reconfirmed the original success-rate and path-cost figures.
-- **Added 95% Wilson confidence intervals** on the small-sample success-rate comparisons (50 scenarios).
-- **Added an informal generalization probe** (94% success on an unseen grid layout, seed 999) as a directional signal, clearly flagged as non-rigorous.
-- **Made the benchmark's scale an explicit, stated methodological choice** (small grid, zero static obstacle density in the dynamic eval) rather than an unstated limitation.
-- **Named single-seed RL training and the absence of ablations as open limitations**, rather than omitting them.
+- five independent RL training seeds;
+- Dijkstra, A*, and D* Lite classical baselines;
+- persisted ID/OOD, scaling, and realism benchmark splits;
+- repeated route timings and machine manifests;
+- controlled RL ablations;
+- event-level adaptability metrics; and
+- generated tables, figures, and evidence-bound prose.
 
-## Compile from this folder with:
+Do not treat the existing `main.pdf` as current until the expanded experiment
+queue finishes and the source is recompiled. Generated fragments under
+`generated/` are placeholders until `evaluation/results/integrity_report.json`
+reports `status: passed`.
+
+## Regenerate evidence
 
 ```bash
-pdflatex main.tex
-bibtex main
-pdflatex main.tex
-pdflatex main.tex
+python scripts/run_full_research.py --variants full
 ```
 
-## Before submission
+Use `--train` on a clean checkout when checkpoints do not yet exist.
 
-- Replace placeholder authors/institution.
-- Complete BibTeX metadata in `references.bib`.
-- Confirm target venue formatting requirements.
+## Compile
 
-## Related files elsewhere in the repo
+From the repository root, the final pipeline uses the checksum-pinned
+workspace-local Tectonic compiler
+and refuses to publish a PDF unless artifact integrity passes and all generated
+fragments have replaced their placeholders:
 
-- `evaluation/compare_dqn_dijkstra_timed.py` — instrumented re-run of the static evaluation with compute-time measurement, used to produce Table II in this version.
-- `evaluation/week3_astar_baseline_results.csv` — raw per-scenario A* results used for the new baseline comparisons.
-- `logs/eval_dqn_vs_dijkstra_timed.csv`, `logs/eval_dqn_vs_dijkstra_v2.csv` — re-run static evaluation outputs.
+```bash
+python scripts/compile_paper.py
+```
+
+For source/layout debugging before the experiment queue finishes:
+
+```bash
+python scripts/compile_paper.py --allow-incomplete
+```
+
+Release output is written to
+`output/pdf/uav_dynamic_routing_research_paper.pdf`, accompanied by a build
+manifest containing the engine version, integrity-report digest, PDF digest,
+and page count.

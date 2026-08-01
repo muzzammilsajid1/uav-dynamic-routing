@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\caption{Generalization summary (mean $\pm$ 95\% CI). C succ. is the minimum success among A*, Dijkstra, and D* Lite; RL estimates use five policies and gap uses successful routes.}
+\scriptsize
+\setlength{\tabcolsep}{2.4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrrrr}
+\toprule
+Condition & C succ. (\%) & RL succ. (\%) & RL gap & A* ms & RL ms \\
+\midrule
+Held-out pairs & 100.0 & $96.0 \pm 11.1$ & $1.11 \pm 0.45$ & $0.15 \pm 0.02$ & $6.61 \pm 9.77$ \\
+Unseen layout & 100.0 & $90.0 \pm 5.9$ & $0.90 \pm 0.38$ & $0.16 \pm 0.04$ & $11.16 \pm 3.79$ \\
+Denser layout & 100.0 & $72.0 \pm 8.6$ & $0.92 \pm 0.38$ & $0.18 \pm 0.04$ & $26.32 \pm 6.95$ \\
+New obstacle sites & 100.0 & $98.0 \pm 5.6$ & $0.93 \pm 0.17$ & $0.20 \pm 0.05$ & $4.59 \pm 2.86$ \\
+New toggle periods & 100.0 & $98.7 \pm 3.7$ & $0.88 \pm 0.35$ & $0.48 \pm 0.14$ & $4.86 \pm 3.28$ \\
+\bottomrule
+\end{tabular}%
+}
+\label{tab:generalization-results}
+\end{table}

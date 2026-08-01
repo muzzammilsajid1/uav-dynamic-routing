@@ -1,23 +1,52 @@
 \section{Introduction}
 
-Unmanned aerial vehicles (UAVs) increasingly operate in environments where routing conditions can change during flight. Obstacles may appear or disappear, restricted regions may change, and the route selected at launch may no longer be valid later in the mission. This makes dynamic path planning a central problem for autonomous UAV navigation \cite{ghambari2024survey,johnson2026rcsr}.
+Autonomous UAVs must often route while obstacles, regulatory restrictions, and
+energy conditions change during flight. A route that is valid at takeoff can
+become inefficient or infeasible after deployment, making dynamic replanning a
+central navigation problem \cite{ghambari2024survey}.
 
-Classical graph-search algorithms remain a strong baseline for this problem because they are deterministic, interpretable, and optimal when the graph and edge costs are known. Dijkstra's algorithm, in particular, returns a shortest path when all edge weights are non-negative. However, in a dynamic environment, each obstacle change can invalidate the previous path and require replanning from the UAV's current position. This repeated recomputation is correct but may become expensive as environment size and change frequency increase.
+Classical graph search provides strong reference methods when the current map
+is known. Dijkstra is optimal but expands uniformly; A* preserves optimality
+while using a heuristic to focus search; D* Lite reuses prior search state when
+edge availability changes \cite{hart1968astar,koenig2005dstarlite}. These three
+algorithms represent meaningfully different classical regimes: naive full
+replanning, heuristic full replanning, and incremental replanning.
 
-Reinforcement learning (RL) provides a different approach. Rather than recomputing a path through explicit graph search, an RL policy maps observations to movement actions after training. This can potentially reduce deployment-time computation and allow reactive behavior under changing conditions. However, learned policies may be suboptimal, may fail in some scenarios, and do not provide the same optimality guarantees as Dijkstra \cite{mannan2023classical,tu2023uav,guo2023uav}.
+Deep reinforcement learning (RL) offers a different deployment model. After
+training, a policy selects actions from observations without explicitly
+solving a graph-search problem at every decision. This may be attractive under
+rapid changes or large state spaces, but it removes shortest-path guarantees
+and introduces sensitivity to training seed, representation, reward design,
+and distribution shift \cite{vanhasselt2016double,andrychowicz2017her,
+henderson2018deep}.
 
-Before testing RL's adaptability under dynamic conditions, it is necessary to establish that the trained policy performs reasonably well when the environment does not change at all; a policy that cannot approach optimal performance on a static grid is not a meaningful comparison point once obstacles start moving. We therefore evaluate all methods twice: first on a static 40-scenario benchmark that establishes a baseline for path-cost and compute-time behavior, and then on the paired 50-scenario dynamic benchmark that is this paper's primary contribution.
+A credible comparison must therefore address more than one policy and one
+classical baseline. It must pair methods on identical scenarios, retain
+training and timing distributions, test unseen environments, separate
+in-distribution from out-of-distribution performance, and measure adaptation
+after individual change events. This paper implements that evidence standard
+for a controlled grid-based UAV-routing study.
 
-A first version of this comparison used only Dijkstra's algorithm, run with full-graph replanning on every obstacle change, as the sole classical baseline. That comparison is a valid but narrow test: it asks whether RL beats one particular, deliberately unoptimized classical implementation, not whether RL beats classical planning in general. A reader could reasonably ask whether the reported compute-time result was really about ``search vs.\ learned policy'' or simply about ``un-pruned search vs.\ pruned search.'' This revision adds A* replanning, which uses the same graph and the same replanning trigger as Dijkstra but prunes its search with an admissible heuristic, as a second classical baseline. Because A* and Dijkstra are both optimal on this non-negative-weight grid, any cost difference between them should be zero, and any compute-time difference isolates the effect of heuristic pruning rather than the effect of ``search vs.\ RL.'' This lets us separate two previously conflated questions: (1) does RL beat classical graph search at all, and (2) was the previous compute-time comparison handicapping the classical side by using an unnecessarily naive implementation.
+The study asks four questions:
+\begin{enumerate}
+    \item How do RL, naive search, heuristic search, and incremental search
+    compare in reliability, path quality, and route-level decision cost?
+    \item How much does RL performance vary across independent training seeds?
+    \item How do the methods respond to layout shift, denser obstacles, new
+    dynamics, realistic cost factors, and increasing grid size?
+    \item Which RL components improve performance under controlled
+    one-factor interventions?
+\end{enumerate}
 
-This paper asks whether a dynamically trained RL policy can match or outperform classical replanning --- both a naive and a heuristic-pruned variant --- in a controlled UAV grid-routing environment. We compare all methods on success rate, path cost, and compute time, both when the environment is static and when it changes during flight.
-
-The main contributions are:
+The principal contributions are:
 \begin{itemize}
-    \item a shared 15$\times$15 UAV grid environment with identical movement and dynamic-obstacle rules for all three methods;
-    \item a static baseline evaluation validating the trained RL policy's path quality and compute-time behavior before dynamic obstacles are introduced, independently re-run and confirmed for this revision;
-    \item two classical replanning baselines --- naive Dijkstra and heuristic-pruned A* --- that recompute after each dynamic obstacle change, isolating the effect of search-time optimization from the effect of using a learned policy at all;
-    \item a Double DQN + HER policy trained through curriculum learning and evaluated on the same 50 scenario IDs and start-goal pairs as both classical baselines;
-    \item paired statistical comparisons using Wilcoxon signed-rank testing across all three method pairs, plus Wilson confidence intervals on the small-sample success-rate comparisons;
-    \item a full account of the RL policy's hyperparameters, training curriculum, and a documented single-seed limitation, so the reported numbers describe one trained policy rather than a distribution over training runs.
+    \item a persisted 310-scenario benchmark that pairs methods on identical
+    graphs, changes, movement costs, information timing, and compute boundaries;
+    \item a 35-run, 17.5-million-step training study covering five seeds and
+    controlled interventions on Double DQN, HER, reward shaping, curriculum,
+    observation scope, and dynamic-only training;
+    \item seed-aware generalization, scaling, realism, timing, and event-level
+    adaptability analyses with paired tests and multiplicity correction; and
+    \item an auditable pipeline linking source provenance, checkpoints, raw
+    repetitions, tables, vector figures, and manuscript claims.
 \end{itemize}

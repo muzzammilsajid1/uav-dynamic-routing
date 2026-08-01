@@ -1,0 +1,114 @@
+{
+  "status": "passed",
+  "suite_id": "uav-routing-benchmark-v2",
+  "dynamics_timing": "post_move_observed",
+  "training_source_sha256": "00a4ff215b3d31f7be2a42d62f7467d19beacd3f3e78c8684efe2d233412f39d",
+  "scenario_count": 310,
+  "repetitions": 10,
+  "artifacts": [
+    {
+      "artifact_type": "route_runs",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\classical_suite_raw.csv",
+      "rows": 9300,
+      "unique_run_ids": 9300,
+      "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec"
+    },
+    {
+      "artifact_type": "adaptability_events",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\classical_adaptability_events.csv",
+      "rows": 5620,
+      "unique_event_keys": 5620
+    },
+    {
+      "artifact_type": "route_runs",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_full_raw.csv",
+      "rows": 15500,
+      "unique_run_ids": 15500,
+      "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec"
+    },
+    {
+      "artifact_type": "adaptability_events",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_full_adaptability_events.csv",
+      "rows": 11630,
+      "unique_event_keys": 11630
+    },
+    {
+      "artifact_type": "route_runs",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_dqn_raw.csv",
+      "rows": 15500,
+      "unique_run_ids": 15500,
+      "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec"
+    },
+    {
+      "artifact_type": "adaptability_events",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_dqn_adaptability_events.csv",
+      "rows": 214710,
+      "unique_event_keys": 214710
+    },
+    {
+      "artifact_type": "route_runs",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_no_her_raw.csv",
+      "rows": 15500,
+      "unique_run_ids": 15500,
+      "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec"
+    },
+    {
+      "artifact_type": "adaptability_events",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_no_her_adaptability_events.csv",
+      "rows": 9980,
+      "unique_event_keys": 9980
+    },
+    {
+      "artifact_type": "route_runs",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_no_shaping_raw.csv",
+      "rows": 15500,
+      "unique_run_ids": 15500,
+      "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec"
+    },
+    {
+      "artifact_type": "adaptability_events",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_no_shaping_adaptability_events.csv",
+      "rows": 8750,
+      "unique_event_keys": 8750
+    },
+    {
+      "artifact_type": "route_runs",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_no_curriculum_raw.csv",
+      "rows": 15500,
+      "unique_run_ids": 15500,
+      "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec"
+    },
+    {
+      "artifact_type": "adaptability_events",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_no_curriculum_adaptability_events.csv",
+      "rows": 8860,
+      "unique_event_keys": 8860
+    },
+    {
+      "artifact_type": "route_runs",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_full_observation_raw.csv",
+      "rows": 14000,
+      "unique_run_ids": 14000,
+      "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec"
+    },
+    {
+      "artifact_type": "adaptability_events",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_full_observation_adaptability_events.csv",
+      "rows": 136090,
+      "unique_event_keys": 136090
+    },
+    {
+      "artifact_type": "route_runs",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_dynamic_from_scratch_raw.csv",
+      "rows": 15500,
+      "unique_run_ids": 15500,
+      "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec"
+    },
+    {
+      "artifact_type": "adaptability_events",
+      "path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\evaluation\\results\\rl_dynamic_from_scratch_adaptability_events.csv",
+      "rows": 38990,
+      "unique_event_keys": 38990
+    }
+  ]
+}

@@ -1,0 +1,595 @@
+{
+  "schema_version": 2,
+  "benchmark_id": "week3-dynamic-v1",
+  "description": "Paired dynamic 15x15 benchmark used by all planning methods.",
+  "dynamics_timing": "post_move_observed",
+  "generation": {
+    "seed": 42,
+    "minimum_static_path_cost": 5.0
+  },
+  "environment": {
+    "size": 15,
+    "obstacle_density": 0.0,
+    "diagonal_movement": true,
+    "orthogonal_cost": 1.0,
+    "diagonal_cost": "sqrt(2)",
+    "dynamic_obstacles": [
+      {
+        "cell": [
+          4,
+          4
+        ],
+        "period": 5,
+        "initial_state": "passable"
+      },
+      {
+        "cell": [
+          8,
+          8
+        ],
+        "period": 5,
+        "initial_state": "blocked"
+      },
+      {
+        "cell": [
+          12,
+          11
+        ],
+        "period": 5,
+        "initial_state": "passable"
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "scenario_id": "W3D-001",
+      "start": [
+        11,
+        0
+      ],
+      "goal": [
+        1,
+        13
+      ]
+    },
+    {
+      "scenario_id": "W3D-002",
+      "start": [
+        0,
+        6
+      ],
+      "goal": [
+        12,
+        12
+      ]
+    },
+    {
+      "scenario_id": "W3D-003",
+      "start": [
+        4,
+        11
+      ],
+      "goal": [
+        4,
+        2
+      ]
+    },
+    {
+      "scenario_id": "W3D-004",
+      "start": [
+        3,
+        12
+      ],
+      "goal": [
+        2,
+        5
+      ]
+    },
+    {
+      "scenario_id": "W3D-005",
+      "start": [
+        12,
+        10
+      ],
+      "goal": [
+        1,
+        11
+      ]
+    },
+    {
+      "scenario_id": "W3D-006",
+      "start": [
+        9,
+        6
+      ],
+      "goal": [
+        1,
+        7
+      ]
+    },
+    {
+      "scenario_id": "W3D-007",
+      "start": [
+        3,
+        14
+      ],
+      "goal": [
+        8,
+        11
+      ]
+    },
+    {
+      "scenario_id": "W3D-008",
+      "start": [
+        10,
+        6
+      ],
+      "goal": [
+        0,
+        6
+      ]
+    },
+    {
+      "scenario_id": "W3D-009",
+      "start": [
+        9,
+        10
+      ],
+      "goal": [
+        3,
+        5
+      ]
+    },
+    {
+      "scenario_id": "W3D-010",
+      "start": [
+        12,
+        1
+      ],
+      "goal": [
+        9,
+        6
+      ]
+    },
+    {
+      "scenario_id": "W3D-011",
+      "start": [
+        7,
+        3
+      ],
+      "goal": [
+        3,
+        11
+      ]
+    },
+    {
+      "scenario_id": "W3D-012",
+      "start": [
+        7,
+        10
+      ],
+      "goal": [
+        10,
+        2
+      ]
+    },
+    {
+      "scenario_id": "W3D-013",
+      "start": [
+        4,
+        12
+      ],
+      "goal": [
+        14,
+        0
+      ]
+    },
+    {
+      "scenario_id": "W3D-014",
+      "start": [
+        0,
+        1
+      ],
+      "goal": [
+        13,
+        2
+      ]
+    },
+    {
+      "scenario_id": "W3D-015",
+      "start": [
+        13,
+        14
+      ],
+      "goal": [
+        2,
+        10
+      ]
+    },
+    {
+      "scenario_id": "W3D-016",
+      "start": [
+        12,
+        0
+      ],
+      "goal": [
+        7,
+        4
+      ]
+    },
+    {
+      "scenario_id": "W3D-017",
+      "start": [
+        13,
+        3
+      ],
+      "goal": [
+        5,
+        12
+      ]
+    },
+    {
+      "scenario_id": "W3D-018",
+      "start": [
+        6,
+        8
+      ],
+      "goal": [
+        1,
+        9
+      ]
+    },
+    {
+      "scenario_id": "W3D-019",
+      "start": [
+        6,
+        2
+      ],
+      "goal": [
+        14,
+        9
+      ]
+    },
+    {
+      "scenario_id": "W3D-020",
+      "start": [
+        5,
+        14
+      ],
+      "goal": [
+        10,
+        6
+      ]
+    },
+    {
+      "scenario_id": "W3D-021",
+      "start": [
+        4,
+        8
+      ],
+      "goal": [
+        13,
+        14
+      ]
+    },
+    {
+      "scenario_id": "W3D-022",
+      "start": [
+        0,
+        11
+      ],
+      "goal": [
+        12,
+        8
+      ]
+    },
+    {
+      "scenario_id": "W3D-023",
+      "start": [
+        7,
+        13
+      ],
+      "goal": [
+        9,
+        4
+      ]
+    },
+    {
+      "scenario_id": "W3D-024",
+      "start": [
+        2,
+        1
+      ],
+      "goal": [
+        6,
+        7
+      ]
+    },
+    {
+      "scenario_id": "W3D-025",
+      "start": [
+        1,
+        5
+      ],
+      "goal": [
+        9,
+        8
+      ]
+    },
+    {
+      "scenario_id": "W3D-026",
+      "start": [
+        5,
+        1
+      ],
+      "goal": [
+        14,
+        5
+      ]
+    },
+    {
+      "scenario_id": "W3D-027",
+      "start": [
+        14,
+        13
+      ],
+      "goal": [
+        6,
+        3
+      ]
+    },
+    {
+      "scenario_id": "W3D-028",
+      "start": [
+        9,
+        14
+      ],
+      "goal": [
+        3,
+        4
+      ]
+    },
+    {
+      "scenario_id": "W3D-029",
+      "start": [
+        12,
+        2
+      ],
+      "goal": [
+        1,
+        2
+      ]
+    },
+    {
+      "scenario_id": "W3D-030",
+      "start": [
+        0,
+        11
+      ],
+      "goal": [
+        11,
+        6
+      ]
+    },
+    {
+      "scenario_id": "W3D-031",
+      "start": [
+        3,
+        13
+      ],
+      "goal": [
+        13,
+        5
+      ]
+    },
+    {
+      "scenario_id": "W3D-032",
+      "start": [
+        5,
+        0
+      ],
+      "goal": [
+        1,
+        5
+      ]
+    },
+    {
+      "scenario_id": "W3D-033",
+      "start": [
+        14,
+        11
+      ],
+      "goal": [
+        3,
+        14
+      ]
+    },
+    {
+      "scenario_id": "W3D-034",
+      "start": [
+        14,
+        14
+      ],
+      "goal": [
+        1,
+        10
+      ]
+    },
+    {
+      "scenario_id": "W3D-035",
+      "start": [
+        14,
+        6
+      ],
+      "goal": [
+        6,
+        4
+      ]
+    },
+    {
+      "scenario_id": "W3D-036",
+      "start": [
+        2,
+        11
+      ],
+      "goal": [
+        6,
+        5
+      ]
+    },
+    {
+      "scenario_id": "W3D-037",
+      "start": [
+        6,
+        1
+      ],
+      "goal": [
+        3,
+        8
+      ]
+    },
+    {
+      "scenario_id": "W3D-038",
+      "start": [
+        11,
+        8
+      ],
+      "goal": [
+        4,
+        9
+      ]
+    },
+    {
+      "scenario_id": "W3D-039",
+      "start": [
+        12,
+        1
+      ],
+      "goal": [
+        11,
+        11
+      ]
+    },
+    {
+      "scenario_id": "W3D-040",
+      "start": [
+        11,
+        2
+      ],
+      "goal": [
+        1,
+        3
+      ]
+    },
+    {
+      "scenario_id": "W3D-041",
+      "start": [
+        10,
+        7
+      ],
+      "goal": [
+        10,
+        14
+      ]
+    },
+    {
+      "scenario_id": "W3D-042",
+      "start": [
+        2,
+        13
+      ],
+      "goal": [
+        9,
+        3
+      ]
+    },
+    {
+      "scenario_id": "W3D-043",
+      "start": [
+        12,
+        8
+      ],
+      "goal": [
+        4,
+        2
+      ]
+    },
+    {
+      "scenario_id": "W3D-044",
+      "start": [
+        2,
+        11
+      ],
+      "goal": [
+        7,
+        14
+      ]
+    },
+    {
+      "scenario_id": "W3D-045",
+      "start": [
+        11,
+        0
+      ],
+      "goal": [
+        11,
+        13
+      ]
+    },
+    {
+      "scenario_id": "W3D-046",
+      "start": [
+        9,
+        9
+      ],
+      "goal": [
+        3,
+        11
+      ]
+    },
+    {
+      "scenario_id": "W3D-047",
+      "start": [
+        11,
+        12
+      ],
+      "goal": [
+        5,
+        9
+      ]
+    },
+    {
+      "scenario_id": "W3D-048",
+      "start": [
+        13,
+        6
+      ],
+      "goal": [
+        0,
+        14
+      ]
+    },
+    {
+      "scenario_id": "W3D-049",
+      "start": [
+        3,
+        13
+      ],
+      "goal": [
+        14,
+        3
+      ]
+    },
+    {
+      "scenario_id": "W3D-050",
+      "start": [
+        0,
+        8
+      ],
+      "goal": [
+        13,
+        14
+      ]
+    }
+  ]
+}

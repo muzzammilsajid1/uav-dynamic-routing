@@ -1,45 +1,68 @@
 # UAV Dynamic Routing
 
-Dijkstra-baseline vs reinforcement-learning UAV routing in a dynamic grid environment.
+Reproducible comparison of classical and reinforcement-learning UAV routing in
+dynamic grid environments.
 
 ## Paper
 
-The research paper lives in two versions:
+- [`paper_latex_v2/`](paper_latex_v2) - current expanded source. It compares
+  Dijkstra, A*, D* Lite, and multi-seed DQN+HER across generalization, scaling,
+  realism, and ablation benchmarks.
+- [`paper_latex_v1/`](paper_latex_v1) - archived original single-baseline paper.
 
-- [`paper_latex_v2/`](paper_latex_v2) — **current version.** Compares naive Dijkstra, A\*, and DQN+HER on static and dynamic benchmarks, with a full hyperparameter table and re-measured compute times.
-- [`paper_latex_v1/`](paper_latex_v1) — archived original version (Dijkstra-only classical baseline). Kept for reference; see `paper_latex_v2/README.md` for what changed and why.
+Generated result fragments in the current paper remain provisional until
+`evaluation/results/integrity_report.json` reports `status: passed`.
 
-## Week 1 Environment Contract
+## Environment contract
 
-- Coordinates: `(row, col)` everywhere.
-- Grid size: start with `15x15`.
-- Movement: 8-direction movement.
-- Move cost: straight = `1.0`, diagonal = `sqrt(2)`.
-- Obstacles: hard-blocked cells, not traversable.
-- Start and goal: never blocked.
-- Dynamic obstacles: not active in Week 1.
-- Shared rule: Dijkstra and RL must both use `GridEnvironment.get_neighbors()`.
+- Coordinates: `(row, col)`.
+- Movement: eight-connected.
+- Straight cost: `1.0`.
+- Diagonal cost: `sqrt(2)`.
+- Diagonal corner cutting is allowed.
+- Dynamics advance after a move and the changed state is observed before the
+  next decision (`post_move_observed`) for every method.
+- Classical methods use `GridEnvironment.get_neighbors()`.
+- RL evaluation injects the exact persisted grid and dynamics for each
+  scenario.
 
-## Run Tests
+## Test
 
 ```bash
 python -m pytest -q
 ```
 
-## Run Static Baseline
+## Reproduce the classical pilot
 
 ```bash
-python experiments/run_static_baseline.py
+python scripts/reproduce_classical.py
 ```
 
-## Run Static Q-Learning
+## Run the expanded research suite
+
+Evaluate every completed baseline and ablation checkpoint, regenerate raw and
+aggregate evidence, rebuild every paper table and figure, and compile the
+integrity-gated PDF:
 
 ```bash
-python experiments/train_q_learning_static.py
+python scripts/run_full_research.py
 ```
 
-## Colab Training
+From a clean checkout, include checkpointed five-seed training for the complete
+method and every controlled ablation:
 
-`train_her_colab_v2.py` is intended to be run in Google Colab. It contains
-Colab notebook magic for installing dependencies and is therefore not a
-standalone Python script.
+```bash
+python scripts/run_full_research.py --train
+```
+
+This is intentionally a long research run. Use `--variants full` for a
+baseline-only replication. All variants are defined in
+[`configs/research_experiments.json`](configs/research_experiments.json).
+See [`docs/EXPERIMENT_PROTOCOL.md`](docs/EXPERIMENT_PROTOCOL.md) for timing,
+statistics, adaptability definitions, and reproducibility boundaries.
+
+## Legacy Colab script
+
+`train_her_colab_v2.py` contains Colab notebook magic and is retained only as a
+historical artifact. New research training uses
+`experiments/train_multiseed.py`.

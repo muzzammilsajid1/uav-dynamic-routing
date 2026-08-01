@@ -1,0 +1,28 @@
+[
+  {
+    "planner": "astar",
+    "runs": 500,
+    "scenarios": 50,
+    "repetitions": 10,
+    "success_rate": 1.0,
+    "path_cost_mean": 10.56371716438,
+    "route_time_mean_ms": 0.598198999406,
+    "route_time_median_ms": 0.450549982,
+    "route_time_std_ms": 0.4729189632175821,
+    "route_time_95ci_half_width_ms": 0.04145317482444685,
+    "node_expansions_mean": 32.6
+  },
+  {
+    "planner": "dijkstra",
+    "runs": 500,
+    "scenarios": 50,
+    "repetitions": 10,
+    "success_rate": 1.0,
+    "path_cost_mean": 10.56371716438,
+    "route_time_mean_ms": 5.174165798692,
+    "route_time_median_ms": 4.4935000039999995,
+    "route_time_std_ms": 3.4048702805702775,
+    "route_time_95ci_half_width_ms": 0.2984500389554177,
+    "node_expansions_mean": 251.14
+  }
+]

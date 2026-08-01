@@ -1,0 +1,50 @@
+{
+  "captured_at_utc": "2026-07-30T00:10:51.644138+00:00",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
+  "operating_system": {
+    "system": "Linux",
+    "release": "6.6.122+",
+    "version": "#1 SMP Thu Apr 30 18:17:14 UTC 2026"
+  },
+  "python": {
+    "version": "3.12.13",
+    "implementation": "CPython",
+    "executable": "/usr/bin/python3"
+  },
+  "cpu": {
+    "processor": "x86_64",
+    "machine": "x86_64",
+    "logical_count": 2
+  },
+  "packages": {
+    "gymnasium": "1.3.0",
+    "matplotlib": "3.11.1",
+    "networkx": "3.6.1",
+    "numpy": "2.5.1",
+    "pytest": "9.1.1",
+    "scipy": "1.18.0",
+    "stable-baselines3": "2.9.0",
+    "torch": "2.13.0"
+  },
+  "source_tree": {
+    "sha256": "c7c733c749c0f0470ea50b8dd08319a05658dd0605385ab2dc55dbf8dcb5e5aa",
+    "files_hashed": 98
+  },
+  "git_commit": "unavailable",
+  "git_worktree": {
+    "dirty": "unavailable"
+  },
+  "accelerator": {
+    "cuda_available": false,
+    "cuda_version": "13.0",
+    "gpu_count": 0,
+    "gpu_names": []
+  },
+  "experiment": {
+    "suite_id": "uav-routing-benchmark-v2",
+    "manifest": "/content/uav-dynamic-routing/evaluation/manifests/benchmark_v2.json",
+    "manifest_sha256": "2e130a16ba1c423147001c24eea3984a2dace2eb31695969297f0585be6091ec",
+    "repetitions": 10,
+    "raw_results": "/content/uav-dynamic-routing/evaluation/results/classical_suite_raw.csv"
+  }
+}

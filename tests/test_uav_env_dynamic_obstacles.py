@@ -16,6 +16,11 @@ def test_dynamic_obstacle_toggles_and_updates_observation():
     
     # Force UAV to a known position adjacent to the dynamic cell
     env.uav_pos = np.array([5, 4])
+    # Keep the tested move non-terminal.  reset() chooses a random goal, and
+    # occasionally selected (5, 3), causing the westward move below to reach
+    # the goal.  Terminal transitions intentionally suppress post-move
+    # dynamics because that state would never be observed by the policy.
+    env.goal_pos = np.array([14, 14])
     
     # helper for checking if (5,5) is in get_neighbors of (5,4)
     def check_neighbor_free():
@@ -30,7 +35,8 @@ def test_dynamic_obstacle_toggles_and_updates_observation():
     
     # STEP 1: ON (OBSTACLE)
     # Action 2 is West (moves away to (5, 3))
-    env.step(2)
+    _, _, _, _, info = env.step(2)
+    assert info["dynamic_changes"] == [[5, 5]]
     next_local_grid = env._get_local_observation()
     # Now UAV is at (5, 3), so (5, 5) is 2 cells East
     east_east_idx = LOCAL_VIEW_RADIUS * (2 * LOCAL_VIEW_RADIUS + 1) + (LOCAL_VIEW_RADIUS + 2)
@@ -89,6 +95,12 @@ def test_multiple_obstacles_toggle_independently():
         obstacle_density=0.0
     )
     env.reset()
+    # Exercise four non-terminal transitions deterministically.  Leaving the
+    # random reset positions in place made an eastward step occasionally hit
+    # the goal or grid boundary, where post-terminal dynamics are correctly
+    # suppressed.
+    env.uav_pos = np.array([7, 5])
+    env.goal_pos = np.array([14, 14])
     
     # Step 1: elapsed=1 (neither toggles)
     env.step(3) # Move somewhere
@@ -109,3 +121,35 @@ def test_multiple_obstacles_toggle_independently():
     env.step(3)
     assert env.grid[1, 1] == CELL_FREE
     assert env.grid[2, 2] == CELL_OBSTACLE
+
+
+def test_post_move_change_is_observed_before_next_decision():
+    env = UAVRoutingEnv(
+        grid_size=5,
+        dynamic_obstacles_enabled=True,
+        dynamic_obstacles=[
+            DynamicObstacle(cell=(2, 2), period=1, initial_state="passable")
+        ],
+        fixed_grid=True,
+        obstacle_density=0.0,
+        dynamics_timing="post_move_observed",
+    )
+    env.reset(seed=7)
+    env.uav_pos = np.array([2, 1], dtype=np.int32)
+    env.goal_pos = np.array([2, 3], dtype=np.int32)
+
+    observation, _, terminated, truncated, info = env.step(3)
+
+    assert not terminated
+    assert not truncated
+    assert tuple(env.uav_pos) == (2, 2)
+    assert env.grid[2, 2] == CELL_OBSTACLE
+    assert info["dynamic_changes"] == [[2, 2]]
+    center = LOCAL_VIEW_RADIUS * (2 * LOCAL_VIEW_RADIUS + 1) + LOCAL_VIEW_RADIUS
+    assert observation["observation"][4 + center] == CELL_OBSTACLE
+
+    _, _, terminated, _, info = env.step(3)
+    assert terminated
+    assert info["is_success"]
+    assert tuple(env.uav_pos) == (2, 3)
+    assert info["dynamic_changes"] == []

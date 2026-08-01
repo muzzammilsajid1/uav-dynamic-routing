@@ -1,27 +1,85 @@
 \section{Experimental Setup}
 \label{sec:experimental-setup}
 
-\subsection{Static Evaluation}
+\subsection{Persisted Benchmark Splits}
 
-The static evaluation uses 40 paired start-goal scenarios on the same 15$\times$15 grid, with obstacle density 0.2 and seed 42. Start-goal pairs are drawn from the free cells of a single \texttt{GridEnvironment} instance and validated against Dijkstra on that same grid; the DQN evaluation environment receives the identical obstacle layout via direct injection rather than independent seeding. No dynamic obstacles are present in this evaluation. For this revision, the static evaluation script was re-run independently to confirm the previously reported success-rate and path-cost figures, and was additionally instrumented to measure route-level compute time directly (Sec.~\ref{sec:compute-time-measurement}), since the original run did not persist raw per-scenario timing data.
+The benchmark manifest contains 310 scenarios. Every record stores its scenario
+ID, split, grid size, exact blocked cells, start and goal, dynamic objects,
+traversal penalties, no-fly configuration, observation-noise level, and
+dynamics seed where applicable.
 
-\subsection{Dynamic Evaluation}
-
-The paired dynamic evaluation uses 50 matched scenarios. Each scenario has a fixed scenario ID, start cell, and goal cell. The same scenario list is used for Dijkstra, A*, and RL evaluation. Pairing is important because comparing unrelated random episodes would confound method performance with scenario difficulty.
-
-The evaluation configuration is:
+The primary generalization splits each contain 30 scenarios:
 \begin{itemize}
-    \item grid size: 15$\times$15;
-    \item movement: 8-connected;
-    \item orthogonal movement cost: 1.0;
-    \item diagonal movement cost: $\sqrt{2}$;
-    \item static obstacle density: 0.0;
-    \item dynamic cells: $(4,4)$, $(8,8)$, and $(12,11)$, each toggling on a 5-step period;
-    \item number of scenarios: 50, shared across all three methods.
+    \item the training layout with held-out start/goal pairs;
+    \item unseen layouts at obstacle density 0.20;
+    \item unseen layouts at density 0.30;
+    \item unseen fixed-toggle obstacle locations; and
+    \item known toggle locations with unseen periods.
 \end{itemize}
 
-The measured metrics are success rate, realized dynamic path cost, compute time, replan/node-expansion counts (for the two classical planners), and paired path-cost and compute-time differences. Statistical significance on continuous paired metrics (path cost, compute time) is evaluated using the two-sided Wilcoxon signed-rank test on paired successful scenarios. Because the success-rate comparisons involve small samples (50 or 49 scenarios), we additionally report 95\% Wilson score confidence intervals \cite{wilson1927interval} on each method's success proportion, which are more reliable than a normal approximation at this sample size and do not require a paired design.
+Scaling uses ten scenarios each at $15$, $30$, $50$, and $100$ cells per side,
+with density 0.20 and new layouts. Realism sweeps independently vary static
+density, stochastic toggle probability, moving-obstacle period, spatial energy
+penalty, hard versus penalized no-fly zones, and sensor-noise probability.
 
-\subsection{Single-Seed Training Caveat}
+\subsection{Pairing and Repetitions}
 
-All RL results in this paper --- static and dynamic --- come from one trained policy (training seed 42, Table~\ref{tab:hyperparams}). Neural-network RL training is known to be sensitive to random seed, and repeating training with a different seed can shift success rate, path-cost gap, and even qualitative behavior \cite{henderson2018deep}. We did not have compute or time budget in this revision to retrain multiple seeds and report variance, and we treat this as an open limitation (Sec.~\ref{sec:limitations}) rather than implying the reported numbers characterize DQN+HER's performance ceiling or typical variance on this task. The classical baselines (Dijkstra, A*) are deterministic and have no equivalent seed sensitivity.
+All methods consume the same manifest records. The grid is reconstructed from
+stored cells rather than from a method-specific random generator. Classical
+planners run on the same graph instance definition; the RL evaluator injects
+the identical grid and dynamics into its Gymnasium environment.
+
+Each classical scenario/planner pair and each RL
+seed/scenario pair is repeated ten times for timing. Outcome and path metrics
+are deterministic under a fixed scenario and policy; repetitions preserve the
+raw timing distribution. Route-level compute time is the sum of planner calls
+for classical methods and the sum of \texttt{predict()} calls for RL.
+Environment construction, stepping, metric calculation, and serialization are
+excluded. Per-decision latency is also retained.
+Local-observation policies cover all 310 scenarios, producing 15,500 raw rows
+per variant ($310\times5\times10$). The fixed-size full-grid ablation is
+evaluated only at its trained $15\times15$ input dimension, producing 14,000
+rows ($280\times5\times10$); this exclusion is structural rather than a
+performance-based omission.
+
+\subsection{Environment and Software Manifest}
+
+The authoritative classical and RL suite manifests both report Linux
+6.6.122+, CPython 3.12.13, two logical CPU cores, and no active GPU. Every
+manifest stores operating system, CPU, logical core count, Python
+implementation and version, package versions, accelerator availability and
+names, Git commit, command configuration, manifest hash, and timestamp. The raw
+suite was produced in a Drive-backed Google Colab workflow. Millisecond
+timings are interpreted only within this recorded runtime class.
+The dedicated timing-distribution artifact reports the mean, median, sample
+standard deviation, extrema, and repetition count for route-level computation
+and per-decision latency, both by policy seed and across seeds.
+
+Historically, one mutable ``latest RL'' environment file was retained rather
+than an immutable manifest for every variant; the artifact pipeline now writes
+both variant-specific manifests and the compatibility alias. Consequently,
+absolute cross-variant timing differences are descriptive, whereas
+same-scenario comparisons within a recorded suite are the primary evidence.
+
+\subsection{Statistical Analysis}
+
+Timing repetitions are first collapsed within each policy-seed/scenario pair,
+preventing pseudoreplication. RL metrics are then summarized per independent
+training seed and reported as the mean and 95\% Student-$t$ confidence
+interval across five seeds. Classical confidence intervals use scenarios as
+the independent units.
+
+Success differences use exact paired McNemar tests. Path cost and route compute
+time use two-sided paired Wilcoxon signed-rank tests with rank-biserial effect
+sizes \cite{mcnemar1947note,wilcoxon1945individual}. Only jointly successful
+routes enter paired path-cost tests; all routes enter success and compute-time
+analyses. Holm correction controls the familywise error rate across the
+reported paired tests \cite{holm1979simple}.
+
+\subsection{Reproducibility Checks}
+
+Before evaluation, all persisted scenarios must reconstruct with a valid path
+and Dijkstra, A*, and D* Lite must agree on the initial optimal cost. After
+evaluation, an integrity pass checks expected row counts, unique run IDs, and
+the scenario-manifest hash in every raw result file. Smoke-test checkpoints and
+legacy single-seed models are rejected by the expanded evaluator.

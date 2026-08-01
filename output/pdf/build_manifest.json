@@ -1,0 +1,11 @@
+{
+  "compiled_at_utc": "2026-08-01T09:47:48.998853+00:00",
+  "source": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\paper_latex_v2\\main.tex",
+  "output": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\output\\pdf\\uav_dynamic_routing_research_paper.pdf",
+  "engine": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\tools\\tectonic\\tectonic.exe",
+  "engine_version": "Tectonic 0.16.9",
+  "page_count": 7,
+  "pdf_sha256": "2c52ae6714504a9c88e04351a5bfa118d12182c048bf2509d39c9e8b2a02049c",
+  "integrity_report_sha256": "7b929624712e25b2c6febca6f2cef05d8d14fc45749300320e0732cba8a990cb",
+  "artifact_integrity_status": "passed"
+}

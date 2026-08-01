@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\caption{Controlled realism summary (mean $\pm$ 95\% CI). C succ. is the minimum success among the three classical planners; RL gap uses successful routes.}
+\scriptsize
+\setlength{\tabcolsep}{2.4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrrrr}
+\toprule
+Condition & C succ. (\%) & RL succ. (\%) & RL gap & A* ms & RL ms \\
+\midrule
+Static density 0.40 & 100.0 & $72.0 \pm 26.9$ & $1.32 \pm 0.45$ & $0.19 \pm 0.05$ & $26.29 \pm 20.59$ \\
+Stochastic toggle 0.20 & 100.0 & $100.0 \pm 0.0$ & $1.18 \pm 0.45$ & $0.39 \pm 0.15$ & $4.11 \pm 0.69$ \\
+Moving obstacle, $T=2$ & 100.0 & $100.0 \pm 0.0$ & $1.32 \pm 0.33$ & $0.66 \pm 0.23$ & $5.82 \pm 0.93$ \\
+Energy penalty 1.0 & 100.0 & $100.0 \pm 0.0$ & $1.98 \pm 0.54$ & $0.15 \pm 0.04$ & $2.93 \pm 0.27$ \\
+Hard no-fly & 100.0 & $78.0 \pm 26.9$ & $1.58 \pm 0.40$ & $0.17 \pm 0.08$ & $16.55 \pm 14.76$ \\
+Penalized no-fly & 100.0 & $92.0 \pm 16.2$ & $1.75 \pm 0.53$ & $0.33 \pm 0.14$ & $10.79 \pm 14.32$ \\
+Sensor noise 0.10 & 100.0 & $100.0 \pm 0.0$ & $1.44 \pm 0.37$ & $0.31 \pm 0.11$ & $3.77 \pm 0.64$ \\
+\bottomrule
+\end{tabular}%
+}
+\label{tab:realism-results}
+\end{table}

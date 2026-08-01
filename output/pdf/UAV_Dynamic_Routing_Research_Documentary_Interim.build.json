@@ -1,0 +1,13 @@
+{
+  "generated_at_utc": "2026-07-27T17:37:03.745706+00:00",
+  "document": "output/pdf/UAV_Dynamic_Routing_Research_Documentary_Interim.pdf",
+  "source": "output/pdf/UAV_Dynamic_Routing_Research_Documentary_Interim.md",
+  "source_sha256": "de1a48747d9d09a47ffb0121530ea1f3e1a725bcc9857861d5f59293b6688931",
+  "pdf_sha256": "9951ee10e4e6918a332110e578cb2da3722a74dd493656f075d75cf5e00d72bc",
+  "pages": 36,
+  "evidence_cutoff": "2026-07-27T22:03:00+05:00",
+  "repository_git_head": "f57ae150068fbd7a00c1b37a8280cf60a5dd2ddc",
+  "training_source_sha256": "00a4ff215b3d31f7be2a42d62f7467d19beacd3f3e78c8684efe2d233412f39d",
+  "expanded_benchmark_sha256": "296196e774e5aa7f45b988f0321355a85f4dcbe21d1c727842cc818ebde0e0b5",
+  "edition": "interim"
+}

@@ -50,3 +50,19 @@ models/
 # Week 3 paired evaluation artifacts
 !evaluation/week3_dynamic_baseline_results.csv
 !evaluation/week3_rl_results.csv
+
+# Versioned reproducibility artifacts
+!evaluation/manifests/
+!evaluation/manifests/*.json
+!evaluation/results/
+!evaluation/results/*.csv
+!evaluation/results/*.json
+!evaluation/results/*.md
+evaluation/results/*.tmp.csv
+
+# Workspace-local document toolchain and rendered PDF staging
+/tools/tectonic/
+/tmp/pdfs/
+/output/pdf/
+/tmp/
+/.codex-remote-attachments/

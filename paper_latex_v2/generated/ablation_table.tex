@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\caption{Held-out-pair ablations across five policy seeds (mean $\pm$ 95\% CI); an interval is omitted when fewer than two finite seed estimates are available.}
+\scriptsize
+\setlength{\tabcolsep}{2.7pt}
+\begin{tabular}{lrrr}
+\toprule
+Variant & Success (\%) & Cost gap & Route ms \\
+\midrule
+DQN+HER & $38.0 \pm 63.0$ & $0.63 \pm 1.39$ & $53.00 \pm 55.69$ \\
+Dynamic-only train & $92.0 \pm 20.0$ & $1.13 \pm 0.43$ & $8.20 \pm 11.63$ \\
+DDQN+HER & $96.0 \pm 11.1$ & $1.11 \pm 0.45$ & $6.61 \pm 9.77$ \\
+Full-grid obs. & $15.3 \pm 42.6$ & 3.18 & $13.84 \pm 5.93$ \\
+No curriculum & $100.0 \pm 0.0$ & $0.87 \pm 0.16$ & $3.55 \pm 0.71$ \\
+No HER & $100.0 \pm 0.0$ & $1.01 \pm 0.14$ & $3.47 \pm 0.69$ \\
+No shaping & $100.0 \pm 0.0$ & $0.92 \pm 0.41$ & $3.21 \pm 0.50$ \\
+\bottomrule
+\end{tabular}
+\label{tab:ablation-results}
+\end{table}
