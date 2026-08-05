@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-08-05T12:28:15.231804+00:00",
+  "source_hash": "ff2d533ff9c2469678c59931941705b05205a294bdca6d65def57587bbf889ac",
+  "action_mapping_hash": "755cf1b98da9831e9fa5039dcdd038c23b488aa52b8e470a8ad802a42317b6a3",
+  "config_hash": "8e65ee58dfbf3db6a00e470c7f3580f85b834c767cacc5a482ffa51d940ca774",
+  "route_count": 50400,
+  "aggregate_metrics": {
+    "successes": 50400,
+    "collisions": 0,
+    "timeouts": 0,
+    "routes": 50400,
+    "non_zero_gap_routes": 0,
+    "max_absolute_gap": 7.105427357601002e-15
+  },
+  "max_absolute_path_cost_gap": 7.105427357601002e-15,
+  "count_non_zero_gap_routes": 0
+}

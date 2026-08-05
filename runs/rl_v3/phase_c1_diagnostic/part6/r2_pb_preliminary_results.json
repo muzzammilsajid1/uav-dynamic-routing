@@ -1,0 +1,362 @@
+{
+  "P1_GlobalLocal": {
+    "metadata": {
+      "seed": 42,
+      "architecture": "P1_GlobalLocal",
+      "reward": "R2-PB",
+      "note_on_early_stopping": "The 5k checkpoint was used because the dense potential-based reward caused the models to converge virtually instantly. To save diagnostic compute, models were early-stopped upon crossing 95% validation success."
+    },
+    "checkpoints": {
+      "5000": {
+        "success_rate": 0.48333333333333334,
+        "success_by_bin": {
+          "short": 0.45,
+          "medium": 0.5,
+          "long": 0.5
+        },
+        "success_by_ori": {
+          "vertical": 0.5882352941176471,
+          "horizontal": 0.375,
+          "diagonal": 0.4117647058823529,
+          "mixed": 0.6
+        },
+        "collisions": 0,
+        "timeouts": 62,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 1.9018734114672662,
+        "normalized_cost_ratio": null,
+        "mean_entropy": 1.8795176576488228,
+        "action_distribution": {
+          "0": 580,
+          "1": 148,
+          "2": 116,
+          "3": 150,
+          "4": 438,
+          "5": 246,
+          "6": 488,
+          "7": 616
+        },
+        "terminal_goal_reward_frequency": 0.48333333333333334,
+        "shaping_reward_mean": 0.020599301378855295,
+        "shaping_reward_std": 0.09890550525114658
+      },
+      "10000": {
+        "success_rate": 0.5666666666666667,
+        "success_by_bin": {
+          "short": 0.55,
+          "medium": 0.6,
+          "long": 0.55
+        },
+        "success_by_ori": {
+          "vertical": 0.5294117647058824,
+          "horizontal": 0.3125,
+          "diagonal": 0.8235294117647058,
+          "mixed": 0.6
+        },
+        "collisions": 0,
+        "timeouts": 52,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 3.352434001685204,
+        "normalized_cost_ratio": null,
+        "mean_entropy": 1.8122604836943705,
+        "action_distribution": {
+          "0": 388,
+          "1": 712,
+          "2": 314,
+          "3": 48,
+          "4": 266,
+          "5": 458,
+          "6": 120,
+          "7": 290
+        },
+        "terminal_goal_reward_frequency": 0.5666666666666667,
+        "shaping_reward_mean": 0.02584985829746273,
+        "shaping_reward_std": 0.0862553293349757
+      },
+      "15000": {
+        "success_rate": 0.7,
+        "success_by_bin": {
+          "short": 0.7,
+          "medium": 0.75,
+          "long": 0.65
+        },
+        "success_by_ori": {
+          "vertical": 0.7058823529411765,
+          "horizontal": 0.5625,
+          "diagonal": 0.8235294117647058,
+          "mixed": 0.7
+        },
+        "collisions": 0,
+        "timeouts": 36,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.8091132394594505,
+        "normalized_cost_ratio": null,
+        "mean_entropy": 1.6361753172130384,
+        "action_distribution": {
+          "0": 614,
+          "1": 638,
+          "2": 152,
+          "3": 60,
+          "4": 162,
+          "5": 148,
+          "6": 42,
+          "7": 286
+        },
+        "terminal_goal_reward_frequency": 0.7,
+        "shaping_reward_mean": 0.033818806886901594,
+        "shaping_reward_std": 0.08192135897854808
+      },
+      "20000": {
+        "success_rate": 0.7666666666666667,
+        "success_by_bin": {
+          "short": 0.8,
+          "medium": 0.8,
+          "long": 0.7
+        },
+        "success_by_ori": {
+          "vertical": 0.8235294117647058,
+          "horizontal": 0.625,
+          "diagonal": 0.7647058823529411,
+          "mixed": 0.9
+        },
+        "collisions": 0,
+        "timeouts": 28,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.6710882105454083,
+        "normalized_cost_ratio": null,
+        "mean_entropy": 1.3682017695700002,
+        "action_distribution": {
+          "0": 348,
+          "1": 470,
+          "2": 152,
+          "3": 170,
+          "4": 174,
+          "5": 220,
+          "6": 134,
+          "7": 204
+        },
+        "terminal_goal_reward_frequency": 0.7666666666666667,
+        "shaping_reward_mean": 0.03793748307691561,
+        "shaping_reward_std": 0.08025674997632887
+      },
+      "25000": {
+        "success_rate": 0.85,
+        "success_by_bin": {
+          "short": 0.9,
+          "medium": 0.85,
+          "long": 0.8
+        },
+        "success_by_ori": {
+          "vertical": 0.8235294117647058,
+          "horizontal": 0.9375,
+          "diagonal": 0.7647058823529411,
+          "mixed": 0.9
+        },
+        "collisions": 0,
+        "timeouts": 18,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.614810569790732,
+        "normalized_cost_ratio": null,
+        "mean_entropy": 1.0576727603106946,
+        "action_distribution": {
+          "0": 166,
+          "1": 320,
+          "2": 270,
+          "3": 120,
+          "4": 62,
+          "5": 308,
+          "6": 126,
+          "7": 146
+        },
+        "terminal_goal_reward_frequency": 0.85,
+        "shaping_reward_mean": 0.048074683537387704,
+        "shaping_reward_std": 0.06983359198664126
+      },
+      "30000": {
+        "success_rate": 0.9333333333333333,
+        "success_by_bin": {
+          "short": 0.95,
+          "medium": 0.9,
+          "long": 0.95
+        },
+        "success_by_ori": {
+          "vertical": 0.9411764705882353,
+          "horizontal": 0.9375,
+          "diagonal": 1.0,
+          "mixed": 0.8
+        },
+        "collisions": 0,
+        "timeouts": 8,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.1468820847217174,
+        "normalized_cost_ratio": null,
+        "mean_entropy": 0.8493948275342994,
+        "action_distribution": {
+          "0": 132,
+          "1": 194,
+          "2": 184,
+          "3": 136,
+          "4": 64,
+          "5": 158,
+          "6": 64,
+          "7": 158
+        },
+        "terminal_goal_reward_frequency": 0.9333333333333333,
+        "shaping_reward_mean": 0.06771853345172872,
+        "shaping_reward_std": 0.07109103976262757
+      },
+      "35000": {
+        "success_rate": 0.8833333333333333,
+        "success_by_bin": {
+          "short": 1.0,
+          "medium": 0.8,
+          "long": 0.85
+        },
+        "success_by_ori": {
+          "vertical": 0.9411764705882353,
+          "horizontal": 0.8125,
+          "diagonal": 0.9411764705882353,
+          "mixed": 0.8
+        },
+        "collisions": 0,
+        "timeouts": 14,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.4574083148513077,
+        "normalized_cost_ratio": null,
+        "mean_entropy": 0.8055681070684317,
+        "action_distribution": {
+          "0": 346,
+          "1": 370,
+          "2": 162,
+          "3": 120,
+          "4": 46,
+          "5": 144,
+          "6": 76,
+          "7": 130
+        },
+        "terminal_goal_reward_frequency": 0.8833333333333333,
+        "shaping_reward_mean": 0.05182855217610693,
+        "shaping_reward_std": 0.06875764123431057
+      },
+      "40000": {
+        "success_rate": 0.9166666666666666,
+        "success_by_bin": {
+          "short": 1.0,
+          "medium": 0.8,
+          "long": 0.95
+        },
+        "success_by_ori": {
+          "vertical": 0.9411764705882353,
+          "horizontal": 1.0,
+          "diagonal": 0.8235294117647058,
+          "mixed": 0.9
+        },
+        "collisions": 0,
+        "timeouts": 10,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.0158192306379776,
+        "normalized_cost_ratio": null,
+        "mean_entropy": 0.6533825547493496,
+        "action_distribution": {
+          "0": 226,
+          "1": 204,
+          "2": 114,
+          "3": 92,
+          "4": 86,
+          "5": 148,
+          "6": 110,
+          "7": 186
+        },
+        "terminal_goal_reward_frequency": 0.9166666666666666,
+        "shaping_reward_mean": 0.06202873330695897,
+        "shaping_reward_std": 0.06819300515478834
+      },
+      "45000": {
+        "success_rate": 0.9666666666666667,
+        "success_by_bin": {
+          "short": 1.0,
+          "medium": 1.0,
+          "long": 0.9
+        },
+        "success_by_ori": {
+          "vertical": 1.0,
+          "horizontal": 0.9375,
+          "diagonal": 0.9411764705882353,
+          "mixed": 1.0
+        },
+        "collisions": 0,
+        "timeouts": 4,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.1982323221216946,
+        "normalized_cost_ratio": null,
+        "mean_entropy": 0.5765690558615166,
+        "action_distribution": {
+          "0": 142,
+          "1": 148,
+          "2": 76,
+          "3": 98,
+          "4": 74,
+          "5": 186,
+          "6": 162,
+          "7": 150
+        },
+        "terminal_goal_reward_frequency": 0.9666666666666667,
+        "shaping_reward_mean": 0.07126414099246134,
+        "shaping_reward_std": 0.06462081733612761
+      }
+    }
+  },
+  "P2_ScalarOnly": {
+    "metadata": {
+      "seed": 42,
+      "architecture": "P2_ScalarOnly",
+      "reward": "R2-PB",
+      "note_on_early_stopping": "The 5k checkpoint was used because the dense potential-based reward caused the models to converge virtually instantly. To save diagnostic compute, models were early-stopped upon crossing 95% validation success."
+    },
+    "checkpoints": {
+      "5000": {
+        "success_rate": 1.0,
+        "success_by_bin": {
+          "short": 1.0,
+          "medium": 1.0,
+          "long": 1.0
+        },
+        "success_by_ori": {
+          "vertical": 1.0,
+          "horizontal": 1.0,
+          "diagonal": 1.0,
+          "mixed": 1.0
+        },
+        "collisions": 0,
+        "timeouts": 0,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 1.9846368414466982,
+        "normalized_cost_ratio": 1.3133377136061957,
+        "mean_entropy": 1.9256106840680018,
+        "action_distribution": {
+          "0": 2,
+          "1": 118,
+          "2": 10,
+          "3": 130,
+          "4": 126,
+          "5": 162,
+          "6": 126,
+          "7": 108
+        },
+        "terminal_goal_reward_frequency": 1.0,
+        "shaping_reward_mean": 0.09440508330136042,
+        "shaping_reward_std": 0.056175179490225574
+      }
+    }
+  }
+}

@@ -1,0 +1,839 @@
+{
+  "R1": {
+    "42": {
+      "5000": {
+        "success_rate": 0.05,
+        "success_by_bin": {
+          "short": 0.1,
+          "medium": 0.0,
+          "long": 0.05
+        },
+        "success_by_ori": {
+          "vertical": 0.058823529411764705,
+          "diagonal": 0.11764705882352941
+        },
+        "collisions": 0,
+        "timeouts": 114,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 0.19526214587563553,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.6790874380103644,
+        "action_distribution": {
+          "0": 1198,
+          "1": 1392,
+          "2": 158,
+          "3": 88,
+          "4": 8,
+          "5": 560,
+          "6": 1098,
+          "7": 0
+        },
+        "terminal_goal_reward_frequency": 0.05,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      },
+      "10000": {
+        "success_rate": 0.1,
+        "success_by_bin": {
+          "short": 0.25,
+          "medium": 0.05,
+          "long": 0.0
+        },
+        "success_by_ori": {
+          "vertical": 0.17647058823529413,
+          "diagonal": 0.11764705882352941,
+          "horizontal": 0.0625
+        },
+        "collisions": 0,
+        "timeouts": 108,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.178511301977579,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.642495132486931,
+        "action_distribution": {
+          "0": 46,
+          "1": 1480,
+          "2": 372,
+          "3": 934,
+          "4": 892,
+          "5": 234,
+          "6": 428,
+          "7": 2
+        },
+        "terminal_goal_reward_frequency": 0.1,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      },
+      "25000": {
+        "success_rate": 0.05,
+        "success_by_bin": {
+          "short": 0.15,
+          "medium": 0.0,
+          "long": 0.0
+        },
+        "success_by_ori": {
+          "vertical": 0.11764705882352941,
+          "horizontal": 0.0625
+        },
+        "collisions": 0,
+        "timeouts": 114,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 1.804737854124365,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.5268506318356976,
+        "action_distribution": {
+          "0": 524,
+          "1": 852,
+          "2": 736,
+          "3": 846,
+          "4": 258,
+          "5": 566,
+          "6": 594,
+          "7": 172
+        },
+        "terminal_goal_reward_frequency": 0.05,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      },
+      "50000": {
+        "success_rate": 0.16666666666666666,
+        "success_by_bin": {
+          "short": 0.3,
+          "medium": 0.15,
+          "long": 0.05
+        },
+        "success_by_ori": {
+          "vertical": 0.17647058823529413,
+          "horizontal": 0.1875,
+          "diagonal": 0.17647058823529413,
+          "mixed": 0.1
+        },
+        "collisions": 0,
+        "timeouts": 100,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 6.798275605729691,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.4430177339465489,
+        "action_distribution": {
+          "0": 96,
+          "1": 648,
+          "2": 402,
+          "3": 608,
+          "4": 778,
+          "5": 668,
+          "6": 502,
+          "7": 508
+        },
+        "terminal_goal_reward_frequency": 0.16666666666666666,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      }
+    },
+    "43": {
+      "5000": {
+        "success_rate": 0.11666666666666667,
+        "success_by_bin": {
+          "short": 0.2,
+          "medium": 0.05,
+          "long": 0.1
+        },
+        "success_by_ori": {
+          "vertical": 0.11764705882352941,
+          "diagonal": 0.11764705882352941,
+          "horizontal": 0.125,
+          "mixed": 0.1
+        },
+        "collisions": 0,
+        "timeouts": 106,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 4.020305089104423,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.7000183591820264,
+        "action_distribution": {
+          "0": 696,
+          "1": 918,
+          "2": 304,
+          "3": 598,
+          "4": 630,
+          "5": 428,
+          "6": 686,
+          "7": 0
+        },
+        "terminal_goal_reward_frequency": 0.11666666666666667,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      },
+      "10000": {
+        "success_rate": 0.13333333333333333,
+        "success_by_bin": {
+          "short": 0.15,
+          "medium": 0.05,
+          "long": 0.2
+        },
+        "success_by_ori": {
+          "vertical": 0.058823529411764705,
+          "diagonal": 0.23529411764705882,
+          "horizontal": 0.1875
+        },
+        "collisions": 0,
+        "timeouts": 104,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 3.389087296526013,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.6862517225690283,
+        "action_distribution": {
+          "0": 726,
+          "1": 286,
+          "2": 84,
+          "3": 50,
+          "4": 262,
+          "5": 964,
+          "6": 1500,
+          "7": 250
+        },
+        "terminal_goal_reward_frequency": 0.13333333333333333,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      },
+      "25000": {
+        "success_rate": 0.08333333333333333,
+        "success_by_bin": {
+          "short": 0.1,
+          "medium": 0.0,
+          "long": 0.15
+        },
+        "success_by_ori": {
+          "diagonal": 0.17647058823529413,
+          "vertical": 0.058823529411764705,
+          "horizontal": 0.0625
+        },
+        "collisions": 0,
+        "timeouts": 110,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.614213562373096,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.5661117662198576,
+        "action_distribution": {
+          "0": 446,
+          "1": 676,
+          "2": 466,
+          "3": 504,
+          "4": 544,
+          "5": 688,
+          "6": 766,
+          "7": 224
+        },
+        "terminal_goal_reward_frequency": 0.08333333333333333,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      },
+      "50000": {
+        "success_rate": 0.4,
+        "success_by_bin": {
+          "short": 0.5,
+          "medium": 0.4,
+          "long": 0.3
+        },
+        "success_by_ori": {
+          "vertical": 0.35294117647058826,
+          "horizontal": 0.375,
+          "diagonal": 0.5882352941176471,
+          "mixed": 0.2
+        },
+        "collisions": 0,
+        "timeouts": 72,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 3.4975468957064284,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.1933834879535896,
+        "action_distribution": {
+          "0": 338,
+          "1": 578,
+          "2": 312,
+          "3": 556,
+          "4": 356,
+          "5": 472,
+          "6": 414,
+          "7": 224
+        },
+        "terminal_goal_reward_frequency": 0.4,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      }
+    },
+    "44": {
+      "5000": {
+        "success_rate": 0.08333333333333333,
+        "success_by_bin": {
+          "short": 0.15,
+          "medium": 0.05,
+          "long": 0.05
+        },
+        "success_by_ori": {
+          "horizontal": 0.1875,
+          "diagonal": 0.11764705882352941
+        },
+        "collisions": 0,
+        "timeouts": 110,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 0.8000000000000004,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.8789242166743407,
+        "action_distribution": {
+          "0": 378,
+          "1": 42,
+          "2": 1368,
+          "3": 1944,
+          "4": 238,
+          "5": 202,
+          "6": 0,
+          "7": 234
+        },
+        "terminal_goal_reward_frequency": 0.08333333333333333,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      },
+      "10000": {
+        "success_rate": 0.05,
+        "success_by_bin": {
+          "short": 0.15,
+          "medium": 0.0,
+          "long": 0.0
+        },
+        "success_by_ori": {
+          "vertical": 0.11764705882352941,
+          "diagonal": 0.058823529411764705
+        },
+        "collisions": 0,
+        "timeouts": 114,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 1.6094757082487299,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.8393479462092939,
+        "action_distribution": {
+          "0": 296,
+          "1": 178,
+          "2": 1404,
+          "3": 2046,
+          "4": 148,
+          "5": 232,
+          "6": 68,
+          "7": 182
+        },
+        "terminal_goal_reward_frequency": 0.05,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      },
+      "25000": {
+        "success_rate": 0.18333333333333332,
+        "success_by_bin": {
+          "short": 0.4,
+          "medium": 0.1,
+          "long": 0.05
+        },
+        "success_by_ori": {
+          "vertical": 0.17647058823529413,
+          "horizontal": 0.25,
+          "diagonal": 0.17647058823529413,
+          "mixed": 0.1
+        },
+        "collisions": 0,
+        "timeouts": 98,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 3.2947855170108444,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.4427501970393763,
+        "action_distribution": {
+          "0": 436,
+          "1": 662,
+          "2": 788,
+          "3": 1100,
+          "4": 442,
+          "5": 210,
+          "6": 124,
+          "7": 364
+        },
+        "terminal_goal_reward_frequency": 0.18333333333333332,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      },
+      "50000": {
+        "success_rate": 0.3,
+        "success_by_bin": {
+          "short": 0.4,
+          "medium": 0.35,
+          "long": 0.15
+        },
+        "success_by_ori": {
+          "vertical": 0.23529411764705882,
+          "horizontal": 0.3125,
+          "diagonal": 0.4117647058823529,
+          "mixed": 0.2
+        },
+        "collisions": 0,
+        "timeouts": 84,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 4.574619208361535,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.2702555477036221,
+        "action_distribution": {
+          "0": 298,
+          "1": 662,
+          "2": 824,
+          "3": 1046,
+          "4": 376,
+          "5": 146,
+          "6": 152,
+          "7": 228
+        },
+        "terminal_goal_reward_frequency": 0.3,
+        "shaping_reward_mean": 0.0,
+        "shaping_reward_std": 0.0
+      }
+    }
+  },
+  "R2-PB": {
+    "42": {
+      "5000": {
+        "success_rate": 0.48333333333333334,
+        "success_by_bin": {
+          "short": 0.45,
+          "medium": 0.5,
+          "long": 0.5
+        },
+        "success_by_ori": {
+          "vertical": 0.5882352941176471,
+          "horizontal": 0.375,
+          "diagonal": 0.4117647058823529,
+          "mixed": 0.6
+        },
+        "collisions": 0,
+        "timeouts": 62,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 1.9018734114672662,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.8795176576488228,
+        "action_distribution": {
+          "0": 580,
+          "1": 148,
+          "2": 116,
+          "3": 150,
+          "4": 438,
+          "5": 246,
+          "6": 488,
+          "7": 616
+        },
+        "terminal_goal_reward_frequency": 0.48333333333333334,
+        "shaping_reward_mean": 0.020599301378855295,
+        "shaping_reward_std": 0.09890550525114658
+      },
+      "10000": {
+        "success_rate": 0.5666666666666667,
+        "success_by_bin": {
+          "short": 0.55,
+          "medium": 0.6,
+          "long": 0.55
+        },
+        "success_by_ori": {
+          "vertical": 0.5294117647058824,
+          "horizontal": 0.3125,
+          "diagonal": 0.8235294117647058,
+          "mixed": 0.6
+        },
+        "collisions": 0,
+        "timeouts": 52,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 3.352434001685204,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.8122604836943705,
+        "action_distribution": {
+          "0": 388,
+          "1": 712,
+          "2": 314,
+          "3": 48,
+          "4": 266,
+          "5": 458,
+          "6": 120,
+          "7": 290
+        },
+        "terminal_goal_reward_frequency": 0.5666666666666667,
+        "shaping_reward_mean": 0.02584985829746273,
+        "shaping_reward_std": 0.0862553293349757
+      },
+      "25000": {
+        "success_rate": 0.85,
+        "success_by_bin": {
+          "short": 0.9,
+          "medium": 0.85,
+          "long": 0.8
+        },
+        "success_by_ori": {
+          "vertical": 0.8235294117647058,
+          "horizontal": 0.9375,
+          "diagonal": 0.7647058823529411,
+          "mixed": 0.9
+        },
+        "collisions": 0,
+        "timeouts": 18,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.614810569790732,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.0576727603106946,
+        "action_distribution": {
+          "0": 166,
+          "1": 320,
+          "2": 270,
+          "3": 120,
+          "4": 62,
+          "5": 308,
+          "6": 126,
+          "7": 146
+        },
+        "terminal_goal_reward_frequency": 0.85,
+        "shaping_reward_mean": 0.048074683537387704,
+        "shaping_reward_std": 0.06983359198664126
+      },
+      "50000": {
+        "success_rate": 0.95,
+        "success_by_bin": {
+          "short": 1.0,
+          "medium": 0.95,
+          "long": 0.9
+        },
+        "success_by_ori": {
+          "vertical": 0.9411764705882353,
+          "horizontal": 1.0,
+          "diagonal": 1.0,
+          "mixed": 0.8
+        },
+        "collisions": 0,
+        "timeouts": 6,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 1.4503341676896866,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 0.5494382389060811,
+        "action_distribution": {
+          "0": 160,
+          "1": 200,
+          "2": 114,
+          "3": 154,
+          "4": 80,
+          "5": 102,
+          "6": 62,
+          "7": 130
+        },
+        "terminal_goal_reward_frequency": 0.95,
+        "shaping_reward_mean": 0.07287770137190819,
+        "shaping_reward_std": 0.06842444751626003
+      }
+    },
+    "43": {
+      "5000": {
+        "success_rate": 0.55,
+        "success_by_bin": {
+          "short": 0.65,
+          "medium": 0.4,
+          "long": 0.6
+        },
+        "success_by_ori": {
+          "vertical": 0.5294117647058824,
+          "horizontal": 0.5625,
+          "diagonal": 0.5882352941176471,
+          "mixed": 0.5
+        },
+        "collisions": 0,
+        "timeouts": 54,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.4726660529226265,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.969979083566017,
+        "action_distribution": {
+          "0": 612,
+          "1": 254,
+          "2": 420,
+          "3": 282,
+          "4": 30,
+          "5": 246,
+          "6": 354,
+          "7": 360
+        },
+        "terminal_goal_reward_frequency": 0.55,
+        "shaping_reward_mean": 0.025573651212033838,
+        "shaping_reward_std": 0.08086334546712477
+      },
+      "10000": {
+        "success_rate": 0.8666666666666667,
+        "success_by_bin": {
+          "short": 0.85,
+          "medium": 0.9,
+          "long": 0.85
+        },
+        "success_by_ori": {
+          "vertical": 1.0,
+          "horizontal": 0.6875,
+          "diagonal": 0.8823529411764706,
+          "mixed": 0.9
+        },
+        "collisions": 0,
+        "timeouts": 16,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.1721792078033464,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.703589678919196,
+        "action_distribution": {
+          "0": 148,
+          "1": 194,
+          "2": 130,
+          "3": 144,
+          "4": 182,
+          "5": 210,
+          "6": 146,
+          "7": 244
+        },
+        "terminal_goal_reward_frequency": 0.8666666666666667,
+        "shaping_reward_mean": 0.052280778671716086,
+        "shaping_reward_std": 0.08150040255230752
+      },
+      "25000": {
+        "success_rate": 0.9166666666666666,
+        "success_by_bin": {
+          "short": 0.95,
+          "medium": 0.85,
+          "long": 0.95
+        },
+        "success_by_ori": {
+          "vertical": 0.9411764705882353,
+          "horizontal": 1.0,
+          "diagonal": 0.8235294117647058,
+          "mixed": 0.9
+        },
+        "collisions": 0,
+        "timeouts": 10,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 1.8524045635256103,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 0.7796797264072535,
+        "action_distribution": {
+          "0": 100,
+          "1": 142,
+          "2": 62,
+          "3": 220,
+          "4": 110,
+          "5": 178,
+          "6": 192,
+          "7": 108
+        },
+        "terminal_goal_reward_frequency": 0.9166666666666666,
+        "shaping_reward_mean": 0.06599038365596852,
+        "shaping_reward_std": 0.06549239423534775
+      },
+      "50000": {
+        "success_rate": 1.0,
+        "success_by_bin": {
+          "short": 1.0,
+          "medium": 1.0,
+          "long": 1.0
+        },
+        "success_by_ori": {
+          "vertical": 1.0,
+          "horizontal": 1.0,
+          "diagonal": 1.0,
+          "mixed": 1.0
+        },
+        "collisions": 0,
+        "timeouts": 0,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 1.4337397769606592,
+        "normalized_cost_ratio": 1.2263611831833345,
+        "mean_entropy": 0.35039786757921076,
+        "action_distribution": {
+          "0": 68,
+          "1": 104,
+          "2": 40,
+          "3": 112,
+          "4": 100,
+          "5": 102,
+          "6": 82,
+          "7": 146
+        },
+        "terminal_goal_reward_frequency": 1.0,
+        "shaping_reward_mean": 0.09852300768357453,
+        "shaping_reward_std": 0.04712073395685708
+      }
+    },
+    "44": {
+      "5000": {
+        "success_rate": 0.36666666666666664,
+        "success_by_bin": {
+          "short": 0.55,
+          "medium": 0.2,
+          "long": 0.35
+        },
+        "success_by_ori": {
+          "vertical": 0.4117647058823529,
+          "horizontal": 0.5625,
+          "diagonal": 0.23529411764705882,
+          "mixed": 0.2
+        },
+        "collisions": 0,
+        "timeouts": 76,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 1.9513150994606603,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.8089453358399241,
+        "action_distribution": {
+          "0": 1082,
+          "1": 908,
+          "2": 184,
+          "3": 174,
+          "4": 352,
+          "5": 34,
+          "6": 70,
+          "7": 502
+        },
+        "terminal_goal_reward_frequency": 0.36666666666666664,
+        "shaping_reward_mean": 0.017187674044047162,
+        "shaping_reward_std": 0.07032028336571203
+      },
+      "10000": {
+        "success_rate": 0.5166666666666667,
+        "success_by_bin": {
+          "short": 0.6,
+          "medium": 0.5,
+          "long": 0.45
+        },
+        "success_by_ori": {
+          "vertical": 0.47058823529411764,
+          "horizontal": 0.4375,
+          "diagonal": 0.6470588235294118,
+          "mixed": 0.5
+        },
+        "collisions": 0,
+        "timeouts": 58,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 3.4331098990707383,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.7711751723374944,
+        "action_distribution": {
+          "0": 428,
+          "1": 354,
+          "2": 186,
+          "3": 134,
+          "4": 686,
+          "5": 140,
+          "6": 88,
+          "7": 774
+        },
+        "terminal_goal_reward_frequency": 0.5166666666666667,
+        "shaping_reward_mean": 0.02232656187150881,
+        "shaping_reward_std": 0.09496369750970275
+      },
+      "25000": {
+        "success_rate": 0.7333333333333333,
+        "success_by_bin": {
+          "short": 0.85,
+          "medium": 0.7,
+          "long": 0.65
+        },
+        "success_by_ori": {
+          "vertical": 0.5882352941176471,
+          "horizontal": 0.875,
+          "diagonal": 0.8823529411764706,
+          "mixed": 0.5
+        },
+        "collisions": 0,
+        "timeouts": 32,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 3.167721038112884,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 1.1944310810893213,
+        "action_distribution": {
+          "0": 104,
+          "1": 242,
+          "2": 92,
+          "3": 108,
+          "4": 228,
+          "5": 562,
+          "6": 438,
+          "7": 244
+        },
+        "terminal_goal_reward_frequency": 0.7333333333333333,
+        "shaping_reward_mean": 0.03475117141162151,
+        "shaping_reward_std": 0.08687556173318489
+      },
+      "50000": {
+        "success_rate": 0.9166666666666666,
+        "success_by_bin": {
+          "short": 1.0,
+          "medium": 0.85,
+          "long": 0.9
+        },
+        "success_by_ori": {
+          "vertical": 0.9411764705882353,
+          "horizontal": 0.8125,
+          "diagonal": 1.0,
+          "mixed": 0.9
+        },
+        "collisions": 0,
+        "timeouts": 10,
+        "oscillations": 0,
+        "longer_loops": 0,
+        "mean_weighted_path_cost_gap": 2.129765181633593,
+        "normalized_cost_ratio": "unavailable_due_to_failures",
+        "mean_entropy": 0.6392040154027661,
+        "action_distribution": {
+          "0": 118,
+          "1": 150,
+          "2": 102,
+          "3": 126,
+          "4": 184,
+          "5": 124,
+          "6": 74,
+          "7": 258
+        },
+        "terminal_goal_reward_frequency": 0.9166666666666666,
+        "shaping_reward_mean": 0.0637494675920863,
+        "shaping_reward_std": 0.07462282051495553
+      }
+    }
+  },
+  "summary_statistics": {
+    "R1": {
+      "mean_sr": 0.2888888888888889,
+      "std_sr": 0.09558139185602921,
+      "median_sr": 0.3,
+      "min_sr": 0.16666666666666666,
+      "max_sr": 0.4
+    },
+    "R2-PB": {
+      "mean_sr": 0.9555555555555556,
+      "std_sr": 0.034246744460938776,
+      "median_sr": 0.95,
+      "min_sr": 0.9166666666666666,
+      "max_sr": 1.0
+    }
+  }
+}

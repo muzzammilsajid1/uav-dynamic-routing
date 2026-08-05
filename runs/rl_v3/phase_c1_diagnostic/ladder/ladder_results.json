@@ -1,0 +1,218 @@
+{
+  "D1": {
+    "metadata": {
+      "manifest_name": "rl_v3_ladder_D1.json",
+      "manifest_hash": "f1eb6d09cff5c87b85e9f1739c85e5b9b48c24b1ebc94614fbe4aeeedc921aaf",
+      "interactions": 25000,
+      "completed_episodes": 2092,
+      "interactions_per_endpoint": 6250.0,
+      "episodes_per_endpoint": 523.0,
+      "seed": 42,
+      "architecture": "PhaseBFeatureExtractor(256) -> MLP([128, 128])",
+      "checkpoints_evaluated": [
+        5000,
+        10000,
+        25000
+      ]
+    },
+    "history": {
+      "5000": {
+        "train_sr": 0.5,
+        "val_sr": 0.2,
+        "episodes_completed": 106,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "10000": {
+        "train_sr": 1.0,
+        "val_sr": 0.15,
+        "episodes_completed": 309,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "15000": {
+        "train_sr": 1.0,
+        "val_sr": 0.15,
+        "episodes_completed": 750,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "20000": {
+        "train_sr": 1.0,
+        "val_sr": 0.08333333333333333,
+        "episodes_completed": 1418,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "25000": {
+        "train_sr": 1.0,
+        "val_sr": 0.18333333333333332,
+        "episodes_completed": 2092,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      }
+    }
+  },
+  "D2": {
+    "metadata": {
+      "manifest_name": "rl_v3_ladder_D2.json",
+      "manifest_hash": "c8a7dd7fdd00acdb6297f6180d5377ddddbdc9797347e2d8244195a275bcf12e",
+      "interactions": 25000,
+      "completed_episodes": 893,
+      "interactions_per_endpoint": 1562.5,
+      "episodes_per_endpoint": 55.8125,
+      "seed": 42,
+      "architecture": "PhaseBFeatureExtractor(256) -> MLP([128, 128])",
+      "checkpoints_evaluated": [
+        5000,
+        10000,
+        25000
+      ]
+    },
+    "history": {
+      "5000": {
+        "train_sr": 0.125,
+        "val_sr": 0.1,
+        "episodes_completed": 99,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "10000": {
+        "train_sr": 0.25,
+        "val_sr": 0.25,
+        "episodes_completed": 240,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "15000": {
+        "train_sr": 0.625,
+        "val_sr": 0.2,
+        "episodes_completed": 413,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "20000": {
+        "train_sr": 0.875,
+        "val_sr": 0.2,
+        "episodes_completed": 614,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "25000": {
+        "train_sr": 0.875,
+        "val_sr": 0.2,
+        "episodes_completed": 893,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      }
+    }
+  },
+  "D3": {
+    "metadata": {
+      "manifest_name": "rl_v3_ladder_D3.json",
+      "manifest_hash": "d536a5f9b031049df239669b4b66c236da0e5a463005d5228eb1e41b4b750f1e",
+      "interactions": 25000,
+      "completed_episodes": 771,
+      "interactions_per_endpoint": 390.625,
+      "episodes_per_endpoint": 12.046875,
+      "seed": 42,
+      "architecture": "PhaseBFeatureExtractor(256) -> MLP([128, 128])",
+      "checkpoints_evaluated": [
+        5000,
+        10000,
+        25000
+      ]
+    },
+    "history": {
+      "5000": {
+        "train_sr": 0.125,
+        "val_sr": 0.15,
+        "episodes_completed": 100,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "10000": {
+        "train_sr": 0.53125,
+        "val_sr": 0.55,
+        "episodes_completed": 238,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "15000": {
+        "train_sr": 0.46875,
+        "val_sr": 0.4166666666666667,
+        "episodes_completed": 403,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "20000": {
+        "train_sr": 0.4375,
+        "val_sr": 0.3333333333333333,
+        "episodes_completed": 579,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "25000": {
+        "train_sr": 0.59375,
+        "val_sr": 0.38333333333333336,
+        "episodes_completed": 771,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      }
+    }
+  },
+  "D4": {
+    "metadata": {
+      "manifest_name": "rl_v3_ladder_D4.json",
+      "manifest_hash": "2e7ec9fecd2794af095171208429244c6aa3c863c83e9226bb366d5d292e3a2c",
+      "interactions": 25000,
+      "completed_episodes": 658,
+      "interactions_per_endpoint": 97.65625,
+      "episodes_per_endpoint": 2.5703125,
+      "seed": 42,
+      "architecture": "PhaseBFeatureExtractor(256) -> MLP([128, 128])",
+      "checkpoints_evaluated": [
+        5000,
+        10000,
+        25000
+      ]
+    },
+    "history": {
+      "5000": {
+        "train_sr": 0.0546875,
+        "val_sr": 0.03333333333333333,
+        "episodes_completed": 95,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "10000": {
+        "train_sr": 0.140625,
+        "val_sr": 0.06666666666666667,
+        "episodes_completed": 221,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "15000": {
+        "train_sr": 0.2265625,
+        "val_sr": 0.21666666666666667,
+        "episodes_completed": 355,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "20000": {
+        "train_sr": 0.2734375,
+        "val_sr": 0.2,
+        "episodes_completed": 506,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      },
+      "25000": {
+        "train_sr": 0.3828125,
+        "val_sr": 0.3,
+        "episodes_completed": 658,
+        "terminal_goal_rewards": "unavailable_due_to_logging_defect",
+        "terminal_goal_reward_freq": "unavailable_due_to_logging_defect"
+      }
+    }
+  }
+}
