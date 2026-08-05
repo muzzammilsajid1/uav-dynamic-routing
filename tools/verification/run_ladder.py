@@ -36,7 +36,7 @@ class LadderEvalCallback(BaseCallback):
         # Count terminal rewards in the rollout buffer
         for i in range(len(self.model.rollout_buffer.rewards)):
             r = self.model.rollout_buffer.rewards[i][0]
-            if r > 10.0:  # The goal reward is +50
+            if r >= 1.0:  # In Phase C1 R1, goal reward is 1.0
                 self.terminal_goal_rewards += 1
             if self.model.rollout_buffer.episode_starts[i][0]:
                 self.episodes_completed += 1

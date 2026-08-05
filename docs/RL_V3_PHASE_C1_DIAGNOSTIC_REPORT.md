@@ -42,7 +42,16 @@ A fast, reproducible diagnostic test suite executes without requiring a GPU. It 
 pytest -q --basetemp=tmp\pytest-phase-c1-diagnostic-final tests/test_phase_c1_diagnostics.py
 ```
 
-## 4. Recommendations for Phase C2
+## 4. R2-PB Implementation Details & Bounds
+
+The potential-based shaping reward (R2-PB) implemented in Phase C1-D defines:
+- **Theoretical Global Potential Bound:** $\Phi(s)$ is strictly normalized to $[-1, 0]$. The maximum absolute potential difference between any two steps is $1.0$, meaning the shaping bound is strictly controlled by the scaling factor $\lambda$.
+- **Maximum Legal One-Step Shaping:** For $\lambda=2.0$ and $\gamma=0.99$, the maximum theoretically achievable positive shaping in a single transition is $< 2.0$. The maximum negative shaping is similarly bounded.
+- **Collision Terminal Behaviour:** A terminal collision forces the next potential $\Phi(s') = 0$, simulating a sudden jump to maximum potential.
+- **Net Positive Collisions:** Because the collision baseline penalty in R1 is $-1.0$, the large positive shaping jump ($\approx +2.0$) on terminal collisions currently yields a **net positive reward** for crashing near the goal.
+
+## 5. Recommendations for Phase C2
 
 1. **Adopt Dense Reward (R2-PB):** The sparse reward R1 should be replaced with the R2-PB potential-based reward for multi-endpoint training.
-2. **Transition to Phase C2:** Since the endpoint generalization issue is diagnosed, Phase C2 (adding static obstacles) can proceed using R2-PB.
+2. **Empty Grid Constraint:** Because R2-PB currently assigns net positive rewards to collisions near the goal, this R2-PB implementation is **approved for collision-free empty-grid Phase C2 only** and must be fundamentally revisited before obstacle experiments begin.
+3. **Transition to Phase C2:** Phase C2 (empty multi-scale navigation) can now proceed.
