@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "suite_id": "rl-v3-phase-c1",
+  "seed": 42,
+  "curriculum": false,
+  "randomize_layout": false,
+  "randomize_endpoints": true,
+  "use_dynamics": false,
+  "scenario": {
+    "grid_size": 15,
+    "start": [2, 2],
+    "goal": [12, 7],
+    "blocked": [],
+    "dynamic_obstacles": [],
+    "no_fly_cells": [],
+    "traversal_penalties": [],
+    "sensor_noise_probability": 0.0
+  },
+  "observation": {
+    "family": "global_local",
+    "local_size": 11,
+    "global_size": 32,
+    "scalar_features": ["uav_norm_r", "uav_norm_c", "goal_disp_r", "goal_disp_c"]
+  },
+  "reward": {
+    "family": "R1",
+    "goal": 1.0,
+    "collision": -1.0,
+    "step_penalty_total_per_episode_budget": -0.2
+  },
+  "training": {
+    "algorithm": "MaskablePPO",
+    "n_steps": 256,
+    "batch_size": 64,
+    "n_epochs": 10,
+    "learning_rate": 3e-4,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "ent_coef": 0.01,
+    "episode_budget_astar_multiplier": 5.0,
+    "minimum_episode_budget": 30,
+    "checkpoints": [10000, 25000, 50000, 100000, 150000, 250000]
+  },
+  "policy": {
+    "features_dim": 256,
+    "net_arch_pi": [128, 64],
+    "net_arch_vf": [128, 64],
+    "activation": "ReLU"
+  },
+  "phase_c1_specifics": {
+    "distance_bins": [6.2, 10.1],
+    "validation_manifest_size": 120
+  }
+}

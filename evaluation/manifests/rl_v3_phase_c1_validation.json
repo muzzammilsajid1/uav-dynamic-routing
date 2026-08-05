@@ -1,0 +1,2162 @@
+[
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      13,
+      2
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "13_2_to_9_2",
+    "route_orientation": "vertical",
+    "scenario_id": "val_000",
+    "start": [
+      9,
+      2
+    ],
+    "start_region": 3,
+    "weighted_astar_cost": 4.0
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      6,
+      13
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "6_13_to_1_12",
+    "route_orientation": "vertical",
+    "scenario_id": "val_001",
+    "start": [
+      1,
+      12
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 5.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      4,
+      1
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "4_1_to_0_2",
+    "route_orientation": "vertical",
+    "scenario_id": "val_002",
+    "start": [
+      0,
+      2
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 4.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      12,
+      10
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "12_10_to_8_9",
+    "route_orientation": "vertical",
+    "scenario_id": "val_003",
+    "start": [
+      8,
+      9
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 4.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      5,
+      11
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "5_11_to_2_12",
+    "route_orientation": "vertical",
+    "scenario_id": "val_004",
+    "start": [
+      2,
+      12
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 3.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      6,
+      6
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "6_6_to_10_5",
+    "route_orientation": "vertical",
+    "scenario_id": "val_005",
+    "start": [
+      10,
+      5
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 4.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      2,
+      12
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "2_12_to_7_13",
+    "route_orientation": "vertical",
+    "scenario_id": "val_006",
+    "start": [
+      7,
+      13
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 5.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      2,
+      10
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "2_10_to_0_9",
+    "route_orientation": "vertical",
+    "scenario_id": "val_007",
+    "start": [
+      0,
+      9
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 2.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      7,
+      1
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "7_1_to_2_2",
+    "route_orientation": "vertical",
+    "scenario_id": "val_008",
+    "start": [
+      2,
+      2
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 5.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      5,
+      12
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "5_12_to_1_13",
+    "route_orientation": "vertical",
+    "scenario_id": "val_009",
+    "start": [
+      1,
+      13
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 4.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      3,
+      5
+    ],
+    "goal_region": 1,
+    "reverse_pair_exclusion_key": "3_5_to_3_7",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_010",
+    "start": [
+      3,
+      7
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 2.0
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      9,
+      5
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "9_5_to_10_9",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_011",
+    "start": [
+      10,
+      9
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 4.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      11,
+      3
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "11_3_to_11_7",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_012",
+    "start": [
+      11,
+      7
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 4.0
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      3,
+      7
+    ],
+    "goal_region": 1,
+    "reverse_pair_exclusion_key": "3_7_to_2_3",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_013",
+    "start": [
+      2,
+      3
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 4.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      14,
+      11
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "14_11_to_14_7",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_014",
+    "start": [
+      14,
+      7
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 4.0
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      11,
+      10
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "11_10_to_11_11",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_015",
+    "start": [
+      11,
+      11
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 1.0
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      11,
+      14
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "11_14_to_9_9",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_016",
+    "start": [
+      9,
+      9
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 5.82842712474619
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      10,
+      0
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "10_0_to_11_3",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_017",
+    "start": [
+      11,
+      3
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 3.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      0,
+      4
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "0_4_to_0_0",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_018",
+    "start": [
+      0,
+      0
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 4.0
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      8,
+      13
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "8_13_to_7_10",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_019",
+    "start": [
+      7,
+      10
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 3.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      1,
+      1
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "1_1_to_5_5",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_020",
+    "start": [
+      5,
+      5
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 5.656854249492381
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      2,
+      5
+    ],
+    "goal_region": 1,
+    "reverse_pair_exclusion_key": "2_5_to_6_8",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_021",
+    "start": [
+      6,
+      8
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 5.242640687119286
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      8,
+      11
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "8_11_to_10_13",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_022",
+    "start": [
+      10,
+      13
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 2.8284271247461903
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      7,
+      9
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "7_9_to_3_12",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_023",
+    "start": [
+      3,
+      12
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 5.242640687119286
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      12,
+      7
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "12_7_to_8_4",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_024",
+    "start": [
+      8,
+      4
+    ],
+    "start_region": 3,
+    "weighted_astar_cost": 5.242640687119286
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      6,
+      3
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "6_3_to_9_0",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_025",
+    "start": [
+      9,
+      0
+    ],
+    "start_region": 3,
+    "weighted_astar_cost": 4.242640687119286
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      8,
+      9
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "8_9_to_12_13",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_026",
+    "start": [
+      12,
+      13
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 5.656854249492381
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      4,
+      3
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "4_3_to_7_7",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_027",
+    "start": [
+      7,
+      7
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 5.242640687119286
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      10,
+      10
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "10_10_to_6_14",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_028",
+    "start": [
+      6,
+      14
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 5.656854249492381
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      7,
+      3
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "7_3_to_8_2",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_029",
+    "start": [
+      8,
+      2
+    ],
+    "start_region": 3,
+    "weighted_astar_cost": 1.4142135623730951
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      9,
+      9
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "9_9_to_6_6",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_030",
+    "start": [
+      6,
+      6
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 4.242640687119286
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      11,
+      6
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "11_6_to_12_7",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_031",
+    "start": [
+      12,
+      7
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 1.4142135623730951
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      14,
+      8
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "14_8_to_14_3",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_032",
+    "start": [
+      14,
+      3
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 5.0
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      7,
+      14
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "7_14_to_4_10",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_033",
+    "start": [
+      4,
+      10
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 5.242640687119286
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      9,
+      4
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "9_4_to_10_5",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_034",
+    "start": [
+      10,
+      5
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 1.4142135623730951
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      3,
+      3
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "3_3_to_4_4",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_035",
+    "start": [
+      4,
+      4
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 1.4142135623730951
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      5,
+      5
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "5_5_to_3_9",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_036",
+    "start": [
+      3,
+      9
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 4.82842712474619
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      12,
+      0
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "12_0_to_13_3",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_037",
+    "start": [
+      13,
+      3
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 3.414213562373095
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      4,
+      0
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "4_0_to_0_3",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_038",
+    "start": [
+      0,
+      3
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 5.242640687119286
+  },
+  {
+    "distance_bin": "short",
+    "episode_budget": 30,
+    "goal": [
+      0,
+      14
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "0_14_to_6_14",
+    "route_orientation": "vertical",
+    "scenario_id": "val_039",
+    "start": [
+      6,
+      14
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 6.0
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 43,
+    "goal": [
+      2,
+      12
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "2_12_to_10_13",
+    "route_orientation": "vertical",
+    "scenario_id": "val_040",
+    "start": [
+      10,
+      13
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 8.414213562373096
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 37,
+    "goal": [
+      11,
+      7
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "11_7_to_5_4",
+    "route_orientation": "vertical",
+    "scenario_id": "val_041",
+    "start": [
+      5,
+      4
+    ],
+    "start_region": 3,
+    "weighted_astar_cost": 7.242640687119286
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 38,
+    "goal": [
+      3,
+      10
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "3_10_to_10_9",
+    "route_orientation": "vertical",
+    "scenario_id": "val_042",
+    "start": [
+      10,
+      9
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 7.414213562373095
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 35,
+    "goal": [
+      13,
+      3
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "13_3_to_7_5",
+    "route_orientation": "vertical",
+    "scenario_id": "val_043",
+    "start": [
+      7,
+      5
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 6.82842712474619
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 43,
+    "goal": [
+      13,
+      8
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "13_8_to_5_7",
+    "route_orientation": "vertical",
+    "scenario_id": "val_044",
+    "start": [
+      5,
+      7
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 8.414213562373096
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 47,
+    "goal": [
+      2,
+      10
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "2_10_to_10_13",
+    "route_orientation": "vertical",
+    "scenario_id": "val_045",
+    "start": [
+      10,
+      13
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 9.242640687119286
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 33,
+    "goal": [
+      13,
+      10
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "13_10_to_7_11",
+    "route_orientation": "vertical",
+    "scenario_id": "val_046",
+    "start": [
+      7,
+      11
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 6.414213562373095
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 49,
+    "goal": [
+      5,
+      0
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "5_0_to_13_4",
+    "route_orientation": "vertical",
+    "scenario_id": "val_047",
+    "start": [
+      13,
+      4
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 9.65685424949238
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 48,
+    "goal": [
+      12,
+      4
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "12_4_to_3_5",
+    "route_orientation": "vertical",
+    "scenario_id": "val_048",
+    "start": [
+      3,
+      5
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 9.414213562373096
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 50,
+    "goal": [
+      11,
+      7
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "11_7_to_2_9",
+    "route_orientation": "vertical",
+    "scenario_id": "val_049",
+    "start": [
+      2,
+      9
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 9.82842712474619
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 35,
+    "goal": [
+      6,
+      6
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "6_6_to_6_13",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_050",
+    "start": [
+      6,
+      13
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 7.0
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 35,
+    "goal": [
+      7,
+      0
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "7_0_to_5_6",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_051",
+    "start": [
+      5,
+      6
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 6.82842712474619
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 50,
+    "goal": [
+      11,
+      0
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "11_0_to_9_9",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_052",
+    "start": [
+      9,
+      9
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 9.82842712474619
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 50,
+    "goal": [
+      8,
+      4
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "8_4_to_8_14",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_053",
+    "start": [
+      8,
+      14
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 10.0
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 49,
+    "goal": [
+      6,
+      12
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "6_12_to_2_4",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_054",
+    "start": [
+      2,
+      4
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 9.65685424949238
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 35,
+    "goal": [
+      3,
+      6
+    ],
+    "goal_region": 1,
+    "reverse_pair_exclusion_key": "3_6_to_3_13",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_055",
+    "start": [
+      3,
+      13
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 7.0
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 37,
+    "goal": [
+      3,
+      10
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "3_10_to_0_4",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_056",
+    "start": [
+      0,
+      4
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 7.242640687119286
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 35,
+    "goal": [
+      2,
+      7
+    ],
+    "goal_region": 1,
+    "reverse_pair_exclusion_key": "2_7_to_4_1",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_057",
+    "start": [
+      4,
+      1
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 6.82842712474619
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 45,
+    "goal": [
+      5,
+      1
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "5_1_to_7_9",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_058",
+    "start": [
+      7,
+      9
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 8.82842712474619
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 38,
+    "goal": [
+      10,
+      10
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "10_10_to_11_3",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_059",
+    "start": [
+      11,
+      3
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 7.414213562373095
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 34,
+    "goal": [
+      6,
+      2
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "6_2_to_10_7",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_060",
+    "start": [
+      10,
+      7
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 6.656854249492381
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 48,
+    "goal": [
+      1,
+      2
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "1_2_to_7_9",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_061",
+    "start": [
+      7,
+      9
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 9.485281374238571
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 36,
+    "goal": [
+      14,
+      9
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "14_9_to_9_14",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_062",
+    "start": [
+      9,
+      14
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 7.0710678118654755
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 41,
+    "goal": [
+      9,
+      4
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "9_4_to_14_10",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_063",
+    "start": [
+      14,
+      10
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 8.071067811865476
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 43,
+    "goal": [
+      3,
+      1
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "3_1_to_9_7",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_064",
+    "start": [
+      9,
+      7
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 8.485281374238571
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 36,
+    "goal": [
+      2,
+      4
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "2_4_to_7_9",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_065",
+    "start": [
+      7,
+      9
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 7.0710678118654755
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 48,
+    "goal": [
+      0,
+      14
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "0_14_to_7_8",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_066",
+    "start": [
+      7,
+      8
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 9.485281374238571
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 50,
+    "goal": [
+      7,
+      1
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "7_1_to_0_8",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_067",
+    "start": [
+      0,
+      8
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 9.899494936611665
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 34,
+    "goal": [
+      8,
+      12
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "8_12_to_4_7",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_068",
+    "start": [
+      4,
+      7
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 6.656854249492381
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 36,
+    "goal": [
+      7,
+      7
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "7_7_to_12_2",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_069",
+    "start": [
+      12,
+      2
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 7.0710678118654755
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 32,
+    "goal": [
+      9,
+      2
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "9_2_to_6_7",
+    "route_orientation": "mixed",
+    "scenario_id": "val_070",
+    "start": [
+      6,
+      7
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 6.242640687119286
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 46,
+    "goal": [
+      14,
+      6
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "14_6_to_9_13",
+    "route_orientation": "mixed",
+    "scenario_id": "val_071",
+    "start": [
+      9,
+      13
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 9.071067811865476
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 44,
+    "goal": [
+      5,
+      5
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "5_5_to_9_12",
+    "route_orientation": "mixed",
+    "scenario_id": "val_072",
+    "start": [
+      9,
+      12
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 8.65685424949238
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 51,
+    "goal": [
+      13,
+      0
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "13_0_to_5_5",
+    "route_orientation": "mixed",
+    "scenario_id": "val_073",
+    "start": [
+      5,
+      5
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 10.071067811865476
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 32,
+    "goal": [
+      5,
+      0
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "5_0_to_8_5",
+    "route_orientation": "mixed",
+    "scenario_id": "val_074",
+    "start": [
+      8,
+      5
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 6.242640687119286
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 32,
+    "goal": [
+      13,
+      11
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "13_11_to_10_6",
+    "route_orientation": "mixed",
+    "scenario_id": "val_075",
+    "start": [
+      10,
+      6
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 6.242640687119286
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 46,
+    "goal": [
+      9,
+      10
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "9_10_to_2_5",
+    "route_orientation": "mixed",
+    "scenario_id": "val_076",
+    "start": [
+      2,
+      5
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 9.071067811865476
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 46,
+    "goal": [
+      9,
+      7
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "9_7_to_4_14",
+    "route_orientation": "mixed",
+    "scenario_id": "val_077",
+    "start": [
+      4,
+      14
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 9.071067811865476
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 39,
+    "goal": [
+      2,
+      11
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "2_11_to_6_5",
+    "route_orientation": "mixed",
+    "scenario_id": "val_078",
+    "start": [
+      6,
+      5
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 7.656854249492381
+  },
+  {
+    "distance_bin": "medium",
+    "episode_budget": 51,
+    "goal": [
+      6,
+      5
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "6_5_to_14_10",
+    "route_orientation": "mixed",
+    "scenario_id": "val_079",
+    "start": [
+      14,
+      10
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 10.071067811865476
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 61,
+    "goal": [
+      0,
+      5
+    ],
+    "goal_region": 1,
+    "reverse_pair_exclusion_key": "0_5_to_10_10",
+    "route_orientation": "vertical",
+    "scenario_id": "val_080",
+    "start": [
+      10,
+      10
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 12.071067811865476
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 69,
+    "goal": [
+      0,
+      0
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "0_0_to_12_4",
+    "route_orientation": "vertical",
+    "scenario_id": "val_081",
+    "start": [
+      12,
+      4
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 13.65685424949238
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 55,
+    "goal": [
+      4,
+      10
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "4_10_to_14_12",
+    "route_orientation": "vertical",
+    "scenario_id": "val_082",
+    "start": [
+      14,
+      12
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 10.82842712474619
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 73,
+    "goal": [
+      1,
+      11
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "1_11_to_13_5",
+    "route_orientation": "vertical",
+    "scenario_id": "val_083",
+    "start": [
+      13,
+      5
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 14.485281374238571
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 69,
+    "goal": [
+      13,
+      5
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "13_5_to_1_1",
+    "route_orientation": "vertical",
+    "scenario_id": "val_084",
+    "start": [
+      1,
+      1
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 13.65685424949238
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 60,
+    "goal": [
+      14,
+      8
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "14_8_to_2_8",
+    "route_orientation": "vertical",
+    "scenario_id": "val_085",
+    "start": [
+      2,
+      8
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 12.0
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 65,
+    "goal": [
+      13,
+      8
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "13_8_to_0_8",
+    "route_orientation": "vertical",
+    "scenario_id": "val_086",
+    "start": [
+      0,
+      8
+    ],
+    "start_region": 1,
+    "weighted_astar_cost": 13.0
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 66,
+    "goal": [
+      2,
+      14
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "2_14_to_13_9",
+    "route_orientation": "vertical",
+    "scenario_id": "val_087",
+    "start": [
+      13,
+      9
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 13.071067811865476
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 65,
+    "goal": [
+      12,
+      5
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "12_5_to_0_3",
+    "route_orientation": "vertical",
+    "scenario_id": "val_088",
+    "start": [
+      0,
+      3
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 12.82842712474619
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 55,
+    "goal": [
+      1,
+      2
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "1_2_to_12_2",
+    "route_orientation": "vertical",
+    "scenario_id": "val_089",
+    "start": [
+      12,
+      2
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 11.0
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 62,
+    "goal": [
+      4,
+      11
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "4_11_to_1_0",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_090",
+    "start": [
+      1,
+      0
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 12.242640687119286
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 53,
+    "goal": [
+      3,
+      13
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "3_13_to_4_3",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_091",
+    "start": [
+      4,
+      3
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 10.414213562373096
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 52,
+    "goal": [
+      13,
+      3
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "13_3_to_10_12",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_092",
+    "start": [
+      10,
+      12
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 10.242640687119286
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 71,
+    "goal": [
+      9,
+      14
+    ],
+    "goal_region": 5,
+    "reverse_pair_exclusion_key": "9_14_to_4_2",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_093",
+    "start": [
+      4,
+      2
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 14.071067811865476
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 69,
+    "goal": [
+      2,
+      12
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "2_12_to_6_0",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_094",
+    "start": [
+      6,
+      0
+    ],
+    "start_region": 3,
+    "weighted_astar_cost": 13.65685424949238
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 63,
+    "goal": [
+      7,
+      0
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "7_0_to_8_12",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_095",
+    "start": [
+      8,
+      12
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 12.414213562373096
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 65,
+    "goal": [
+      13,
+      13
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "13_13_to_13_0",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_096",
+    "start": [
+      13,
+      0
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 13.0
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 70,
+    "goal": [
+      14,
+      14
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "14_14_to_14_0",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_097",
+    "start": [
+      14,
+      0
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 14.0
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 65,
+    "goal": [
+      6,
+      0
+    ],
+    "goal_region": 3,
+    "reverse_pair_exclusion_key": "6_0_to_4_12",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_098",
+    "start": [
+      4,
+      12
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 12.82842712474619
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 60,
+    "goal": [
+      14,
+      3
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "14_3_to_12_14",
+    "route_orientation": "horizontal",
+    "scenario_id": "val_099",
+    "start": [
+      12,
+      14
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 11.82842712474619
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 55,
+    "goal": [
+      5,
+      8
+    ],
+    "goal_region": 4,
+    "reverse_pair_exclusion_key": "5_8_to_12_0",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_100",
+    "start": [
+      12,
+      0
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 10.899494936611665
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 55,
+    "goal": [
+      4,
+      13
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "4_13_to_11_5",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_101",
+    "start": [
+      11,
+      5
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 10.899494936611665
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 71,
+    "goal": [
+      0,
+      10
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "0_10_to_10_0",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_102",
+    "start": [
+      10,
+      0
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 14.142135623730951
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 62,
+    "goal": [
+      10,
+      11
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "10_11_to_2_2",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_103",
+    "start": [
+      2,
+      2
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 12.313708498984761
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 55,
+    "goal": [
+      10,
+      3
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "10_3_to_3_11",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_104",
+    "start": [
+      3,
+      11
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 10.899494936611665
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 62,
+    "goal": [
+      12,
+      6
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "12_6_to_3_14",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_105",
+    "start": [
+      3,
+      14
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 12.313708498984761
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 71,
+    "goal": [
+      10,
+      11
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "10_11_to_0_1",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_106",
+    "start": [
+      0,
+      1
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 14.142135623730951
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 69,
+    "goal": [
+      14,
+      0
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "14_0_to_5_10",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_107",
+    "start": [
+      5,
+      10
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 13.727922061357857
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 92,
+    "goal": [
+      1,
+      13
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "1_13_to_14_0",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_108",
+    "start": [
+      14,
+      0
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 18.38477631085024
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 62,
+    "goal": [
+      13,
+      2
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "13_2_to_5_11",
+    "route_orientation": "diagonal",
+    "scenario_id": "val_109",
+    "start": [
+      5,
+      11
+    ],
+    "start_region": 5,
+    "weighted_astar_cost": 12.313708498984761
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 74,
+    "goal": [
+      13,
+      9
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "13_9_to_2_0",
+    "route_orientation": "mixed",
+    "scenario_id": "val_110",
+    "start": [
+      2,
+      0
+    ],
+    "start_region": 0,
+    "weighted_astar_cost": 14.727922061357857
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 70,
+    "goal": [
+      0,
+      14
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "0_14_to_11_7",
+    "route_orientation": "mixed",
+    "scenario_id": "val_111",
+    "start": [
+      11,
+      7
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 13.899494936611665
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 53,
+    "goal": [
+      11,
+      6
+    ],
+    "goal_region": 7,
+    "reverse_pair_exclusion_key": "11_6_to_3_12",
+    "route_orientation": "mixed",
+    "scenario_id": "val_112",
+    "start": [
+      3,
+      12
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 10.485281374238571
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 80,
+    "goal": [
+      0,
+      4
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "0_4_to_13_11",
+    "route_orientation": "mixed",
+    "scenario_id": "val_113",
+    "start": [
+      13,
+      11
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 15.899494936611665
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 77,
+    "goal": [
+      4,
+      12
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "4_12_to_12_0",
+    "route_orientation": "mixed",
+    "scenario_id": "val_114",
+    "start": [
+      12,
+      0
+    ],
+    "start_region": 6,
+    "weighted_astar_cost": 15.313708498984761
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 58,
+    "goal": [
+      11,
+      14
+    ],
+    "goal_region": 8,
+    "reverse_pair_exclusion_key": "11_14_to_5_5",
+    "route_orientation": "mixed",
+    "scenario_id": "val_115",
+    "start": [
+      5,
+      5
+    ],
+    "start_region": 4,
+    "weighted_astar_cost": 11.485281374238571
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 82,
+    "goal": [
+      12,
+      0
+    ],
+    "goal_region": 6,
+    "reverse_pair_exclusion_key": "12_0_to_4_13",
+    "route_orientation": "mixed",
+    "scenario_id": "val_116",
+    "start": [
+      4,
+      13
+    ],
+    "start_region": 2,
+    "weighted_astar_cost": 16.31370849898476
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 80,
+    "goal": [
+      1,
+      1
+    ],
+    "goal_region": 0,
+    "reverse_pair_exclusion_key": "1_1_to_14_8",
+    "route_orientation": "mixed",
+    "scenario_id": "val_117",
+    "start": [
+      14,
+      8
+    ],
+    "start_region": 7,
+    "weighted_astar_cost": 15.899494936611665
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 70,
+    "goal": [
+      1,
+      6
+    ],
+    "goal_region": 1,
+    "reverse_pair_exclusion_key": "1_6_to_12_13",
+    "route_orientation": "mixed",
+    "scenario_id": "val_118",
+    "start": [
+      12,
+      13
+    ],
+    "start_region": 8,
+    "weighted_astar_cost": 13.899494936611665
+  },
+  {
+    "distance_bin": "long",
+    "episode_budget": 70,
+    "goal": [
+      0,
+      13
+    ],
+    "goal_region": 2,
+    "reverse_pair_exclusion_key": "0_13_to_7_2",
+    "route_orientation": "mixed",
+    "scenario_id": "val_119",
+    "start": [
+      7,
+      2
+    ],
+    "start_region": 3,
+    "weighted_astar_cost": 13.899494936611665
+  }
+]
