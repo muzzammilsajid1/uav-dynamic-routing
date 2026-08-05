@@ -1,0 +1,904 @@
+{
+  "validation_v2_hash": "3d2e18667de96516ae71250b2d2c5ce28b9027fce1cf5f79eaff052afe9d1574",
+  "pilots": {
+    "P1": {
+      "configuration": {
+        "id": "P1",
+        "observation": "local_only",
+        "reward": "R1"
+      },
+      "parameter_count": 159929,
+      "inference_latency_ms": 2.2039279993623495,
+      "learning_curve": [
+        {
+          "average_process_cpu_utilization_percent": 44.22709371102579,
+          "environment_steps_per_second": 174.57883846829188,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 25000,
+          "training_wall_seconds": 143.20177759998478,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.020833333333333332
+        },
+        {
+          "average_process_cpu_utilization_percent": 40.844815431795084,
+          "environment_steps_per_second": 153.223421800937,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 50000,
+          "training_wall_seconds": 163.16043399996124,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.010416666666666666
+        },
+        {
+          "average_process_cpu_utilization_percent": 40.487242032218745,
+          "environment_steps_per_second": 144.55897516350296,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 100000,
+          "training_wall_seconds": 345.879596499959,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.020833333333333332
+        }
+      ],
+      "final_successes": 2,
+      "final_episodes": 96,
+      "failure_taxonomy": {
+        "excessive_detour": 4,
+        "longer_repeated_loop": 2,
+        "success": 2,
+        "two_cell_oscillation": 88
+      },
+      "by_scale": {
+        "100": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.9166666666666666,
+          "longer_loop_rate": 0.9166666666666666,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 237.75,
+          "mean_decision_latency_ms": 2.598369153984751,
+          "total_attempted_episode_computation_seconds": 28.87338359968271,
+          "successful_route_computation_seconds": 0
+        },
+        "15": {
+          "episodes": 24,
+          "success_rate": 0.041666666666666664,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9583333333333334,
+          "two_cell_oscillation_rate": 0.9166666666666666,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 0.9583333333333334,
+          "mean_path_cost_gap_successes": 2.82842712474619,
+          "mean_decisions": 37.708333333333336,
+          "mean_decision_latency_ms": 2.202789643769029,
+          "total_attempted_episode_computation_seconds": 3.0621892999624833,
+          "successful_route_computation_seconds": 0.02168909995816648
+        },
+        "30": {
+          "episodes": 24,
+          "success_rate": 0.041666666666666664,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9583333333333334,
+          "two_cell_oscillation_rate": 0.8333333333333334,
+          "longer_loop_rate": 0.875,
+          "excessive_detour_rate": 0.9583333333333334,
+          "mean_path_cost_gap_successes": 2.8284271247461916,
+          "mean_decisions": 71.79166666666667,
+          "mean_decision_latency_ms": 2.7425511213212963,
+          "total_attempted_episode_computation_seconds": 7.712464700103737,
+          "successful_route_computation_seconds": 0.0713559000287205
+        },
+        "50": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 1.0,
+          "longer_loop_rate": 1.0,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 114.375,
+          "mean_decision_latency_ms": 5.563333260249273,
+          "total_attempted_episode_computation_seconds": 25.032259099767543,
+          "successful_route_computation_seconds": 0
+        }
+      },
+      "by_family": {
+        "dynamic": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 1.0,
+          "longer_loop_rate": 1.0,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 116.41666666666667,
+          "mean_decision_latency_ms": 3.657481086428246,
+          "total_attempted_episode_computation_seconds": 27.361393500003032,
+          "successful_route_computation_seconds": 0
+        },
+        "empty": {
+          "episodes": 24,
+          "success_rate": 0.041666666666666664,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9583333333333334,
+          "two_cell_oscillation_rate": 0.9166666666666666,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 0.9583333333333334,
+          "mean_path_cost_gap_successes": 2.82842712474619,
+          "mean_decisions": 116.95833333333333,
+          "mean_decision_latency_ms": 2.6193969250390197,
+          "total_attempted_episode_computation_seconds": 10.861616299604066,
+          "successful_route_computation_seconds": 0.02168909995816648
+        },
+        "random_static": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.9583333333333334,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 115.58333333333333,
+          "mean_decision_latency_ms": 3.246863125100088,
+          "total_attempted_episode_computation_seconds": 12.55517159984447,
+          "successful_route_computation_seconds": 0
+        },
+        "structured": {
+          "episodes": 24,
+          "success_rate": 0.041666666666666664,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9583333333333334,
+          "two_cell_oscillation_rate": 0.7916666666666666,
+          "longer_loop_rate": 0.8333333333333334,
+          "excessive_detour_rate": 0.9583333333333334,
+          "mean_path_cost_gap_successes": 2.8284271247461916,
+          "mean_decisions": 112.66666666666667,
+          "mean_decision_latency_ms": 3.5833020427569946,
+          "total_attempted_episode_computation_seconds": 13.902115300064906,
+          "successful_route_computation_seconds": 0.0713559000287205
+        }
+      },
+      "by_route": {
+        "long": {
+          "episodes": 32,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.9375,
+          "longer_loop_rate": 1.0,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 175.84375,
+          "mean_decision_latency_ms": 3.197161340927698,
+          "total_attempted_episode_computation_seconds": 32.40717740007676,
+          "successful_route_computation_seconds": 0
+        },
+        "medium": {
+          "episodes": 32,
+          "success_rate": 0.03125,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.96875,
+          "two_cell_oscillation_rate": 0.96875,
+          "longer_loop_rate": 0.96875,
+          "excessive_detour_rate": 0.96875,
+          "mean_path_cost_gap_successes": 2.8284271247461916,
+          "mean_decisions": 106.28125,
+          "mean_decision_latency_ms": 3.3693436447270066,
+          "total_attempted_episode_computation_seconds": 20.94393689977005,
+          "successful_route_computation_seconds": 0.0713559000287205
+        },
+        "short": {
+          "episodes": 32,
+          "success_rate": 0.03125,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.96875,
+          "two_cell_oscillation_rate": 0.84375,
+          "longer_loop_rate": 0.84375,
+          "excessive_detour_rate": 0.96875,
+          "mean_path_cost_gap_successes": 2.82842712474619,
+          "mean_decisions": 64.09375,
+          "mean_decision_latency_ms": 3.263777398838557,
+          "total_attempted_episode_computation_seconds": 11.329182399669662,
+          "successful_route_computation_seconds": 0.02168909995816648
+        }
+      },
+      "overall": {
+        "episodes": 96,
+        "success_rate": 0.020833333333333332,
+        "collision_rate": 0.0,
+        "timeout_rate": 0.9791666666666666,
+        "two_cell_oscillation_rate": 0.9166666666666666,
+        "longer_loop_rate": 0.9375,
+        "excessive_detour_rate": 0.9791666666666666,
+        "mean_path_cost_gap_successes": 2.8284271247461907,
+        "mean_decisions": 115.40625,
+        "mean_decision_latency_ms": 3.276760794831087,
+        "total_attempted_episode_computation_seconds": 64.68029669951648,
+        "successful_route_computation_seconds": 0.09304499998688698
+      }
+    },
+    "P2": {
+      "configuration": {
+        "id": "P2",
+        "observation": "global_local",
+        "reward": "R1"
+      },
+      "parameter_count": 470025,
+      "inference_latency_ms": 2.583436999702826,
+      "learning_curve": [
+        {
+          "average_process_cpu_utilization_percent": 42.38627834216099,
+          "environment_steps_per_second": 71.83068710591157,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 25000,
+          "training_wall_seconds": 348.0406634999672,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.020833333333333332
+        },
+        {
+          "average_process_cpu_utilization_percent": 44.218435346000255,
+          "environment_steps_per_second": 57.15745399386041,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 50000,
+          "training_wall_seconds": 437.3882714000065,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.041666666666666664
+        },
+        {
+          "average_process_cpu_utilization_percent": 46.09593470411746,
+          "environment_steps_per_second": 97.76282276153687,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 100000,
+          "training_wall_seconds": 511.4418609000277,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.03125
+        }
+      ],
+      "final_successes": 3,
+      "final_episodes": 96,
+      "failure_taxonomy": {
+        "excessive_detour": 3,
+        "longer_repeated_loop": 30,
+        "success": 3,
+        "two_cell_oscillation": 60
+      },
+      "by_scale": {
+        "100": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.7083333333333334,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 237.75,
+          "mean_decision_latency_ms": 2.7342428309330713,
+          "total_attempted_episode_computation_seconds": 40.91774900013115,
+          "successful_route_computation_seconds": 0
+        },
+        "15": {
+          "episodes": 24,
+          "success_rate": 0.08333333333333333,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9166666666666666,
+          "two_cell_oscillation_rate": 0.5416666666666666,
+          "longer_loop_rate": 0.9166666666666666,
+          "excessive_detour_rate": 0.9583333333333334,
+          "mean_path_cost_gap_successes": 2.4142135623730954,
+          "mean_decisions": 36.666666666666664,
+          "mean_decision_latency_ms": 2.4552280732373233,
+          "total_attempted_episode_computation_seconds": 3.1995442998595536,
+          "successful_route_computation_seconds": 0.032096700044348836
+        },
+        "30": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.6666666666666666,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 74.04166666666667,
+          "mean_decision_latency_ms": 3.3022556215167955,
+          "total_attempted_episode_computation_seconds": 9.239906499860808,
+          "successful_route_computation_seconds": 0
+        },
+        "50": {
+          "episodes": 24,
+          "success_rate": 0.041666666666666664,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9583333333333334,
+          "two_cell_oscillation_rate": 0.5833333333333334,
+          "longer_loop_rate": 0.9166666666666666,
+          "excessive_detour_rate": 0.9583333333333334,
+          "mean_path_cost_gap_successes": 18.870057685088803,
+          "mean_decisions": 108.95833333333333,
+          "mean_decision_latency_ms": 3.4502185644147083,
+          "total_attempted_episode_computation_seconds": 15.768632100196555,
+          "successful_route_computation_seconds": 0.2593360000755638
+        }
+      },
+      "by_family": {
+        "dynamic": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.8333333333333334,
+          "longer_loop_rate": 1.0,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 116.41666666666667,
+          "mean_decision_latency_ms": 3.0742851376673266,
+          "total_attempted_episode_computation_seconds": 26.07328370027244,
+          "successful_route_computation_seconds": 0
+        },
+        "empty": {
+          "episodes": 24,
+          "success_rate": 0.08333333333333333,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9166666666666666,
+          "two_cell_oscillation_rate": 0.4583333333333333,
+          "longer_loop_rate": 0.7916666666666666,
+          "excessive_detour_rate": 0.9166666666666666,
+          "mean_path_cost_gap_successes": 9.435028842544401,
+          "mean_decisions": 111.45833333333333,
+          "mean_decision_latency_ms": 3.0724809075120305,
+          "total_attempted_episode_computation_seconds": 14.246538200066425,
+          "successful_route_computation_seconds": 0.27170710009522736
+        },
+        "random_static": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.7916666666666666,
+          "longer_loop_rate": 1.0,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 115.58333333333333,
+          "mean_decision_latency_ms": 3.0806028605128914,
+          "total_attempted_episode_computation_seconds": 14.859560699784197,
+          "successful_route_computation_seconds": 0
+        },
+        "structured": {
+          "episodes": 24,
+          "success_rate": 0.041666666666666664,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9583333333333334,
+          "two_cell_oscillation_rate": 0.4166666666666667,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": 4.828427124746191,
+          "mean_decisions": 113.95833333333333,
+          "mean_decision_latency_ms": 2.71457618440965,
+          "total_attempted_episode_computation_seconds": 13.946449299925007,
+          "successful_route_computation_seconds": 0.019725600024685264
+        }
+      },
+      "by_route": {
+        "long": {
+          "episodes": 32,
+          "success_rate": 0.03125,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.96875,
+          "two_cell_oscillation_rate": 0.65625,
+          "longer_loop_rate": 0.96875,
+          "excessive_detour_rate": 0.96875,
+          "mean_path_cost_gap_successes": 18.870057685088803,
+          "mean_decisions": 171.78125,
+          "mean_decision_latency_ms": 2.8418303720710827,
+          "total_attempted_episode_computation_seconds": 35.52079659991432,
+          "successful_route_computation_seconds": 0.2593360000755638
+        },
+        "medium": {
+          "episodes": 32,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.6875,
+          "longer_loop_rate": 1.0,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 107.96875,
+          "mean_decision_latency_ms": 3.058580409476335,
+          "total_attempted_episode_computation_seconds": 21.592660099850036,
+          "successful_route_computation_seconds": 0
+        },
+        "short": {
+          "episodes": 32,
+          "success_rate": 0.0625,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9375,
+          "two_cell_oscillation_rate": 0.53125,
+          "longer_loop_rate": 0.84375,
+          "excessive_detour_rate": 0.96875,
+          "mean_path_cost_gap_successes": 2.4142135623730954,
+          "mean_decisions": 63.3125,
+          "mean_decision_latency_ms": 3.0560480360290057,
+          "total_attempted_episode_computation_seconds": 12.012375200283714,
+          "successful_route_computation_seconds": 0.032096700044348836
+        }
+      },
+      "overall": {
+        "episodes": 96,
+        "success_rate": 0.03125,
+        "collision_rate": 0.0,
+        "timeout_rate": 0.96875,
+        "two_cell_oscillation_rate": 0.625,
+        "longer_loop_rate": 0.9375,
+        "excessive_detour_rate": 0.9791666666666666,
+        "mean_path_cost_gap_successes": 7.8994949366116645,
+        "mean_decisions": 114.35416666666667,
+        "mean_decision_latency_ms": 2.9854862725254745,
+        "total_attempted_episode_computation_seconds": 69.12583190004807,
+        "successful_route_computation_seconds": 0.2914327001199126
+      }
+    },
+    "P3": {
+      "configuration": {
+        "id": "P3",
+        "observation": "global_local_recency",
+        "reward": "R1"
+      },
+      "parameter_count": 470025,
+      "inference_latency_ms": 2.114190000575036,
+      "learning_curve": [
+        {
+          "average_process_cpu_utilization_percent": 48.02339106115251,
+          "environment_steps_per_second": 123.99132757438117,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 25000,
+          "training_wall_seconds": 201.62700480001513,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.010416666666666666
+        },
+        {
+          "average_process_cpu_utilization_percent": 47.838565799440104,
+          "environment_steps_per_second": 117.71798493431635,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 50000,
+          "training_wall_seconds": 212.3719668999547,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.020833333333333332
+        },
+        {
+          "average_process_cpu_utilization_percent": 47.2362733907583,
+          "environment_steps_per_second": 100.48433620875608,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 100000,
+          "training_wall_seconds": 497.5899915000191,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.0
+        }
+      ],
+      "final_successes": 0,
+      "final_episodes": 96,
+      "failure_taxonomy": {
+        "excessive_detour": 10,
+        "longer_repeated_loop": 64,
+        "two_cell_oscillation": 22
+      },
+      "by_scale": {
+        "100": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.08333333333333333,
+          "longer_loop_rate": 0.9166666666666666,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 237.75,
+          "mean_decision_latency_ms": 2.788411427285712,
+          "total_attempted_episode_computation_seconds": 42.944888899917714,
+          "successful_route_computation_seconds": 0
+        },
+        "15": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.6666666666666666,
+          "longer_loop_rate": 0.9166666666666666,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 38.75,
+          "mean_decision_latency_ms": 3.354618589069199,
+          "total_attempted_episode_computation_seconds": 4.4895793999312446,
+          "successful_route_computation_seconds": 0
+        },
+        "30": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.08333333333333333,
+          "longer_loop_rate": 0.7916666666666666,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 74.04166666666667,
+          "mean_decision_latency_ms": 3.6021462463061606,
+          "total_attempted_episode_computation_seconds": 9.94011429976672,
+          "successful_route_computation_seconds": 0
+        },
+        "50": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.08333333333333333,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 114.375,
+          "mean_decision_latency_ms": 3.279462353790986,
+          "total_attempted_episode_computation_seconds": 16.840091099846177,
+          "successful_route_computation_seconds": 0
+        }
+      },
+      "by_family": {
+        "dynamic": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.16666666666666666,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 116.41666666666667,
+          "mean_decision_latency_ms": 2.7175451557441925,
+          "total_attempted_episode_computation_seconds": 26.125691599678248,
+          "successful_route_computation_seconds": 0
+        },
+        "empty": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.16666666666666666,
+          "longer_loop_rate": 0.8333333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 118.0,
+          "mean_decision_latency_ms": 2.936068895549464,
+          "total_attempted_episode_computation_seconds": 15.422585899941623,
+          "successful_route_computation_seconds": 0
+        },
+        "random_static": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.3333333333333333,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 115.58333333333333,
+          "mean_decision_latency_ms": 3.9080090796480302,
+          "total_attempted_episode_computation_seconds": 17.11604049988091,
+          "successful_route_computation_seconds": 0
+        },
+        "structured": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.25,
+          "longer_loop_rate": 0.8333333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 114.91666666666667,
+          "mean_decision_latency_ms": 3.4630154855103705,
+          "total_attempted_episode_computation_seconds": 15.550355699961074,
+          "successful_route_computation_seconds": 0
+        }
+      },
+      "by_route": {
+        "long": {
+          "episodes": 32,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.25,
+          "longer_loop_rate": 1.0,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 175.84375,
+          "mean_decision_latency_ms": 3.140859904299748,
+          "total_attempted_episode_computation_seconds": 36.97007929976098,
+          "successful_route_computation_seconds": 0
+        },
+        "medium": {
+          "episodes": 32,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.25,
+          "longer_loop_rate": 1.0,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 107.96875,
+          "mean_decision_latency_ms": 3.345496456632398,
+          "total_attempted_episode_computation_seconds": 23.853496399591677,
+          "successful_route_computation_seconds": 0
+        },
+        "short": {
+          "episodes": 32,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.1875,
+          "longer_loop_rate": 0.6875,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 64.875,
+          "mean_decision_latency_ms": 3.2821226014068965,
+          "total_attempted_episode_computation_seconds": 13.391098000109196,
+          "successful_route_computation_seconds": 0
+        }
+      },
+      "overall": {
+        "episodes": 96,
+        "success_rate": 0.0,
+        "collision_rate": 0.0,
+        "timeout_rate": 1.0,
+        "two_cell_oscillation_rate": 0.22916666666666666,
+        "longer_loop_rate": 0.8958333333333334,
+        "excessive_detour_rate": 1.0,
+        "mean_path_cost_gap_successes": null,
+        "mean_decisions": 116.22916666666667,
+        "mean_decision_latency_ms": 3.2561596541130142,
+        "total_attempted_episode_computation_seconds": 74.21467369946185,
+        "successful_route_computation_seconds": 0
+      }
+    },
+    "P4": {
+      "configuration": {
+        "id": "P4",
+        "observation": "global_local_recency",
+        "reward": "R2"
+      },
+      "parameter_count": 470025,
+      "inference_latency_ms": 1.8666660005692393,
+      "learning_curve": [
+        {
+          "average_process_cpu_utilization_percent": 46.490692883457015,
+          "environment_steps_per_second": 118.1630366569865,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 25000,
+          "training_wall_seconds": 211.57208469999023,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.041666666666666664
+        },
+        {
+          "average_process_cpu_utilization_percent": 47.90687460599231,
+          "environment_steps_per_second": 116.79484885753224,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 50000,
+          "training_wall_seconds": 214.0505360000534,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.03125
+        },
+        {
+          "average_process_cpu_utilization_percent": 46.643375394275026,
+          "environment_steps_per_second": 96.4141859451457,
+          "gpu_note": "PyTorch CPU build; CUDA unavailable",
+          "gpu_utilization_percent": null,
+          "interactions": 100000,
+          "training_wall_seconds": 518.595884099952,
+          "validation_episodes": 96,
+          "validation_success_rate": 0.010416666666666666
+        }
+      ],
+      "final_successes": 1,
+      "final_episodes": 96,
+      "failure_taxonomy": {
+        "excessive_detour": 18,
+        "longer_repeated_loop": 7,
+        "success": 1,
+        "two_cell_oscillation": 70
+      },
+      "by_scale": {
+        "100": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.6666666666666666,
+          "longer_loop_rate": 0.7083333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 237.75,
+          "mean_decision_latency_ms": 3.6965667511941245,
+          "total_attempted_episode_computation_seconds": 52.44105089979712,
+          "successful_route_computation_seconds": 0
+        },
+        "15": {
+          "episodes": 24,
+          "success_rate": 0.041666666666666664,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9583333333333334,
+          "two_cell_oscillation_rate": 0.5833333333333334,
+          "longer_loop_rate": 0.8333333333333334,
+          "excessive_detour_rate": 0.9583333333333334,
+          "mean_path_cost_gap_successes": 0.0,
+          "mean_decisions": 37.75,
+          "mean_decision_latency_ms": 3.6405655627603477,
+          "total_attempted_episode_computation_seconds": 4.832223500008695,
+          "successful_route_computation_seconds": 0.03508609998971224
+        },
+        "30": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.875,
+          "longer_loop_rate": 0.8333333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 74.04166666666667,
+          "mean_decision_latency_ms": 4.769296544936046,
+          "total_attempted_episode_computation_seconds": 12.568254400161095,
+          "successful_route_computation_seconds": 0
+        },
+        "50": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.7916666666666666,
+          "longer_loop_rate": 0.7916666666666666,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 114.375,
+          "mean_decision_latency_ms": 4.38305079184962,
+          "total_attempted_episode_computation_seconds": 20.573584000230767,
+          "successful_route_computation_seconds": 0
+        }
+      },
+      "by_family": {
+        "dynamic": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.7916666666666666,
+          "longer_loop_rate": 0.875,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 116.41666666666667,
+          "mean_decision_latency_ms": 3.7634772719977243,
+          "total_attempted_episode_computation_seconds": 28.485673800110817,
+          "successful_route_computation_seconds": 0
+        },
+        "empty": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.5,
+          "longer_loop_rate": 0.5833333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 118.0,
+          "mean_decision_latency_ms": 3.7692759020393254,
+          "total_attempted_episode_computation_seconds": 20.89710630022455,
+          "successful_route_computation_seconds": 0
+        },
+        "random_static": {
+          "episodes": 24,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.9583333333333334,
+          "longer_loop_rate": 0.9583333333333334,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 115.58333333333333,
+          "mean_decision_latency_ms": 4.811846511349218,
+          "total_attempted_episode_computation_seconds": 20.957708899863064,
+          "successful_route_computation_seconds": 0
+        },
+        "structured": {
+          "episodes": 24,
+          "success_rate": 0.041666666666666664,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.9583333333333334,
+          "two_cell_oscillation_rate": 0.6666666666666666,
+          "longer_loop_rate": 0.75,
+          "excessive_detour_rate": 0.9583333333333334,
+          "mean_path_cost_gap_successes": 0.0,
+          "mean_decisions": 113.91666666666667,
+          "mean_decision_latency_ms": 4.144879965353872,
+          "total_attempted_episode_computation_seconds": 20.074623799999245,
+          "successful_route_computation_seconds": 0.03508609998971224
+        }
+      },
+      "by_route": {
+        "long": {
+          "episodes": 32,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.875,
+          "longer_loop_rate": 0.96875,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 175.84375,
+          "mean_decision_latency_ms": 3.776451988521453,
+          "total_attempted_episode_computation_seconds": 48.37961420009378,
+          "successful_route_computation_seconds": 0
+        },
+        "medium": {
+          "episodes": 32,
+          "success_rate": 0.03125,
+          "collision_rate": 0.0,
+          "timeout_rate": 0.96875,
+          "two_cell_oscillation_rate": 0.71875,
+          "longer_loop_rate": 0.78125,
+          "excessive_detour_rate": 0.96875,
+          "mean_path_cost_gap_successes": 0.0,
+          "mean_decisions": 107.21875,
+          "mean_decision_latency_ms": 4.571181967489509,
+          "total_attempted_episode_computation_seconds": 27.58822769986,
+          "successful_route_computation_seconds": 0.03508609998971224
+        },
+        "short": {
+          "episodes": 32,
+          "success_rate": 0.0,
+          "collision_rate": 0.0,
+          "timeout_rate": 1.0,
+          "two_cell_oscillation_rate": 0.59375,
+          "longer_loop_rate": 0.625,
+          "excessive_detour_rate": 1.0,
+          "mean_path_cost_gap_successes": null,
+          "mean_decisions": 64.875,
+          "mean_decision_latency_ms": 4.019475782044143,
+          "total_attempted_episode_computation_seconds": 14.447270900243893,
+          "successful_route_computation_seconds": 0
+        }
+      },
+      "overall": {
+        "episodes": 96,
+        "success_rate": 0.010416666666666666,
+        "collision_rate": 0.0,
+        "timeout_rate": 0.9895833333333334,
+        "two_cell_oscillation_rate": 0.7291666666666666,
+        "longer_loop_rate": 0.7916666666666666,
+        "excessive_detour_rate": 0.9895833333333334,
+        "mean_path_cost_gap_successes": 0.0,
+        "mean_decisions": 115.97916666666667,
+        "mean_decision_latency_ms": 4.122369912685035,
+        "total_attempted_episode_computation_seconds": 90.41511280019768,
+        "successful_route_computation_seconds": 0.03508609998971224
+      }
+    }
+  },
+  "decision": {
+    "continue_to_250k": [],
+    "reason": "No model passed the empty-route or scale credibility gates; no 250k continuation is authorized.",
+    "largest_observed_improvement": "R2 at 25k (4/96), but it regressed to 1/96 at 100k and is not reliable.",
+    "recency_retained": false,
+    "R2_retained": false,
+    "recurrence_evidence": "Loop-dominated failures justify a future controlled recurrent pilot, but these data do not establish recurrence as necessary because optimization, curriculum, and reward-scale alternatives remain confounded."
+  }
+}

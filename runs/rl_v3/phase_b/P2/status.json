@@ -1,0 +1,104 @@
+{
+  "completed_interactions": 100000,
+  "generator_state": {
+    "episode_index": 1260,
+    "total_interactions": 100000
+  },
+  "history": [
+    {
+      "average_process_cpu_utilization_percent": 42.38627834216099,
+      "environment_steps_per_second": 71.83068710591157,
+      "gpu_note": "PyTorch CPU build; CUDA unavailable",
+      "gpu_utilization_percent": null,
+      "interactions": 25000,
+      "training_wall_seconds": 348.0406634999672,
+      "validation_episodes": 96,
+      "validation_success_rate": 0.020833333333333332
+    },
+    {
+      "average_process_cpu_utilization_percent": 44.218435346000255,
+      "environment_steps_per_second": 57.15745399386041,
+      "gpu_note": "PyTorch CPU build; CUDA unavailable",
+      "gpu_utilization_percent": null,
+      "interactions": 50000,
+      "training_wall_seconds": 437.3882714000065,
+      "validation_episodes": 96,
+      "validation_success_rate": 0.041666666666666664
+    },
+    {
+      "average_process_cpu_utilization_percent": 46.09593470411746,
+      "environment_steps_per_second": 97.76282276153687,
+      "gpu_note": "PyTorch CPU build; CUDA unavailable",
+      "gpu_utilization_percent": null,
+      "interactions": 100000,
+      "training_wall_seconds": 511.4418609000277,
+      "validation_episodes": 96,
+      "validation_success_rate": 0.03125
+    }
+  ],
+  "initial_inference_latency_ms": 2.583436999702826,
+  "parameter_count": 470025,
+  "pilot": {
+    "id": "P2",
+    "observation": "global_local",
+    "reward": "R1"
+  },
+  "resume_semantics": "statistically_equivalent",
+  "seed": 314159,
+  "source_provenance": {
+    "aggregate_sha256": "1ff3ba29f9b54669bfaa319174bb21c87ff48128ccd8fe33ffbff6995b4fc40e",
+    "files": {
+      "configs/rl_v3_phase_b.json": "e0e3fba2930cb1608d0a33ee1bdc163631c69e0f0cd4c94d850ce56d5ad8dd78",
+      "requirements.txt": "8cbfb17c7040ff377db69e719a7b29d0c3a47dd60f5dfd1232484aa546168984",
+      "rl_agent/uav_env.py": "bacf0fdbb263ec4243afcc3a79cba5692c3278a56f9800ba41ffb41faa274b26",
+      "rl_v3/action_masking.py": "c3f42a278c53a9c2953e01da25c31bc6935ff2e01da481e4fe834675a83d857d",
+      "rl_v3/env_builders.py": "6d46f7a2e61399ce5e8f60637e6f46a60547bf152e8a2eafb14bb49185f07ac4",
+      "rl_v3/observations.py": "261ecb534ee33f126baf1d966a4f6fe125b393eee49131ade141382788d0c418",
+      "rl_v3/phase_b_env.py": "2a8fdad620dfa8ac09ad4988b679ecdb6ccfdfc0b19c3db615035b92a9ef0018",
+      "rl_v3/phase_b_evaluation.py": "a688deef01c08cbb0b30fd77e784fc2d145cfc72913734822df8706ea5f4b54c",
+      "rl_v3/phase_b_policy.py": "124a8bbe087f1b47798bb7de0febbed437f994c81bc7c3b7f76870a21ac814a6",
+      "rl_v3/phase_b_scenarios.py": "87c113f4e6c51684eb9c1957ef6f18f677e9df3c2b18ccbe2059116834483b89",
+      "rl_v3/run_phase_b.py": "0075399625a7b93e8f4ccb73362d38246ccdf7da4e81e64078740f04e8dcdad7",
+      "rl_v3/wrappers.py": "6ea53face60f5b5df106d3b1d43751720806020cab1c46a5a975a28aa52fd475"
+    }
+  },
+  "source_provenance_history": [
+    {
+      "aggregate_sha256": "3c115bbe85beea9572cf45ff212624277530d616800c29aa483efbab5ac87797",
+      "files": {
+        "configs/rl_v3_phase_b.json": "e0e3fba2930cb1608d0a33ee1bdc163631c69e0f0cd4c94d850ce56d5ad8dd78",
+        "requirements.txt": "8cbfb17c7040ff377db69e719a7b29d0c3a47dd60f5dfd1232484aa546168984",
+        "rl_agent/uav_env.py": "bacf0fdbb263ec4243afcc3a79cba5692c3278a56f9800ba41ffb41faa274b26",
+        "rl_v3/action_masking.py": "c3f42a278c53a9c2953e01da25c31bc6935ff2e01da481e4fe834675a83d857d",
+        "rl_v3/env_builders.py": "6d46f7a2e61399ce5e8f60637e6f46a60547bf152e8a2eafb14bb49185f07ac4",
+        "rl_v3/observations.py": "ecf5e46ddd3b504c82a71f0ec176a112ff6a67bd0ad64a54696f115fcec1c79f",
+        "rl_v3/phase_b_env.py": "2a8fdad620dfa8ac09ad4988b679ecdb6ccfdfc0b19c3db615035b92a9ef0018",
+        "rl_v3/phase_b_evaluation.py": "a688deef01c08cbb0b30fd77e784fc2d145cfc72913734822df8706ea5f4b54c",
+        "rl_v3/phase_b_policy.py": "124a8bbe087f1b47798bb7de0febbed437f994c81bc7c3b7f76870a21ac814a6",
+        "rl_v3/phase_b_scenarios.py": "87c113f4e6c51684eb9c1957ef6f18f677e9df3c2b18ccbe2059116834483b89",
+        "rl_v3/run_phase_b.py": "67e899d9f115b9dad28818b6634274efe8938bdbd6e1b5cb1d4f72f2a44d5245",
+        "rl_v3/wrappers.py": "6ea53face60f5b5df106d3b1d43751720806020cab1c46a5a975a28aa52fd475"
+      }
+    },
+    {
+      "aggregate_sha256": "1ff3ba29f9b54669bfaa319174bb21c87ff48128ccd8fe33ffbff6995b4fc40e",
+      "files": {
+        "configs/rl_v3_phase_b.json": "e0e3fba2930cb1608d0a33ee1bdc163631c69e0f0cd4c94d850ce56d5ad8dd78",
+        "requirements.txt": "8cbfb17c7040ff377db69e719a7b29d0c3a47dd60f5dfd1232484aa546168984",
+        "rl_agent/uav_env.py": "bacf0fdbb263ec4243afcc3a79cba5692c3278a56f9800ba41ffb41faa274b26",
+        "rl_v3/action_masking.py": "c3f42a278c53a9c2953e01da25c31bc6935ff2e01da481e4fe834675a83d857d",
+        "rl_v3/env_builders.py": "6d46f7a2e61399ce5e8f60637e6f46a60547bf152e8a2eafb14bb49185f07ac4",
+        "rl_v3/observations.py": "261ecb534ee33f126baf1d966a4f6fe125b393eee49131ade141382788d0c418",
+        "rl_v3/phase_b_env.py": "2a8fdad620dfa8ac09ad4988b679ecdb6ccfdfc0b19c3db615035b92a9ef0018",
+        "rl_v3/phase_b_evaluation.py": "a688deef01c08cbb0b30fd77e784fc2d145cfc72913734822df8706ea5f4b54c",
+        "rl_v3/phase_b_policy.py": "124a8bbe087f1b47798bb7de0febbed437f994c81bc7c3b7f76870a21ac814a6",
+        "rl_v3/phase_b_scenarios.py": "87c113f4e6c51684eb9c1957ef6f18f677e9df3c2b18ccbe2059116834483b89",
+        "rl_v3/run_phase_b.py": "0075399625a7b93e8f4ccb73362d38246ccdf7da4e81e64078740f04e8dcdad7",
+        "rl_v3/wrappers.py": "6ea53face60f5b5df106d3b1d43751720806020cab1c46a5a975a28aa52fd475"
+      }
+    }
+  ],
+  "target_interactions": 100000,
+  "updated_at_utc": "2026-08-04T21:18:38.668545+00:00",
+  "validation_v2_hash": "3d2e18667de96516ae71250b2d2c5ce28b9027fce1cf5f79eaff052afe9d1574"
+}

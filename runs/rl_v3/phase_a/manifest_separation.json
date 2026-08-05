@@ -1,0 +1,8 @@
+{
+  "validation_scenarios": 36,
+  "validation_sha256": "ba5824f5c13242d66f1cf133088712bf6fcaf53799c94028246853d2b94f9bf7",
+  "training_preview_count": 1000,
+  "train_validation_seed_overlap": [],
+  "validation_final_private_seed_overlap": [],
+  "passed": true
+}

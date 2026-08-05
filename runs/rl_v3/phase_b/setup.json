@@ -1,0 +1,102 @@
+{
+  "balance": {
+    "by_family": {
+      "dynamic": 24,
+      "empty": 24,
+      "random_static": 24,
+      "structured": 24
+    },
+    "by_route_bucket": {
+      "long": 32,
+      "medium": 32,
+      "short": 32
+    },
+    "by_scale": {
+      "100": 24,
+      "15": 24,
+      "30": 24,
+      "50": 24
+    },
+    "scale_family_bucket": {
+      "100/dynamic/long": 2,
+      "100/dynamic/medium": 2,
+      "100/dynamic/short": 2,
+      "100/empty/long": 2,
+      "100/empty/medium": 2,
+      "100/empty/short": 2,
+      "100/random_static/long": 2,
+      "100/random_static/medium": 2,
+      "100/random_static/short": 2,
+      "100/structured/long": 2,
+      "100/structured/medium": 2,
+      "100/structured/short": 2,
+      "15/dynamic/long": 2,
+      "15/dynamic/medium": 2,
+      "15/dynamic/short": 2,
+      "15/empty/long": 2,
+      "15/empty/medium": 2,
+      "15/empty/short": 2,
+      "15/random_static/long": 2,
+      "15/random_static/medium": 2,
+      "15/random_static/short": 2,
+      "15/structured/long": 2,
+      "15/structured/medium": 2,
+      "15/structured/short": 2,
+      "30/dynamic/long": 2,
+      "30/dynamic/medium": 2,
+      "30/dynamic/short": 2,
+      "30/empty/long": 2,
+      "30/empty/medium": 2,
+      "30/empty/short": 2,
+      "30/random_static/long": 2,
+      "30/random_static/medium": 2,
+      "30/random_static/short": 2,
+      "30/structured/long": 2,
+      "30/structured/medium": 2,
+      "30/structured/short": 2,
+      "50/dynamic/long": 2,
+      "50/dynamic/medium": 2,
+      "50/dynamic/short": 2,
+      "50/empty/long": 2,
+      "50/empty/medium": 2,
+      "50/empty/short": 2,
+      "50/random_static/long": 2,
+      "50/random_static/medium": 2,
+      "50/random_static/short": 2,
+      "50/structured/long": 2,
+      "50/structured/medium": 2,
+      "50/structured/short": 2
+    },
+    "total": 96
+  },
+  "created_at_utc": "2026-08-04T21:08:32.015903+00:00",
+  "hardware": {
+    "cpu": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cuda_available": false,
+    "logical_cpus": 8,
+    "memory_gib": 15.86,
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13",
+    "torch": "2.13.0+cpu"
+  },
+  "phase_a_manifest_hash_unchanged": "36222fa85f726f57be1cc8094234f5151934f3f9e83c11b725e5af5b9b4bae80",
+  "private_final_test_exposed": false,
+  "source_provenance": {
+    "aggregate_sha256": "1ff3ba29f9b54669bfaa319174bb21c87ff48128ccd8fe33ffbff6995b4fc40e",
+    "files": {
+      "configs/rl_v3_phase_b.json": "e0e3fba2930cb1608d0a33ee1bdc163631c69e0f0cd4c94d850ce56d5ad8dd78",
+      "requirements.txt": "8cbfb17c7040ff377db69e719a7b29d0c3a47dd60f5dfd1232484aa546168984",
+      "rl_agent/uav_env.py": "bacf0fdbb263ec4243afcc3a79cba5692c3278a56f9800ba41ffb41faa274b26",
+      "rl_v3/action_masking.py": "c3f42a278c53a9c2953e01da25c31bc6935ff2e01da481e4fe834675a83d857d",
+      "rl_v3/env_builders.py": "6d46f7a2e61399ce5e8f60637e6f46a60547bf152e8a2eafb14bb49185f07ac4",
+      "rl_v3/observations.py": "261ecb534ee33f126baf1d966a4f6fe125b393eee49131ade141382788d0c418",
+      "rl_v3/phase_b_env.py": "2a8fdad620dfa8ac09ad4988b679ecdb6ccfdfc0b19c3db615035b92a9ef0018",
+      "rl_v3/phase_b_evaluation.py": "a688deef01c08cbb0b30fd77e784fc2d145cfc72913734822df8706ea5f4b54c",
+      "rl_v3/phase_b_policy.py": "124a8bbe087f1b47798bb7de0febbed437f994c81bc7c3b7f76870a21ac814a6",
+      "rl_v3/phase_b_scenarios.py": "87c113f4e6c51684eb9c1957ef6f18f677e9df3c2b18ccbe2059116834483b89",
+      "rl_v3/run_phase_b.py": "0075399625a7b93e8f4ccb73362d38246ccdf7da4e81e64078740f04e8dcdad7",
+      "rl_v3/wrappers.py": "6ea53face60f5b5df106d3b1d43751720806020cab1c46a5a975a28aa52fd475"
+    }
+  },
+  "validation_v2_hash": "3d2e18667de96516ae71250b2d2c5ce28b9027fce1cf5f79eaff052afe9d1574"
+}

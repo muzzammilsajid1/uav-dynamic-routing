@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "checkpoint_path": "D:\\UAV Dynamic Routing\\uav-dynamic-routing\\runs\\rl_v3\\phase_a\\checkpoint_smoke\\checkpoint.pt",
+  "timestep": 3,
+  "policy_seed": 12345,
+  "losses": [
+    0.2079547643661499,
+    0.07763072103261948,
+    0.047103919088840485
+  ],
+  "source_revision": "12e572e9201028a5a42f6941e9ad63f24db1aa9f",
+  "python": "3.12.13 (main, Mar  3 2026, 15:01:35) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "resume_verified": true
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "generator_hash": "c2df7b7417c2ba18f930e37e9e5659294f2544091d52a651770250f65e7eed80",
+  "validation_hash": "36222fa85f726f57be1cc8094234f5151934f3f9e83c11b725e5af5b9b4bae80",
+  "manifest_separation": {
+    "validation_scenarios": 36,
+    "validation_sha256": "ba5824f5c13242d66f1cf133088712bf6fcaf53799c94028246853d2b94f9bf7",
+    "training_preview_count": 1000,
+    "train_validation_seed_overlap": [],
+    "validation_final_private_seed_overlap": [],
+    "passed": true
+  },
+  "validation_diagnostics": {
+    "original": {
+      "episodes": 24,
+      "success_rate": 0.4166666666666667,
+      "failure_counts": {
+        "success": 10,
+        "two_cell_oscillation": 7,
+        "collision": 6,
+        "longer_repeated_loop": 1
+      }
+    },
+    "posthoc_masked": {
+      "episodes": 24,
+      "success_rate": 0.4166666666666667,
+      "failure_counts": {
+        "success": 10,
+        "two_cell_oscillation": 13,
+        "longer_repeated_loop": 1
+      }
+    }
+  },
+  "empty_map_diagnostics": {
+    "original": {
+      "episodes": 112,
+      "success_rate": 0.6071428571428571,
+      "failure_counts": {
+        "success": 68,
+        "two_cell_oscillation": 19,
+        "longer_repeated_loop": 13,
+        "collision": 11,
+        "immediate_invalid_action_crash": 1
+      }
+    },
+    "posthoc_masked": {
+      "episodes": 112,
+      "success_rate": 0.6339285714285714,
+      "failure_counts": {
+        "success": 71,
+        "two_cell_oscillation": 21,
+        "longer_repeated_loop": 20
+      }
+    }
+  },
+  "final_test_exposed": false,
+  "substantive_ppo_training_launched": false,
+  "dependency_resolution": {
+    "stable_baselines3": "2.9.0",
+    "sb3_contrib": "2.9.0",
+    "compatibility": "sb3-contrib 2.9.0 declares stable-baselines3>=2.9.0,<3.0"
+  },
+  "config_sha256": "e39ddc2e861c7fb992d96089dc5479af43ea7ec17da275460237a7ea315892c3"
+}

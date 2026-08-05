@@ -1,0 +1,11 @@
+{
+  "checkpoint_loads": true,
+  "classification": "statistically_equivalent",
+  "generator_state_restored": {
+    "episode_index": 22,
+    "total_interactions": 1000
+  },
+  "optimizer_and_model_state_restored": true,
+  "post_resume_action_is_legal": true,
+  "reason": "SB3 save/load does not serialize a partially active environment transition; bit-identical or transition-identical continuation is therefore not claimed."
+}

@@ -1,0 +1,80 @@
+{
+  "asset_type": "rl_v3_training_generator",
+  "description": "This is a deterministic distribution definition, not a finite training manifest. Training episodes are generated from the master seed and episode index.",
+  "distribution": {
+    "movement_contract": "v2-uav-routing-env",
+    "schema_version": 1,
+    "suite_id": "rl-v3-phase-a",
+    "training_generator": {
+      "dynamic_obstacle_count": {
+        "max": 4,
+        "min": 0
+      },
+      "dynamic_periods": [
+        3,
+        4,
+        5,
+        7,
+        9,
+        11
+      ],
+      "forbidden_seed_ranges": [
+        {
+          "end": 819999,
+          "name": "validation",
+          "start": 810000
+        },
+        {
+          "end": 919999,
+          "name": "final_test_private",
+          "start": 910000
+        }
+      ],
+      "generator_version": "rl-v3-generator-v1",
+      "grid_sizes": [
+        15,
+        30,
+        50,
+        100
+      ],
+      "master_seed": 730001,
+      "max_generation_attempts": 5000,
+      "obstacle_density": {
+        "max": 0.3,
+        "min": 0.05
+      },
+      "route_length_buckets": {
+        "long": {
+          "max_ratio": 1.1,
+          "min_ratio": 0.7
+        },
+        "medium": {
+          "max_ratio": 0.7,
+          "min_ratio": 0.4
+        },
+        "short": {
+          "max_ratio": 0.4,
+          "min_ratio": 0.2
+        }
+      }
+    },
+    "validation_manifest": {
+      "grid_sizes": [
+        15,
+        30,
+        50,
+        100
+      ],
+      "path": "evaluation/manifests/rl_v3_validation.json",
+      "route_length_buckets": [
+        "short",
+        "medium",
+        "long"
+      ],
+      "scenarios_per_grid_size_per_bucket": 3,
+      "seed": 810001
+    }
+  },
+  "distribution_sha256": "a67357c33836cab65acfab81c4063829a5944752b42222cec0260fd7f18582a1",
+  "schema_version": 1
+}

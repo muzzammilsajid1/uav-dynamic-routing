@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "suite_id": "rl-v3-phase-a",
+  "movement_contract": "v2-uav-routing-env",
+  "training_generator": {
+    "generator_version": "rl-v3-generator-v1",
+    "master_seed": 730001,
+    "forbidden_seed_ranges": [
+      {
+        "name": "validation",
+        "start": 810000,
+        "end": 819999
+      },
+      {
+        "name": "final_test_private",
+        "start": 910000,
+        "end": 919999
+      }
+    ],
+    "grid_sizes": [15, 30, 50, 100],
+    "obstacle_density": {
+      "min": 0.05,
+      "max": 0.30
+    },
+    "route_length_buckets": {
+      "short": {
+        "min_ratio": 0.20,
+        "max_ratio": 0.40
+      },
+      "medium": {
+        "min_ratio": 0.40,
+        "max_ratio": 0.70
+      },
+      "long": {
+        "min_ratio": 0.70,
+        "max_ratio": 1.10
+      }
+    },
+    "dynamic_obstacle_count": {
+      "min": 0,
+      "max": 4
+    },
+    "dynamic_periods": [3, 4, 5, 7, 9, 11],
+    "max_generation_attempts": 5000
+  },
+  "validation_manifest": {
+    "seed": 810001,
+    "path": "evaluation/manifests/rl_v3_validation.json",
+    "scenarios_per_grid_size_per_bucket": 3,
+    "grid_sizes": [15, 30, 50, 100],
+    "route_length_buckets": ["short", "medium", "long"]
+  },
+  "empty_map_diagnostics": {
+    "grid_sizes": [15, 20, 30, 40, 50, 75, 100],
+    "distance_ratios": [0.25, 0.50, 0.75, 1.00],
+    "orientations": ["horizontal", "vertical", "diagonal", "goal_opposing"]
+  },
+  "ddqn_diagnostic": {
+    "variant": "full",
+    "seeds": [11],
+    "checkpoint_stage": "02_dynamic_full_final.zip",
+    "grid_sizes": [15, 30, 50, 100],
+    "episodes_per_grid_size": 6,
+    "diagnostic_budget_to_astar_cost": 4.0,
+    "minimum_diagnostic_budget": 20,
+    "modes": ["original", "posthoc_masked"]
+  },
+  "observation": {
+    "local_crop_size": 11,
+    "coarse_global_size": 24,
+    "scalar_features": [
+      "relative_goal_row",
+      "relative_goal_col",
+      "grid_size",
+      "previous_action"
+    ]
+  },
+  "checkpoint_smoke": {
+    "seed": 12345,
+    "timesteps": 3
+  }
+}
