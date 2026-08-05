@@ -33,7 +33,7 @@ Training checked for early stopping against a threshold of **>=99/100 success** 
 
 **Preflight Verification:** PASS.
 The preflight script confirmed:
-- A* cost of ~12.07 for the selected start/goal.
+- A* cost of ~12.071 for the selected start/goal.
 - Consistent, deterministic resets.
 - Correct local and global observation channel formatting.
 - Correct action masking allowing all in-bounds moves.
@@ -41,18 +41,17 @@ The preflight script confirmed:
 **Training Outcomes:**
 Training successfully reached the mastery condition and early-stopped after evaluating the 25,000-interaction checkpoint.
 
-| Interactions | Success Rate | Crashes | Timeouts | Route Length | Mean Return |
-|--------------|--------------|---------|----------|--------------|-------------|
-| 1,000        | 0.0%         | 0       | 100      | N/A          | -0.200      |
-| 5,000        | 0.0%         | 0       | 100      | N/A          | -0.200      |
-| 10,000       | 100.0%       | 0       | 0        | 10.0         | 0.970       |
-| 25,000       | 100.0%       | 0       | 0        | 10.0         | 0.970       |
+| Interactions | Success Rate | Crashes | Timeouts | Route Steps | Path Cost Gap | Mean Return |
+|--------------|--------------|---------|----------|-------------|---------------|-------------|
+| 1,000        | 0.0%         | 0       | 100      | N/A         | N/A           | -0.200      |
+| 5,000        | 0.0%         | 0       | 100      | N/A         | N/A           | -0.200      |
+| 10,000       | 100.0%       | 0       | 0        | 10.0        | 0.000         | 0.970       |
+| 25,000       | 100.0%       | 0       | 0        | 10.0        | 0.000         | 0.970       |
 
-- **Earliest Mastery:** Mastery was established definitively by the 10,000 interaction checkpoint.
-- **Optimality:** The agent solved the task in exactly 10 steps (an optimal 10-step route traversing distance ~12.07), which yielded a mean return of ~0.97, factoring in the small step penalty.
-- **Failures at Initialization:** At 1,000 and 5,000 interactions, the untrained and partially-trained agent timed out on 100% of evaluation episodes by entering localized 2-cell oscillations or wandering until the 60-step limit. No crashes occurred because action masking correctly confined the agent to the empty grid.
+- **Earliest Mastery:** Mastery was reached by the 10,000 interaction checkpoint, where the agent demonstrated 100/100 success.
+- **Mastery Confirmed:** Mastery was confirmed by the second consecutive 100/100 checkpoint at 25,000 interactions, which triggered early stopping.
+- **Optimality:** The agent solved the task in exactly 10 route steps. The path cost gap evaluates to exactly 0 (realized path cost approximately 12.071 vs A* path cost 12.071), yielding a mean return of ~0.97 factoring in the step penalty.
+- **Failures at Initialization:** At 1,000 and 5,000 interactions, the agent timed out on 100% of evaluation episodes by entering localized 2-cell oscillations or wandering until the 60-step limit.
 
 ## Conclusion
-The RL V3 MaskablePPO pipeline successfully learned to navigate perfectly on a fixed scenario in 10,000 interactions.
-
-**Verdict: PASS.** The fundamental integration of SB3-Contrib's `MaskablePPO`, the `UAVRoutingEnv` wrapper, the action masking logic, and the observation/reward encoders is fully functional. The inability to solve complex scenarios in earlier phases can be confidently attributed to task difficulty, curriculum structure, or generalization challenges, not to a basic pipeline defect.
+The RL V3 Maskable PPO pipeline can learn and execute one fixed deterministic navigation task. This rules out a completely non-functional training integration, but does not establish generalization, curriculum adequacy, global-map usefulness, or large-scale routing competence.

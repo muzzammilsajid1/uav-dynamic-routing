@@ -322,7 +322,8 @@ def evaluate_single_scenario(
     timeouts = 0
     oscillations_2 = 0  # 2-cell oscillation count
     longer_loops = 0
-    route_lengths: list[int] = []
+    route_steps_list: list[int] = []
+    realized_costs: list[float] = []
     returns: list[float] = []
     trajectories_success: list[list[dict]] = []
     trajectories_failure: list[list[dict]] = []
@@ -333,6 +334,7 @@ def evaluate_single_scenario(
         obs, _ = env.reset()
         ep_return = 0.0
         ep_steps = 0
+        ep_cost = 0.0
         traj: list[dict] = []
         pos_history: list[tuple] = [tuple(int(v) for v in env._v2.uav_pos)]
         done = False
@@ -340,9 +342,11 @@ def evaluate_single_scenario(
             masks = env.action_masks()
             action, _ = model.predict(obs, deterministic=True, action_masks=masks)
             action = int(action)
+            edge_cost = math.sqrt(2.0) if action >= 4 else 1.0
             obs, rew, term, trunc, info = env.step(action)
             ep_return += rew
             ep_steps += 1
+            ep_cost += edge_cost
             action_counts[ACTION_NAMES[action]] += 1
             pos = tuple(int(v) for v in env._v2.uav_pos)
             pos_history.append(pos)
@@ -363,7 +367,8 @@ def evaluate_single_scenario(
 
         if info.get("is_success"):
             successes += 1
-            route_lengths.append(ep_steps)
+            route_steps_list.append(ep_steps)
+            realized_costs.append(ep_cost)
             if not trajectories_success:
                 trajectories_success.append(traj)
         else:
@@ -393,7 +398,8 @@ def evaluate_single_scenario(
     astar_cost = _astar_cost(
         tuple(config["scenario"]["start"]), tuple(config["scenario"]["goal"])
     )
-    mean_route = float(np.mean(route_lengths)) if route_lengths else float("nan")
+    mean_route_steps = float(np.mean(route_steps_list)) if route_steps_list else float("nan")
+    mean_realized_cost = float(np.mean(realized_costs)) if realized_costs else float("nan")
 
     return {
         "n_episodes": n_episodes,
@@ -404,10 +410,11 @@ def evaluate_single_scenario(
         "oscillations_2cell": oscillations_2,
         "longer_loops": longer_loops,
         "failure_patterns": sorted(failure_patterns),
-        "mean_route_length": round(mean_route, 3),
-        "max_route_length": int(max(route_lengths)) if route_lengths else None,
+        "mean_route_steps": round(mean_route_steps, 3),
+        "max_route_steps": int(max(route_steps_list)) if route_steps_list else None,
+        "mean_realized_cost": round(mean_realized_cost, 6),
         "astar_cost": round(astar_cost, 6),
-        "path_cost_gap": round(mean_route - astar_cost, 3) if route_lengths else None,
+        "path_cost_gap": round(mean_realized_cost - astar_cost, 6) if realized_costs else None,
         "mean_return": round(float(np.mean(returns)), 6),
         "action_distribution": dict(action_counts),
         "trajectory_success": trajectories_success[:1],
@@ -547,8 +554,9 @@ def run_training() -> dict:
             "eval_successes": successes,
             "eval_n_episodes": eval_episodes,
             "eval_success_rate": eval_result["success_rate"],
-            "eval_mean_route_length": eval_result["mean_route_length"],
-            "eval_max_route_length": eval_result["max_route_length"],
+            "eval_mean_route_steps": eval_result["mean_route_steps"],
+            "eval_max_route_steps": eval_result["max_route_steps"],
+            "eval_mean_realized_cost": eval_result["mean_realized_cost"],
             "eval_path_cost_gap": eval_result["path_cost_gap"],
             "eval_collisions": eval_result["collisions"],
             "eval_timeouts": eval_result["timeouts"],

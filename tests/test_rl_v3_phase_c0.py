@@ -207,20 +207,22 @@ def test_goal_reward_on_success(c0_env):
 
 
 def test_max_steps_truncation(c0_env):
-    """Exceed max_steps and verify truncation."""
-    cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    """Exceed max_steps and verify truncation by alternating moves."""
     max_steps = c0_env._max_steps
     c0_env.reset()
-    truncated = False
-    for _ in range(max_steps + 10):
-        mask = c0_env.action_masks()
-        legal = [i for i, m in enumerate(mask) if m]
-        # Take first legal action repeatedly
-        _, _, term, trunc, _ = c0_env.step(legal[0])
-        if trunc:
-            truncated = True
-            break
-        if term:
-            break
-    # Either truncated or succeeded (if agent walked into goal)
-    assert truncated or True  # relaxed: just verify it eventually ends
+    
+    # 3 is East, 2 is West
+    actions = [3, 2]
+    
+    for i in range(max_steps):
+        action = actions[i % 2]
+        _, _, term, trunc, info = c0_env.step(action)
+        
+        if i < max_steps - 1:
+            assert not trunc, f"Premature truncation at step {i+1}"
+            assert not term, f"Premature termination at step {i+1}"
+        else:
+            assert trunc is True, "Expected truncation at max_steps"
+            assert term is False, "Expected term=False when truncated"
+            assert info.get("is_success", False) is False
+            assert info.get("crashed", False) is False
