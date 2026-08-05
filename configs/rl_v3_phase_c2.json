@@ -1,0 +1,57 @@
+{
+  "env": {
+    "local_crop_size": 11,
+    "global_map_size": 32,
+    "grid_sizes": [15, 30, 50, 100],
+    "corner_cutting": true,
+    "max_steps_multiplier": 2.0
+  },
+  "curriculum": {
+    "stages": [
+      {
+        "max_interactions": 25000,
+        "active_sizes": [15, 30]
+      },
+      {
+        "max_interactions": 75000,
+        "active_sizes": [15, 30, 50]
+      },
+      {
+        "max_interactions": 150000,
+        "active_sizes": [15, 30, 50, 100]
+      }
+    ]
+  },
+  "reward": {
+    "type": "R2-PB-empty-v1",
+    "goal": 1.0,
+    "collision": -1.0,
+    "step_penalty_total_per_episode_budget": -0.2,
+    "step_penalty": -0.01,
+    "gamma": 0.99,
+    "lambda_": 2.0
+  },
+  "observation": {
+    "family": "global_local",
+    "local_size": 11,
+    "global_size": 32,
+    "scalar_features": ["uav_norm_r", "uav_norm_c", "goal_disp_r", "goal_disp_c"]
+  },
+  "training": {
+    "episode_budget_astar_multiplier": 2.0,
+    "minimum_episode_budget": 10
+  },
+  "scenario": {
+    "grid_size": 15,
+    "max_steps": 200,
+    "start": [0, 0],
+    "goal": [14, 14]
+  },
+  "model": {
+    "n_steps": 2048,
+    "batch_size": 64,
+    "gamma": 0.99,
+    "learning_rate": 3e-4,
+    "ent_coef": 0.01
+  }
+}
