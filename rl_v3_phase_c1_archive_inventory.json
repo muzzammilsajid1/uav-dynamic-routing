@@ -1,0 +1,32 @@
+[
+  {
+    "path": "phase_c1\\model_010000.zip",
+    "size": 5877335,
+    "sha256": "92bd401eff2bfebf480e9e837227bd8f6bb1c799cb9dff83463ba4c61faeedc4"
+  },
+  {
+    "path": "phase_c1\\model_025000.zip",
+    "size": 5877407,
+    "sha256": "905c47cf54ade60d5398b27e7c4590c914d9af8fc1bfa5bbff971e044e7aa7ea"
+  },
+  {
+    "path": "phase_c1\\model_050000.zip",
+    "size": 5877407,
+    "sha256": "f0ac52ce70ca426128347bc5bd6697e9d6d86a1649b8ade05daa4d31aae7631a"
+  },
+  {
+    "path": "phase_c1\\model_100000.zip",
+    "size": 5877419,
+    "sha256": "ac182094009f3a3e41a1e4a4727887fcb8b29745d84749a6b69e29d9a7b80276"
+  },
+  {
+    "path": "phase_c1\\preflight_verification.json",
+    "size": 419,
+    "sha256": "a981afb4a81d77818aad3a9ba13eee0318bf3bc02d18d08d040421a46a4b4bc6"
+  },
+  {
+    "path": "phase_c1\\status.json",
+    "size": 63959,
+    "sha256": "ab3c0f56b8acf5dcb19d2690fbeb90cb224bf8a4bd5075b9f4fe3ccafe0d1d6d"
+  }
+]
