@@ -1,16 +1,20 @@
 import json
 import numpy as np
+import math
 from pathlib import Path
 import sys
+import hashlib
+from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT))
 
 from rl_v3.phase_c1_env import PhaseC1Env, PhaseC1EndpointGenerator
 from rl_v3.phase_c0_env import _astar_cost
+from tools.verification.action_mapping import AUTHORITATIVE_ACTION_MAPPING
 
 class PhaseC1Oracle:
-    def __init__(self, env):
+    def __init__(self, env=None):
         self.env = env
         
     def octile_distance(self, p1, p2):
@@ -18,134 +22,119 @@ class PhaseC1Oracle:
         dy = abs(p1[1] - p2[1])
         return max(dx, dy) + (np.sqrt(2) - 1) * min(dx, dy)
 
-    def predict(self, state, mask):
-        # We need to simulate the next state for each legal action.
-        # But wait, PhaseC1Env is a gym environment. We can't trivially simulate without stepping and unwinding.
-        # However, the dynamics are perfectly deterministic and known:
-        # action 0-7 are 8-way movement, action 8 is hover.
-        # The env's current position is self.env.unwrapped._pos
-        # The goal is self.env.unwrapped._goal
+    def predict_from_pos(self, pos, goal, mask=None):
+        best_action = None
+        best_val = float('inf')
         
+        for a in range(8):
+            if mask is not None and not mask[a]:
+                continue
+            delta = AUTHORITATIVE_ACTION_MAPPING[a]["delta"]
+            cost = AUTHORITATIVE_ACTION_MAPPING[a]["cost"]
+            next_pos = (pos[0] + delta[0], pos[1] + delta[1])
+            dist = self.octile_distance(next_pos, goal)
+            val = cost + dist
+            
+            # Tie breaking by smallest action index implicitly
+            if val < best_val - 1e-9:
+                best_val = val
+                best_action = a
+        return best_action
+        
+    def predict(self, state, mask):
         env = self.env.unwrapped
         pos = env._v2.uav_pos
         goal = env._v2.goal_pos
-        
-        best_action = None
-        best_dist = float('inf')
-        
-        # Action space mapping from UAVRoutingEnv.ACTION_DELTAS:
-        # [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
-        action_deltas = {
-            0: (-1, 0),
-            1: (1, 0),
-            2: (0, -1),
-            3: (0, 1),
-            4: (-1, -1),
-            5: (-1, 1),
-            6: (1, -1),
-            7: (1, 1)
-        }
-        
-        for a in range(8):
-            if mask[a]:
-                dr, dc = action_deltas[a]
-                next_pos = (pos[0] + dr, pos[1] + dc)
-                dist = self.octile_distance(next_pos, goal)
-                if dist < best_dist:
-                    best_dist = dist
-                    best_action = a
-                    
-        return best_action
+        return self.predict_from_pos(pos, goal, mask)
 
-def evaluate_oracle(env, num_episodes):
+def eval_all_pairs():
+    with open(ROOT / "configs" / "rl_v3_phase_c1.json") as f:
+        config_text = f.read()
+        config = json.loads(config_text)
+        
+    config_hash = hashlib.sha256(config_text.encode('utf-8')).hexdigest()
+    
+    with open(Path(__file__).resolve(), "r") as f:
+        source_hash = hashlib.sha256(f.read().encode('utf-8')).hexdigest()
+        
+    with open(ROOT / "tools" / "verification" / "action_mapping.py", "r") as f:
+        action_hash = hashlib.sha256(f.read().encode('utf-8')).hexdigest()
+
+    gen = PhaseC1EndpointGenerator(seed=42)
+    env = PhaseC1Env(config, mode="train", generator=gen)
     oracle = PhaseC1Oracle(env)
     
+    # Generate 50,400 pairs
+    pairs = []
+    for sx in range(15):
+        for sy in range(15):
+            for gx in range(15):
+                for gy in range(15):
+                    if sx == gx and sy == gy: continue
+                    pairs.append(((sx, sy), (gx, gy)))
+                    
     metrics = {
         "successes": 0,
         "collisions": 0,
         "timeouts": 0,
-        "realized_cost_sum": 0.0,
-        "astar_cost_sum": 0.0,
-        "path_cost_gap_sum": 0.0,
-        "route_steps_sum": 0,
-        "orientation": {},
-        "distance_bin": {"short": 0, "medium": 0, "long": 0}
+        "routes": len(pairs),
+        "non_zero_gap_routes": 0,
+        "max_absolute_gap": 0.0,
     }
     
-    for _ in range(num_episodes):
-        obs, info = env.reset()
+    for start, goal in pairs:
+        env.reset()
+        env.unwrapped._start = start
+        env.unwrapped._goal = goal
+        env.unwrapped._v2.uav_pos = np.array(start, dtype=int)
+        env.unwrapped._v2.goal_pos = np.array(goal, dtype=int)
+        
+        astar_cost = _astar_cost(start, goal)
+        env.unwrapped._max_steps = max(10, int(math.ceil(astar_cost * float(config["training"]["episode_budget_astar_multiplier"]))))
+        
+        path_cost = 0.0
         done = False
-        steps = 0
-        realized_cost = 0.0
         
-        start = env.unwrapped._start
-        goal = env.unwrapped._goal
-        astar = _astar_cost(start, goal)
-        metrics["astar_cost_sum"] += astar
-        
-        gen = env.unwrapped.generator
-        if astar < gen.T1: dist_bin = "short"
-        elif astar < gen.T2: dist_bin = "medium"
-        else: dist_bin = "long"
-        
-        ori = gen.orientations.get((start, goal), "mixed")
-        if ori not in metrics["orientation"]:
-            metrics["orientation"][ori] = 0
-            
         while not done:
             mask = env.action_masks()
-            action = oracle.predict(obs, mask)
+            action = oracle.predict(None, mask)
             
-            # For cost: orthogonal = 1, diagonal = sqrt(2), hover = 0.2
-            if action == 8: step_cost = 0.2
-            elif action in [0,2,4,6]: step_cost = 1.0
-            else: step_cost = np.sqrt(2)
+            path_cost += AUTHORITATIVE_ACTION_MAPPING[action]["cost"]
             
-            obs, reward, terminated, truncated, info = env.step(action)
-            done = terminated or truncated
-            steps += 1
-            realized_cost += step_cost
+            obs, reward, term, trunc, info = env.step(action)
+            done = term or trunc
             
         if info.get("is_success"):
             metrics["successes"] += 1
-            metrics["realized_cost_sum"] += realized_cost
-            metrics["path_cost_gap_sum"] += (realized_cost - astar)
-            metrics["route_steps_sum"] += steps
-            metrics["orientation"][ori] += 1
-            metrics["distance_bin"][dist_bin] += 1
-        elif info.get("is_collision"):
+            gap = abs(path_cost - astar_cost)
+            metrics["max_absolute_gap"] = max(metrics["max_absolute_gap"], gap)
+            if gap > 1e-6:
+                metrics["non_zero_gap_routes"] += 1
+        elif info.get("crashed"):
             metrics["collisions"] += 1
-        elif info.get("is_timeout"):
+        else:
             metrics["timeouts"] += 1
             
-    return metrics
-
-def run_oracle_sanity_test():
-    with open(ROOT / "configs" / "rl_v3_phase_c1.json") as f:
-        config = json.load(f)
-        
-    print("Running Oracle on Validation Set (120 pairs)...")
-    val_gen = PhaseC1EndpointGenerator(seed=42)
-    val_env = PhaseC1Env(config, mode="eval", generator=val_gen)
+    out_path = ROOT / "runs" / "rl_v3" / "phase_c1_diagnostic" / "oracle_results.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     
-    val_metrics = evaluate_oracle(val_env, 120)
-    print("Validation Oracle Metrics:", val_metrics)
-    
-    print("Running Oracle on Training Set (1000 pairs)...")
-    train_gen = PhaseC1EndpointGenerator(seed=42)
-    train_env = PhaseC1Env(config, mode="train", generator=train_gen)
-    train_metrics = evaluate_oracle(train_env, 1000)
-    print("Training Oracle Metrics:", train_metrics)
-    
-    report = {
-        "validation_120": val_metrics,
-        "training_1000": train_metrics
+    result_data = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "source_hash": source_hash,
+        "action_mapping_hash": action_hash,
+        "config_hash": config_hash,
+        "route_count": metrics["routes"],
+        "aggregate_metrics": metrics,
+        "max_absolute_path_cost_gap": metrics["max_absolute_gap"],
+        "count_non_zero_gap_routes": metrics["non_zero_gap_routes"]
     }
     
-    out_dir = ROOT / "runs" / "rl_v3" / "phase_c1_diagnostic"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_dir / "oracle_results.json", "w") as f:
-        json.dump(report, f, indent=2)
-        
+    temp_path = out_path.with_suffix('.tmp')
+    with open(temp_path, "w") as f:
+        json.dump(result_data, f, indent=2)
+    temp_path.replace(out_path)
+    
+    print(f"Oracle test completed. Gap > 0 routes: {metrics['non_zero_gap_routes']}")
+
 if __name__ == "__main__":
-    run_oracle_sanity_test()
+    eval_all_pairs()

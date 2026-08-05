@@ -46,7 +46,7 @@ def test_expressivity_audit():
     env = PhaseC1Env(config, mode="train", generator=gen)
     oracle = PhaseC1Oracle(env)
     
-    dataset = collect_dataset(env, oracle, max_episodes=100)
+    dataset, pairs, _ = collect_dataset(env, oracle, max_episodes=100)
     assert len(dataset) > 50, "Dataset too small"
     
     loader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
@@ -123,3 +123,72 @@ def test_cardinality_ladder_failure():
     sr = successes / 4.0
     # The sparse reward should fail to master it in just 1000 steps
     assert sr < 0.9, f"Ladder learned too quickly? SR={sr}"
+
+from tools.verification.r2_pb_wrapper import PotentialShapingWrapper
+import numpy as np
+
+def test_r2_pb_shaping():
+    config = make_test_config()
+    gen = PhaseC1EndpointGenerator(seed=111)
+    gen.train_bins = {
+        "short": [((2, 2), (5, 5))],
+        "medium": [((2, 2), (5, 5))],
+        "long": [((2, 2), (5, 5))]
+    }
+    env = PhaseC1Env(config, mode="train", generator=gen)
+    w_env = PotentialShapingWrapper(env, gamma=0.99, lambda_=2.0)
+    
+    # 1. Reset
+    obs, info = w_env.reset()
+    assert w_env.unwrapped._v2.uav_pos[0] == 2
+    assert w_env.unwrapped._v2.uav_pos[1] == 2
+    
+    init_phi = w_env.get_phi((2, 2), (5, 5))
+    
+    # 2. Movement toward goal (SE is action 7 -> (3,3))
+    # We don't use oracle, just step directly.
+    obs, r_toward, term, trunc, info = w_env.step(7) 
+    phi_toward = w_env.get_phi((3, 3), (5, 5))
+    expected_shaping = 2.0 * (0.99 * phi_toward - init_phi)
+    base_r_toward = w_env.last_base_reward
+    assert abs(r_toward - (base_r_toward + expected_shaping)) < 1e-5
+    
+    # 3. Movement away from goal (NW is action 4 -> (2,2))
+    obs, r_away, term, trunc, info = w_env.step(4)
+    phi_away = w_env.get_phi((2, 2), (5, 5))
+    expected_shaping_away = 2.0 * (0.99 * phi_away - phi_toward)
+    base_r_away = w_env.last_base_reward
+    assert abs(r_away - (base_r_away + expected_shaping_away)) < 1e-5
+    
+    # 4. Reaching the goal
+    # Let's teleport near goal: (4, 4)
+    w_env.unwrapped._v2.uav_pos = np.array((4, 4), dtype=int)
+    w_env.prev_phi = w_env.get_phi((4, 4), (5, 5))
+    obs, r_goal, term, trunc, info = w_env.step(7) # SE to (5,5)
+    assert term
+    assert info["is_success"]
+    # At terminal success, next_phi = 0
+    expected_shaping_goal = 2.0 * (0.99 * 0.0 - w_env.get_phi((4, 4), (5, 5)))
+    assert abs(r_goal - (w_env.last_base_reward + expected_shaping_goal)) < 1e-5
+    
+    # 5. Collision termination
+    w_env.reset()
+    w_env.unwrapped._v2.uav_pos = np.array((2, 0), dtype=int)
+    w_env.prev_phi = w_env.get_phi((2, 0), (5, 5))
+    obs, r_coll, term, trunc, info = w_env.step(2) # W (into wall)
+    assert term
+    assert info["crashed"]
+    # At terminal collision, next_phi = 0
+    expected_shaping_coll = 2.0 * (0.99 * 0.0 - w_env.get_phi((2, 0), (5, 5)))
+    assert abs(r_coll - (w_env.last_base_reward + expected_shaping_coll)) < 1e-5
+    
+    # 6. Time limit truncation
+    w_env.reset()
+    w_env.unwrapped._v2.current_step = w_env.unwrapped._v2.max_steps - 1
+    w_env.prev_phi = w_env.get_phi((2, 2), (5, 5))
+    obs, r_trunc, term, trunc, info = w_env.step(7)
+    assert trunc and not term
+    # At truncation, next_phi is NOT 0. It's the actual next phi.
+    phi_trunc = w_env.get_phi((3, 3), (5, 5))
+    expected_shaping_trunc = 2.0 * (0.99 * phi_trunc - w_env.get_phi((2, 2), (5, 5)))
+    assert abs(r_trunc - (w_env.last_base_reward + expected_shaping_trunc)) < 1e-5

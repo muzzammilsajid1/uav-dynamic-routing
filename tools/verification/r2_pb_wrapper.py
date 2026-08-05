@@ -41,6 +41,7 @@ class PotentialShapingWrapper(gym.Wrapper):
         
     def step(self, action):
         obs, reward, terminated, truncated, info = self.env.step(action)
+        self.last_base_reward = reward
         
         goal = self.env.unwrapped._v2.goal_pos
         

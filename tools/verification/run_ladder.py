@@ -1,12 +1,11 @@
 import json
 import logging
 import os
-import shutil
 import sys
 from pathlib import Path
-from typing import Any
+import hashlib
+from datetime import datetime, timezone
 
-import numpy as np
 from sb3_contrib import MaskablePPO
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_util import make_vec_env
@@ -29,14 +28,21 @@ class LadderEvalCallback(BaseCallback):
         self.save_dir.mkdir(parents=True, exist_ok=True)
         self.train_len = train_len
         self.checkpoints = [5000, 10000, 25000]
-        self.high_train_success_count = 0
         self.history = {}
+        self.episodes_completed = 0
+        self.terminal_goal_rewards = 0
+
+    def _on_rollout_end(self):
+        # Count terminal rewards in the rollout buffer
+        for i in range(len(self.model.rollout_buffer.rewards)):
+            r = self.model.rollout_buffer.rewards[i][0]
+            if r > 10.0:  # The goal reward is +50
+                self.terminal_goal_rewards += 1
+            if self.model.rollout_buffer.episode_starts[i][0]:
+                self.episodes_completed += 1
 
     def _evaluate(self, env, n_episodes):
         successes = 0
-        collisions = 0
-        timeouts = 0
-        
         for _ in range(n_episodes):
             obs = env.reset()
             done = False
@@ -46,54 +52,36 @@ class LadderEvalCallback(BaseCallback):
                 obs, reward, done_list, info_list = env.step(action)
                 done = done_list[0]
                 info = info_list[0]
-                
             if info.get("is_success"):
                 successes += 1
-            elif info.get("crashed"):
-                collisions += 1
-            else:
-                timeouts += 1
-                
-        return successes / n_episodes, collisions, timeouts
+        return successes / n_episodes
 
     def _on_step(self) -> bool:
         ts = self.num_timesteps
         if ts in self.checkpoints or ts % 5000 == 0:
-            train_sr, tr_coll, tr_time = self._evaluate(self.train_env, self.train_len)
-            val_sr, val_coll, val_time = self._evaluate(self.val_env, 120)
+            train_sr = self._evaluate(self.train_env, self.train_len)
+            val_sr = self._evaluate(self.val_env, 120)
             
             logger.info(f"[{ts}] Train SR: {train_sr:.3f}, Val SR: {val_sr:.3f}")
             self.history[ts] = {
                 "train_sr": train_sr,
                 "val_sr": val_sr,
-                "train_coll": tr_coll,
-                "train_time": tr_time,
-                "val_coll": val_coll,
-                "val_time": val_time
+                "episodes_completed": self.episodes_completed,
+                "terminal_goal_rewards": self.terminal_goal_rewards,
+                "terminal_goal_reward_freq": self.terminal_goal_rewards / max(1, self.episodes_completed)
             }
-            
             if ts in self.checkpoints:
                 self.model.save(str(self.save_dir / f"model_{ts:06d}.zip"))
-                
-            if train_sr >= 0.99:
-                self.high_train_success_count += 1
-                if self.high_train_success_count >= 2:
-                    logger.info("Reached 99% training success twice. Stopping early.")
-                    return False
-            else:
-                self.high_train_success_count = 0
-                
         return True
 
 def make_env(config, manifest_name, mode):
     def _init():
-        gen = PhaseC1EndpointGenerator(seed=42)
-        # Override manifest loading to load the ladder manifest directly
         manifest_path = ROOT / "evaluation" / "manifests" / manifest_name
         with open(manifest_path, "r", encoding="utf-8") as f:
             manifest_data = json.load(f)
             ladder_pairs = [(tuple(d["start"]), tuple(d["goal"])) for d in manifest_data]
             
+        gen = PhaseC1EndpointGenerator(seed=42)
         gen.val_manifest = ladder_pairs
         gen.train_bins = {"short": [], "medium": [], "long": []}
         from rl_v3.phase_c0_env import _astar_cost
@@ -111,14 +99,10 @@ def make_env(config, manifest_name, mode):
         for p in ladder_pairs:
             dx = abs(p[1][0] - p[0][0])
             dy = abs(p[1][1] - p[0][1])
-            if dx > 0 and dy <= dx * 0.5:
-                ori = "vertical"
-            elif dy > 0 and dx <= dy * 0.5:
-                ori = "horizontal"
-            elif abs(dx - dy) <= 1:
-                ori = "diagonal"
-            else:
-                ori = "mixed"
+            if dx > 0 and dy <= dx * 0.5: ori = "vertical"
+            elif dy > 0 and dx <= dy * 0.5: ori = "horizontal"
+            elif abs(dx - dy) <= 1: ori = "diagonal"
+            else: ori = "mixed"
             gen.orientations[p] = ori
             
         return PhaseC1Env(config, mode=mode, generator=gen)
@@ -136,6 +120,9 @@ def train_ladder():
     
     for name, size in [("D1", 4), ("D2", 16), ("D3", 64), ("D4", 256)]:
         logger.info(f"--- Training {name} (size {size}) ---")
+        
+        manifest_path = ROOT / "evaluation" / "manifests" / f"rl_v3_ladder_{name}.json"
+        manifest_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
         
         train_env = make_vec_env(make_env(config, f"rl_v3_ladder_{name}.json", "train"), n_envs=1)
         eval_train_env = make_vec_env(make_env(config, f"rl_v3_ladder_{name}.json", "eval"), n_envs=1)
@@ -168,17 +155,27 @@ def train_ladder():
         
         model.learn(total_timesteps=25000, callback=cb)
         
-        ladder_results[name] = cb.history
+        # Pull final stats from cb
+        final_ts = max(cb.history.keys())
+        episodes = cb.history[final_ts]["episodes_completed"]
+        
+        ladder_results[name] = {
+            "metadata": {
+                "manifest_name": f"rl_v3_ladder_{name}.json",
+                "manifest_hash": manifest_hash,
+                "interactions": 25000,
+                "completed_episodes": episodes,
+                "interactions_per_endpoint": 25000 / size,
+                "episodes_per_endpoint": episodes / size if size > 0 else 0,
+                "seed": 42,
+                "architecture": "PhaseBFeatureExtractor(256) -> MLP([128, 128])",
+                "checkpoints_evaluated": cb.checkpoints
+            },
+            "history": cb.history
+        }
         
         with open(out_dir / "ladder_results.json", "w") as f:
             json.dump(ladder_results, f, indent=2)
-            
-        # Stop ladder if it cannot master 4 endpoint pairs
-        final_ts = max(cb.history.keys()) if cb.history else 0
-        final_train_sr = cb.history[final_ts]["train_sr"] if final_ts else 0
-        if name == "D1" and final_train_sr < 0.99:
-            logger.error("Failed to master D1 (4 pairs). Stopping ladder.")
-            break
             
 if __name__ == "__main__":
     train_ladder()
