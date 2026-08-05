@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "suite_id": "rl-v3-phase-c0",
+  "description": "Single-scenario overfitting test. Determine whether MaskablePPO can master one trivial fixed task before any generalization work.",
+  "seed": 42,
+  "movement_contract": "v2-uav-routing-env/post_move_observed",
+  "scenario": {
+    "scenario_id": "C0-G015-EMPTY-FIXED",
+    "grid_size": 15,
+    "start": [2, 2],
+    "goal": [12, 7],
+    "blocked": [],
+    "dynamic_obstacles": [],
+    "stochastic_obstacles": [],
+    "moving_obstacles": [],
+    "traversal_penalties": [],
+    "no_fly_cells": [],
+    "no_fly_mode": null,
+    "no_fly_penalty": 5.0,
+    "sensor_noise_probability": 0.0,
+    "dynamics_seed": null,
+    "route_bucket": "fixed_overfit",
+    "optimal_astar_cost_note": "Octile: 5*sqrt(2)+5 approx 12.07; verified during preflight"
+  },
+  "observation": {
+    "family": "global_local",
+    "local_size": 11,
+    "global_size": 32
+  },
+  "reward": {
+    "family": "R1",
+    "goal": 1.0,
+    "collision": -1.0,
+    "step_penalty_total_per_episode_budget": -0.20
+  },
+  "training": {
+    "n_steps": 256,
+    "batch_size": 64,
+    "n_epochs": 10,
+    "learning_rate": 0.0003,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "ent_coef": 0.01,
+    "episode_budget_astar_multiplier": 5.0,
+    "minimum_episode_budget": 30,
+    "checkpoints": [1000, 5000, 10000, 25000, 50000, 100000],
+    "eval_episodes": 100,
+    "early_stop_success_threshold": 99,
+    "early_stop_consecutive_checkpoints": 2
+  },
+  "policy": {
+    "features_dim": 256,
+    "net_arch_pi": [128, 64],
+    "net_arch_vf": [128, 64],
+    "activation": "ReLU"
+  },
+  "curriculum": false,
+  "randomize_layout": false,
+  "randomize_endpoints": false,
+  "use_dynamics": false
+}

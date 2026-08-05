@@ -1,0 +1,220 @@
+{
+  "best_success_at_interactions": 10000,
+  "best_success_rate": 1.0,
+  "created_at_utc": "2026-08-05T06:53:09.163975+00:00",
+  "earliest_mastery_interactions": 10000,
+  "final_collisions": 0,
+  "final_mean_return": 0.970492,
+  "final_oscillations_2cell": 0,
+  "final_success_rate": 1.0,
+  "final_timeouts": 0,
+  "hardware": {
+    "cpu": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "cuda_available": false,
+    "logical_cpus": 8,
+    "memory_gib": 15.86,
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13",
+    "torch": "2.13.0+cpu"
+  },
+  "history": [
+    {
+      "cpu_utilization_percent": 46.64,
+      "environment_steps_per_second": 72.0,
+      "eval_action_distribution": {
+        "N": 3100,
+        "S": 1800,
+        "SE": 1200
+      },
+      "eval_collisions": 0,
+      "eval_failure_patterns": [
+        "longer_loop",
+        "oscillation_2",
+        "timeout"
+      ],
+      "eval_longer_loops": 100,
+      "eval_max_route_length": null,
+      "eval_mean_return": -0.2,
+      "eval_mean_route_length": null,
+      "eval_n_episodes": 100,
+      "eval_oscillations_2cell": 100,
+      "eval_path_cost_gap": null,
+      "eval_success_rate": 0.0,
+      "eval_successes": 0,
+      "eval_timeouts": 100,
+      "gpu_note": "CPU build",
+      "gpu_utilization_percent": null,
+      "interactions": 1000,
+      "params_changed_at": 1000,
+      "params_changed_confirmed": true,
+      "sb3_stats": {
+        "approx_kl": 0.008457700721919537,
+        "clip_fraction": 0.06328125,
+        "clip_range": 0.2,
+        "entropy_loss": -1.817054995894432,
+        "explained_variance": -0.3459576368331909,
+        "fps": null,
+        "learning_rate": 0.0003,
+        "n_updates": 40,
+        "policy_gradient_loss": -0.012353193643502892,
+        "value_loss": 0.0006727934520313284
+      },
+      "training_wall_seconds": 13.89
+    },
+    {
+      "cpu_utilization_percent": 42.16,
+      "environment_steps_per_second": 54.4,
+      "eval_action_distribution": {
+        "NE": 2600,
+        "SE": 800,
+        "SW": 2700
+      },
+      "eval_collisions": 0,
+      "eval_failure_patterns": [
+        "longer_loop",
+        "oscillation_2",
+        "timeout"
+      ],
+      "eval_longer_loops": 100,
+      "eval_max_route_length": null,
+      "eval_mean_return": -0.2,
+      "eval_mean_route_length": null,
+      "eval_n_episodes": 100,
+      "eval_oscillations_2cell": 100,
+      "eval_path_cost_gap": null,
+      "eval_success_rate": 0.0,
+      "eval_successes": 0,
+      "eval_timeouts": 100,
+      "gpu_note": "CPU build",
+      "gpu_utilization_percent": null,
+      "interactions": 5000,
+      "params_changed_at": 1000,
+      "params_changed_confirmed": true,
+      "sb3_stats": {
+        "approx_kl": 0.019461652263998985,
+        "clip_fraction": 0.216796875,
+        "clip_range": 0.2,
+        "entropy_loss": -1.6008317172527313,
+        "explained_variance": 0.15286600589752197,
+        "fps": null,
+        "learning_rate": 0.0003,
+        "n_updates": 200,
+        "policy_gradient_loss": -0.031307476200163366,
+        "value_loss": 0.041766532510519025
+      },
+      "training_wall_seconds": 73.48
+    },
+    {
+      "cpu_utilization_percent": 46.24,
+      "environment_steps_per_second": 40.8,
+      "eval_action_distribution": {
+        "S": 500,
+        "SE": 500
+      },
+      "eval_collisions": 0,
+      "eval_failure_patterns": [],
+      "eval_longer_loops": 0,
+      "eval_max_route_length": 10,
+      "eval_mean_return": 0.970492,
+      "eval_mean_route_length": 10.0,
+      "eval_n_episodes": 100,
+      "eval_oscillations_2cell": 0,
+      "eval_path_cost_gap": -2.071,
+      "eval_success_rate": 1.0,
+      "eval_successes": 100,
+      "eval_timeouts": 0,
+      "gpu_note": "CPU build",
+      "gpu_utilization_percent": null,
+      "interactions": 10000,
+      "params_changed_at": 1000,
+      "params_changed_confirmed": true,
+      "sb3_stats": {
+        "approx_kl": 0.027416903525590897,
+        "clip_fraction": 0.256640625,
+        "clip_range": 0.2,
+        "entropy_loss": -0.7009438559412956,
+        "explained_variance": 0.11909210681915283,
+        "fps": null,
+        "learning_rate": 0.0003,
+        "n_updates": 400,
+        "policy_gradient_loss": -0.03451755403075367,
+        "value_loss": 0.001454770918644499
+      },
+      "training_wall_seconds": 122.43
+    },
+    {
+      "cpu_utilization_percent": 46.82,
+      "environment_steps_per_second": 42.0,
+      "eval_action_distribution": {
+        "S": 500,
+        "SE": 500
+      },
+      "eval_collisions": 0,
+      "eval_failure_patterns": [],
+      "eval_longer_loops": 0,
+      "eval_max_route_length": 10,
+      "eval_mean_return": 0.970492,
+      "eval_mean_route_length": 10.0,
+      "eval_n_episodes": 100,
+      "eval_oscillations_2cell": 0,
+      "eval_path_cost_gap": -2.071,
+      "eval_success_rate": 1.0,
+      "eval_successes": 100,
+      "eval_timeouts": 0,
+      "gpu_note": "CPU build",
+      "gpu_utilization_percent": null,
+      "interactions": 25000,
+      "params_changed_at": 1000,
+      "params_changed_confirmed": true,
+      "sb3_stats": {
+        "approx_kl": 0.02226427011191845,
+        "clip_fraction": 0.183203125,
+        "clip_range": 0.2,
+        "entropy_loss": -0.6195607617497444,
+        "explained_variance": 0.7996466159820557,
+        "fps": null,
+        "learning_rate": 0.0003,
+        "n_updates": 990,
+        "policy_gradient_loss": -0.01193205565214157,
+        "value_loss": 0.0006824584008427337
+      },
+      "training_wall_seconds": 357.27
+    }
+  ],
+  "mastered": true,
+  "parameter_count": 470025,
+  "pipeline_diagnosis": {
+    "status": "mastered",
+    "verdict": "Pipeline works correctly on the trivial task."
+  },
+  "preflight_verdict": "PASS",
+  "scenario": {
+    "blocked": [],
+    "dynamic_obstacles": [],
+    "dynamics_seed": null,
+    "goal": [
+      12,
+      7
+    ],
+    "grid_size": 15,
+    "moving_obstacles": [],
+    "no_fly_cells": [],
+    "no_fly_mode": null,
+    "no_fly_penalty": 5.0,
+    "optimal_astar_cost_note": "Octile: 5*sqrt(2)+5 approx 12.07; verified during preflight",
+    "route_bucket": "fixed_overfit",
+    "scenario_id": "C0-G015-EMPTY-FIXED",
+    "sensor_noise_probability": 0.0,
+    "start": [
+      2,
+      2
+    ],
+    "stochastic_obstacles": [],
+    "traversal_penalties": []
+  },
+  "schema_version": 1,
+  "seed": 42,
+  "suite_id": "rl-v3-phase-c0",
+  "total_interactions_run": 25000,
+  "training_checkpoints": 4
+}
