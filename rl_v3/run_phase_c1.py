@@ -143,7 +143,14 @@ def run_preflight() -> dict:
     env.close()
     
     RUN_ROOT.mkdir(parents=True, exist_ok=True)
-    _write_json(RUN_ROOT / "preflight_verification.json", result)
+    _write_json(RUN_ROOT / "preflight_verification.json", result)    
+    # 7. Check training generator hash
+    gen_path = ROOT / "evaluation" / "manifests" / "rl_v3_phase_c1_training_generator.json"
+    import hashlib
+    h = hashlib.sha256(gen_path.read_bytes()).hexdigest()
+    # The actual hash should be verified
+    assert h == "dd3170b20c47e895331f64fab1bba4a087daf820ed8613c86b42462bf9d2136e", f"Training generator hash mismatch: {h}"
+    
     print("Preflight passed.")
     return result
 

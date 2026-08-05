@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "grid_size": 15,
+  "master_seed": 42,
+  "distance_bin_thresholds": {
+    "T1_short_medium": 6.2,
+    "T2_medium_long": 10.0
+  },
+  "bin_sampling_probabilities": {
+    "short": 0.3333333333333333,
+    "medium": 0.3333333333333333,
+    "long": 0.3333333333333333
+  },
+  "orientation_definitions": {
+    "vertical": "dx <= dy * 0.5",
+    "horizontal": "dy <= dx * 0.5",
+    "diagonal": "abs(dx - dy) <= 1",
+    "mixed": "otherwise"
+  },
+  "region_definitions": "3x3 subgrids of the 15x15 map. Region index = (r // 5) * 3 + (c // 5).",
+  "validation_manifest": {
+    "path": "evaluation/manifests/rl_v3_phase_c1_validation.json",
+    "sha256": "49ffc2d987e5ba7f4f59b483ff043822cd61676edf1145fa46fd2604f44582fa"
+  },
+  "exclusions": [
+    "All pairs present in the validation manifest.",
+    "The reverse of all pairs present in the validation manifest."
+  ],
+  "endpoint_sequence_generation_method": "Deterministic random choice from valid pairs using np.random.RandomState(seed + 1).",
+  "episode_budget_equation": "max(minimum_budget, ceil(astar_cost * episode_budget_astar_multiplier))",
+  "contracts": {
+    "observation": "global_local",
+    "reward": "goal_1.0_collision_-1.0_step_-0.2"
+  }
+}

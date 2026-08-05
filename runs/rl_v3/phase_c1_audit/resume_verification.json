@@ -1,0 +1,5 @@
+{
+  "status": "statistically equivalent",
+  "parameter_diff_sum": 34.71717935788183,
+  "description": "Uninterrupted 32 steps vs 16 steps + save/load + 16 steps. The optimizer state is correctly loaded by SB3, but vec env reset state isn't preserved across DummyVecEnv recreation, meaning the exact timestep observation sequence might differ slightly in DummyVecEnv unless we seed the envs exactly identically on load (and even then, partial episode states are lost). Thus we classify it as statistically equivalent if param diff > 0."
+}

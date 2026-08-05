@@ -70,7 +70,9 @@ def generate_manifest():
     
     for b in ["short", "medium", "long"]:
         candidates = bins[b]
-        rng.shuffle(candidates)
+        
+        # Sort candidates deterministically for reproducibility before stratification
+        candidates.sort(key=lambda c: (c["start_region"], c["goal_region"], c["cost"], c["pair"]))
         
         selected_for_bin = []
         
@@ -78,24 +80,57 @@ def generate_manifest():
         for c in candidates:
             ori_buckets[c["orientation"]].append(c)
             
-        for ori in ["vertical", "horizontal", "diagonal", "mixed"]:
-            needed = 10
+        if b == "short":
+            quotas = {"vertical": 13, "horizontal": 13, "diagonal": 14, "mixed": 0}
+        else:
+            quotas = {"vertical": 10, "horizontal": 10, "diagonal": 10, "mixed": 10}
+            
+        for ori, needed in quotas.items():
+            if needed <= 0: continue
+            
+            # Stratify by (start_region, goal_region) to ensure maximum diversity for both
+            region_groups = {(s, g): [] for s in range(9) for g in range(9)}
             for c in ori_buckets[ori]:
-                if len(selected_for_bin) >= 40:
-                    break
-                if needed <= 0:
+                region_groups[(c["start_region"], c["goal_region"])].append(c)
+                
+            # Round-robin selection across region groups
+            active_regions = [r for r in region_groups if region_groups[r]]
+            
+            # Shuffle deterministically to prevent bias toward start_region 0
+            rng.shuffle(active_regions)
+            
+            pointers = {r: 0 for r in active_regions}
+            
+            while needed > 0 and active_regions:
+                to_remove = []
+                for r in active_regions:
+                    if needed <= 0: break
+                    
+                    idx = pointers[r]
+                    if idx >= len(region_groups[r]):
+                        to_remove.append(r)
+                        continue
+                        
+                    c = region_groups[r][idx]
+                    pointers[r] += 1
+                    
+                    p = c["pair"]
+                    rev = (p[1], p[0])
+                    if p not in excluded_set and rev not in excluded_set:
+                        needed -= 1
+                        selected_for_bin.append(c)
+                        excluded_set.add(p)
+                        excluded_set.add(rev)
+                        
+                for r in to_remove:
+                    active_regions.remove(r)
+                
+                # If we exhausted all options in this round but still need more,
+                # active_regions will naturally shrink until empty
+                if not active_regions:
                     break
                     
-                p = c["pair"]
-                rev = (p[1], p[0])
-                if p in excluded_set or rev in excluded_set:
-                    continue
-                
-                needed -= 1
-                selected_for_bin.append(c)
-                excluded_set.add(p)
-                excluded_set.add(rev)
-                
+        # Fallback if quotas couldn't be filled (should not happen on 15x15)
         if len(selected_for_bin) < 40:
             for c in candidates:
                 if len(selected_for_bin) >= 40:
