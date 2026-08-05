@@ -120,3 +120,22 @@ def test_hashes_exist_in_notebook():
     assert "HASH_VALIDATION =" in src
     assert "HASH_TRAIN_GEN =" in src
     assert "HASH_CONFIG =" in src
+
+def test_m2_no_map_tensors():
+    import json
+    from rl_v3.run_phase_c2 import PhaseC2Runner
+    
+    runner = PhaseC2Runner(ROOT / "configs/rl_v3_phase_c2.json", out_dir=str(ROOT / "runs/test_arch"), model_type="M2")
+    
+    obs, _ = runner.train_env.reset()
+    assert "global_map" not in obs, "M2 received global_map!"
+    assert "local_map" not in obs, "M2 received local_map!"
+    assert "scalars" in obs, "M2 did not receive scalars!"
+
+def test_output_root_enforcement():
+    runner_path = ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py"
+    with open(runner_path) as f:
+        src = f.read()
+    
+    assert "/kaggle/working/uav_phase_c2" in src
+    assert "rl_v3_phase_c2_" in src and "_raw_artifacts" in src

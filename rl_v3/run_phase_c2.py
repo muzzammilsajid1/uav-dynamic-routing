@@ -9,6 +9,18 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 from rl_v3.phase_c2_env import PhaseC2Env, PhaseC2EndpointGenerator
 from tools.verification.r2_pb_wrapper import PotentialShapingWrapper
+import gymnasium as gym
+
+class M2ScalarWrapper(gym.ObservationWrapper):
+    def __init__(self, env):
+        super().__init__(env)
+        # Re-define observation space to just the scalars
+        self.observation_space = gym.spaces.Dict({
+            "scalars": env.observation_space.spaces["scalars"]
+        })
+        
+    def observation(self, obs):
+        return {"scalars": obs["scalars"]}
 
 logger = logging.getLogger(__name__)
 
@@ -137,6 +149,8 @@ class PhaseC2Runner:
                 gamma=self.config["reward"]["gamma"],
                 lambda_=self.config["reward"]["lambda_"]
             )
+        if model_type == "M2":
+            self.train_env = M2ScalarWrapper(self.train_env)
             
         if not resume:
             if model_type == "M1":
@@ -169,6 +183,8 @@ class PhaseC2Runner:
                 gamma=self.config["reward"]["gamma"],
                 lambda_=self.config["reward"]["lambda_"]
             )
+        if self.model_type == "M2":
+            val_env = M2ScalarWrapper(val_env)
             
         successes, collisions, timeouts = 0, 0, 0
         n_eval = len(self.generator.val_manifest)

@@ -160,19 +160,24 @@ if __name__ == "__main__":
     is_kaggle = os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
     out_dir = Path("/kaggle/working/uav_phase_c2" if is_kaggle else str(ROOT / "runs" / "uav_phase_c2_local_test"))
     
-    final_archive = out_dir.parent / f"rl_v3_phase_c2_{args.model}_raw_artifacts"
-    shutil.make_archive(str(final_archive), 'zip', str(out_dir))
+    # Create in parent to avoid infinite recursion, then move inside
+    temp_archive = out_dir.parent / f"rl_v3_phase_c2_{args.model}_raw_artifacts"
+    shutil.make_archive(str(temp_archive), 'zip', str(out_dir))
+    
+    final_archive = out_dir / f"rl_v3_phase_c2_{args.model}_raw_artifacts.zip"
+    shutil.move(str(temp_archive) + ".zip", str(final_archive))
     
     # Final Inventory
     lines = []
     for root, dirs, files in os.walk(str(out_dir)):
         for file in files:
             p = Path(root) / file
+            if p.suffix == ".zip" and "raw_artifacts" in p.name: continue
             h = hash_file(p)
             rel = p.relative_to(out_dir)
             lines.append(f"{h}  {rel}  {p.stat().st_size} bytes")
     
-    with open(out_dir.parent / "final_inventory.txt", "w") as f:
+    with open(out_dir / "final_inventory.txt", "w") as f:
         f.write("\n".join(lines))
         
     logger.info(f"Final artifacts archived to: {final_archive}.zip")
