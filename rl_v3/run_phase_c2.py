@@ -126,7 +126,7 @@ def preflight(config_path, out_dir):
 
 
 class PhaseC2Runner:
-    def __init__(self, config_path, out_dir, model_type="M1", resume=False):
+    def __init__(self, config_path, out_dir, model_type="M1", resume=False, device="auto"):
         with open(config_path) as f:
             self.config = json.load(f)
             
@@ -134,6 +134,10 @@ class PhaseC2Runner:
         self.out_dir.mkdir(parents=True, exist_ok=True)
         self.model_type = model_type
         self.resume = resume
+        
+        if device not in {"cpu", "cuda", "auto"}:
+            raise ValueError(f"Invalid device: {device}. Must be cpu, cuda, or auto.")
+        self.device = device
         
         self.checkpoints = [25000, 50000, 75000, 100000, 150000]
         self.history = {}
@@ -158,6 +162,7 @@ class PhaseC2Runner:
                 self.model = MaskablePPO(
                     "MultiInputPolicy",
                     self.train_env,
+                    device=self.device,
                     policy_kwargs={
                         "features_extractor_class": PhaseBFeatureExtractor,
                         "features_extractor_kwargs": {"features_dim": 256}
@@ -168,6 +173,7 @@ class PhaseC2Runner:
                 self.model = MaskablePPO(
                     "MultiInputPolicy",
                     self.train_env,
+                    device=self.device,
                     **self.config["model"]
                 )
         else:

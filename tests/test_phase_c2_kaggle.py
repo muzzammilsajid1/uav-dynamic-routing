@@ -164,3 +164,49 @@ def test_m2_scalar_contract():
     # Specifically reproduce the reported invalid observation check: [0, 0, -1, 0]
     invalid_obs = {"scalars": np.array([0, 0, -1, 0], dtype=np.float32)}
     assert not env.observation_space.contains(invalid_obs), "Observation space incorrectly contains invalid observation"
+
+def test_device_propagation():
+    import numpy as np
+    from rl_v3.run_phase_c2 import PhaseC2Runner
+    from sb3_contrib import MaskablePPO
+    
+    # Test valid device
+    runner = PhaseC2Runner(ROOT / "configs/rl_v3_phase_c2.json", out_dir=str(ROOT / "runs/test_dev"), model_type="M2", device="cpu")
+    assert runner.device == "cpu"
+    assert runner.model.device.type == "cpu"
+    
+    # Test invalid device
+    try:
+        PhaseC2Runner(ROOT / "configs/rl_v3_phase_c2.json", out_dir=str(ROOT / "runs/test_dev2"), model_type="M2", device="invalid_dev")
+        assert False, "Should reject invalid device"
+    except ValueError:
+        pass
+
+def test_kaggle_runner_device():
+    import subprocess
+    import sys
+    
+    res = subprocess.run([sys.executable, str(ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py"), "--help"], capture_output=True, text=True)
+    assert "--device" in res.stdout
+
+def test_inventory_path():
+    with open(ROOT / "cloud/kaggle/phase_c2_kaggle.ipynb") as f:
+        src = f.read()
+    assert "/kaggle/working/final_inventory.txt" not in src
+    assert "/kaggle/working/uav_phase_c2/final_inventory.txt" in src
+
+def test_pytest_in_notebook():
+    with open(ROOT / "cloud/kaggle/phase_c2_kaggle.ipynb") as f:
+        src = f.read()
+    assert "pytest_kaggle.log" in src
+    assert "pytest" in src
+
+def test_preflight_command():
+    import subprocess
+    import sys
+    
+    out_dir = ROOT / "runs/test_preflight_cli"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    
+    res = subprocess.run([sys.executable, "-m", "rl_v3.run_phase_c2", "preflight", str(out_dir)], check=True)
+    assert res.returncode == 0

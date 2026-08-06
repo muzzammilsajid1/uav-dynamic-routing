@@ -22,7 +22,7 @@ def hash_file(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 class KagglePhaseC2Runner(PhaseC2Runner):
-    def __init__(self, model_type, max_interactions, resume=False, bundle_path=None):
+    def __init__(self, model_type, max_interactions, resume=False, bundle_path=None, device="auto"):
         is_kaggle = os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
         out_dir = "/kaggle/working/uav_phase_c2" if is_kaggle else str(ROOT / "runs" / "uav_phase_c2_local_test")
         
@@ -32,16 +32,16 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         if resume:
             self._handle_resume(bundle_path, out_dir, model_type)
             
-        super().__init__(config_path=config_path, out_dir=out_dir, model_type=model_type, resume=resume)
+        super().__init__(config_path=config_path, out_dir=out_dir, model_type=model_type, resume=resume, device=device)
         self.max_interactions = max_interactions
         
         if resume:
-            self.model = MaskablePPO.load(self.resume_model_path, env=self.train_env, device="auto")
+            self.model = MaskablePPO.load(self.resume_model_path, env=self.train_env, device=self.device)
             # Override num_timesteps
             self.model.num_timesteps = self.resume_ts
             self.history = self.resume_history
             self.generator.set_state(self.resume_gen_state)
-            logger.info(f"Successfully resumed at timestep {self.resume_ts}")
+            logger.info(f"Successfully resumed at timestep {self.resume_ts} on device {self.device}")
 
     def _handle_resume(self, bundle_path, out_dir, expected_model):
         if not bundle_path or not Path(bundle_path).exists():
@@ -107,6 +107,7 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         # Provenance
         prov = {
             "model_type": self.model_type,
+            "device": self.device,
             "completed_interactions": ts,
             "hashes": {
                 "config": hash_file(ROOT / "configs" / "rl_v3_phase_c2.json"),
@@ -147,14 +148,16 @@ if __name__ == "__main__":
     parser.add_argument("--interactions", type=int, default=150000)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--bundle-path", type=str, default=None)
+    parser.add_argument("--device", type=str, default="auto", choices=["cpu", "cuda", "auto"])
     args = parser.parse_args()
     
     logger.info(f"\n Launching Phase C2 Kaggle Runner")
     logger.info(f"Model: {args.model}")
     logger.info(f"Interactions: {args.interactions}")
-    logger.info(f"Resume: {args.resume}\n")
+    logger.info(f"Resume: {args.resume}")
+    logger.info(f"Device: {args.device}\n")
     
-    runner = KagglePhaseC2Runner(args.model, args.interactions, args.resume, args.bundle_path)
+    runner = KagglePhaseC2Runner(args.model, args.interactions, args.resume, args.bundle_path, args.device)
     runner.run(args.interactions)
     
     is_kaggle = os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
@@ -180,4 +183,4 @@ if __name__ == "__main__":
     with open(out_dir / "final_inventory.txt", "w") as f:
         f.write("\n".join(lines))
         
-    logger.info(f"Final artifacts archived to: {final_archive}.zip")
+    logger.info(f"Final artifacts archived to: {final_archive}")
