@@ -24,7 +24,11 @@ def hash_file(path):
 class KagglePhaseC2Runner(PhaseC2Runner):
     def __init__(self, model_type, max_interactions, resume=False, bundle_path=None, device="auto"):
         is_kaggle = os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
-        out_dir = "/kaggle/working/uav_phase_c2" if is_kaggle else str(ROOT / "runs" / "uav_phase_c2_local_test")
+        test_out = os.environ.get("KAGGLE_TEST_OUT_DIR")
+        if test_out:
+            out_dir = test_out
+        else:
+            out_dir = "/kaggle/working/uav_phase_c2" if is_kaggle else str(ROOT / "runs" / "uav_phase_c2_local_test")
         
         config_path = ROOT / "configs" / "rl_v3_phase_c2.json"
         
@@ -205,7 +209,11 @@ if __name__ == "__main__":
     runner.run(args.interactions)
     
     is_kaggle = os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
-    out_dir = Path("/kaggle/working/uav_phase_c2" if is_kaggle else str(ROOT / "runs" / "uav_phase_c2_local_test"))
+    test_out = os.environ.get("KAGGLE_TEST_OUT_DIR")
+    if test_out:
+        out_dir = Path(test_out)
+    else:
+        out_dir = Path("/kaggle/working/uav_phase_c2" if is_kaggle else str(ROOT / "runs" / "uav_phase_c2_local_test"))
 
     # Stage the raw-artifact archive in a tempdir, then move into out_dir.
     # This prevents shutil.make_archive from recursing into out_dir while

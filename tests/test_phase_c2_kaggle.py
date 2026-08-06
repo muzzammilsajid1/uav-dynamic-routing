@@ -1,4 +1,13 @@
 import json
+
+def local_runner_env(out_dir=None):
+    import os
+    env = os.environ.copy()
+    env.pop("KAGGLE_KERNEL_RUN_TYPE", None)
+    if out_dir:
+        env["KAGGLE_TEST_OUT_DIR"] = str(out_dir)
+    return env
+
 import pytest
 import os
 import ast
@@ -42,6 +51,7 @@ def test_no_windows_paths():
     
 def test_m1_architecture():
     import json
+
     from rl_v3.run_phase_c2 import PhaseC2Runner
     from sb3_contrib import MaskablePPO
     
@@ -54,6 +64,7 @@ def test_m1_architecture():
            
 def test_m2_architecture():
     import json
+
     from rl_v3.run_phase_c2 import PhaseC2Runner
     from sb3_contrib import MaskablePPO
     
@@ -76,22 +87,21 @@ def test_preflight_command_exists():
         v = json.load(f)
     assert v["status"] == "PASS"
 
-def test_bundle_creation_and_resume():
+def test_bundle_creation_and_resume(tmp_path):
     import sys
     import subprocess
     import shutil
     
     # Run 10 steps of M2 to create bundle
-    out_dir = ROOT / "runs" / "uav_phase_c2_local_test"
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
+    out_dir = tmp_path
+    
     
     cmd = [
         sys.executable, str(ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py"),
         "--model", "M2",
         "--interactions", "10"
     ]
-    subprocess.run(cmd, check=True)
+    subprocess.run(cmd, check=True, env=local_runner_env(out_dir))
     
     # Bundle must be INSIDE out_dir (v4 fix)
     bundle_path = out_dir / "latest_checkpoint_bundle.zip"
@@ -105,7 +115,7 @@ def test_bundle_creation_and_resume():
         "--resume",
         "--bundle-path", str(bundle_path)
     ]
-    res = subprocess.run(cmd, capture_output=True)
+    res = subprocess.run(cmd, capture_output=True, env=local_runner_env(out_dir))
     assert res.returncode == 0
     
 def test_git_token_hygiene():
@@ -125,6 +135,7 @@ def test_hashes_exist_in_notebook():
 
 def test_m2_no_map_tensors():
     import json
+
     from rl_v3.run_phase_c2 import PhaseC2Runner
     
     runner = PhaseC2Runner(ROOT / "configs/rl_v3_phase_c2.json", out_dir=str(ROOT / "runs/test_arch"), model_type="M2")
@@ -218,8 +229,7 @@ def test_bundle_inside_out_dir_m1():
     """latest_checkpoint_bundle.zip must be inside out_dir, not in parent."""
     import shutil
     out_dir = ROOT / "runs/test_bundle_path_m1"
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
+    
 
     from cloud.kaggle.phase_c2_kaggle_runner import KagglePhaseC2Runner
     from rl_v3.run_phase_c2 import PhaseC2Runner
@@ -244,8 +254,7 @@ def test_bundle_inside_out_dir_m2():
     """Same check for M2."""
     import shutil
     out_dir = ROOT / "runs/test_bundle_path_m2"
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
+    
 
     from cloud.kaggle.phase_c2_kaggle_runner import KagglePhaseC2Runner
     from rl_v3.run_phase_c2 import PhaseC2Runner
@@ -271,8 +280,7 @@ def test_no_nested_zip_in_bundle():
     import zipfile
     import shutil
     out_dir = ROOT / "runs/test_no_nested_zip"
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
+    
 
     from cloud.kaggle.phase_c2_kaggle_runner import KagglePhaseC2Runner
     from rl_v3.run_phase_c2 import PhaseC2Runner
@@ -294,20 +302,19 @@ def test_no_nested_zip_in_bundle():
     shutil.rmtree(out_dir)
 
 
-def test_resume_from_in_root_bundle():
+def test_resume_from_in_root_bundle(tmp_path):
     """Resume must work when bundle is inside out_dir (not parent)."""
     import shutil
     import subprocess
     import sys
 
-    actual_out = ROOT / "runs/uav_phase_c2_local_test"
-    if actual_out.exists():
-        shutil.rmtree(actual_out)
+    actual_out = tmp_path / "uav_phase_c2_local_test"
+    
 
     subprocess.run(
         [sys.executable, "cloud/kaggle/phase_c2_kaggle_runner.py",
          "--model", "M1", "--interactions", "10", "--device", "cpu"],
-        check=True, cwd=str(ROOT)
+        check=True, cwd=str(ROOT), env=local_runner_env(actual_out)
     )
 
     bundle_in_root = actual_out / "latest_checkpoint_bundle.zip"
@@ -319,27 +326,25 @@ def test_resume_from_in_root_bundle():
         [sys.executable, "cloud/kaggle/phase_c2_kaggle_runner.py",
          "--model", "M1", "--interactions", "20", "--device", "cpu",
          "--resume", "--bundle-path", str(bundle_in_root)],
-        check=True, cwd=str(ROOT)
+        check=True, cwd=str(ROOT), env=local_runner_env(actual_out)
     )
 
-    if actual_out.exists():
-        shutil.rmtree(actual_out)
+    
 
 
-def test_no_parent_dir_bundles():
+def test_no_parent_dir_bundles(tmp_path):
     """No checkpoint_bundle_*.zip should exist in parent of out_dir after a run."""
     import shutil
     import subprocess
     import sys
 
-    actual_out = ROOT / "runs/uav_phase_c2_local_test"
-    if actual_out.exists():
-        shutil.rmtree(actual_out)
+    actual_out = tmp_path / "uav_phase_c2_local_test"
+    
 
     subprocess.run(
         [sys.executable, "cloud/kaggle/phase_c2_kaggle_runner.py",
          "--model", "M2", "--interactions", "10", "--device", "cpu"],
-        check=True, cwd=str(ROOT)
+        check=True, cwd=str(ROOT), env=local_runner_env(actual_out)
     )
     parent = actual_out.parent
 
@@ -347,8 +352,7 @@ def test_no_parent_dir_bundles():
              list(parent.glob("latest_checkpoint_bundle.zip"))
     assert not leaked, f"Bundles leaked to parent dir: {leaked}"
 
-    if actual_out.exists():
-        shutil.rmtree(actual_out)
+    
 
 
 def test_runner_no_parent_zip_leakage():
@@ -359,6 +363,7 @@ def test_runner_no_parent_zip_leakage():
 import sys
 from pathlib import Path
 import json
+
 import subprocess
 import hashlib
 
@@ -396,3 +401,42 @@ def test_canonical_hashes():
         canonical_hash = hashlib.sha256(canonical_bytes).hexdigest()
         assert canonical_hash == hashes[var], f"Hash mismatch for {var} ({fpath}): expected {canonical_hash}, got {hashes[var]}"
 
+
+
+def test_kaggle_environment_regression(tmp_path):
+    import subprocess
+    import sys
+    import os
+    
+    os.environ["KAGGLE_KERNEL_RUN_TYPE"] = "Interactive"
+    try:
+        out_dir = tmp_path / "uav_phase_c2"
+        prod_dir = Path("/kaggle/working/uav_phase_c2")
+        
+        cmd = [
+            sys.executable, str(ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py"),
+            "--model", "M2",
+            "--interactions", "10"
+        ]
+        subprocess.run(cmd, check=True, env=local_runner_env(out_dir))
+        
+        assert out_dir.exists(), "Output not in local test directory"
+        bundle_path = out_dir / "latest_checkpoint_bundle.zip"
+        assert bundle_path.exists(), "Bundle not found in isolated directory"
+        
+        if prod_dir.exists():
+            assert not (prod_dir / "latest_checkpoint_bundle.zip").exists()
+            assert not (prod_dir / "pytest_kaggle.log").exists() # Ensure it didn't create anything there
+        
+        resume_cmd = [
+            sys.executable, str(ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py"),
+            "--model", "M2",
+            "--interactions", "20",
+            "--resume",
+            "--bundle-path", str(bundle_path)
+        ]
+        res = subprocess.run(resume_cmd, capture_output=True, env=local_runner_env(out_dir))
+        assert res.returncode == 0
+        
+    finally:
+        os.environ.pop("KAGGLE_KERNEL_RUN_TYPE", None)
