@@ -139,3 +139,28 @@ def test_output_root_enforcement():
     
     assert "/kaggle/working/uav_phase_c2" in src
     assert "rl_v3_phase_c2_" in src and "_raw_artifacts" in src
+
+def test_m2_scalar_contract():
+    import numpy as np
+    from rl_v3.run_phase_c2 import PhaseC2Runner
+    
+    runner = PhaseC2Runner(ROOT / "configs/rl_v3_phase_c2.json", out_dir=str(ROOT / "runs/test_arch2"), model_type="M2")
+    env = runner.train_env
+    
+    obs, info = env.reset(seed=42)
+    scalars = obs["scalars"]
+    
+    # Verify shape and type
+    assert scalars.shape == (4,), f"Expected 4 scalars, got {scalars.shape}"
+    assert scalars.dtype == np.float32, f"Expected float32, got {scalars.dtype}"
+    
+    # Verify no local_map or global_map
+    assert "local_map" not in obs
+    assert "global_map" not in obs
+    
+    # Verify containment
+    assert env.observation_space.contains(obs), "Observation space does not contain the observation"
+    
+    # Specifically reproduce the reported invalid observation check: [0, 0, -1, 0]
+    invalid_obs = {"scalars": np.array([0, 0, -1, 0], dtype=np.float32)}
+    assert not env.observation_space.contains(invalid_obs), "Observation space incorrectly contains invalid observation"
