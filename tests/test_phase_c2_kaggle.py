@@ -356,3 +356,43 @@ def test_runner_no_parent_zip_leakage():
     runner_src = (ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py").read_text()
     assert 'out_dir).parent / "latest_checkpoint_bundle' not in runner_src
     assert 'out_dir).parent / f"checkpoint_bundle_' not in runner_src
+import sys
+from pathlib import Path
+import json
+import subprocess
+import hashlib
+
+ROOT = Path(__file__).parent.parent
+
+def test_canonical_hashes():
+    nb_path = ROOT / "cloud/kaggle/phase_c2_kaggle.ipynb"
+    nb = json.loads(nb_path.read_text(encoding="utf-8"))
+    
+    hashes = {}
+    for cell in nb["cells"]:
+        if cell["cell_type"] == "code":
+            for line in cell["source"]:
+                if line.startswith("HASH_"):
+                    parts = line.split("=")
+                    if len(parts) == 2:
+                        name = parts[0].strip()
+                        val = parts[1].strip().strip('",\\n')
+                        hashes[name] = val
+
+    expected_vars = ["HASH_VALIDATION", "HASH_TRAIN_GEN", "HASH_CONFIG", "HASH_REWARD", "HASH_OBSERVATION"]
+    for var in expected_vars:
+        assert var in hashes, f"Missing {var} in notebook"
+
+    file_mapping = {
+        "HASH_VALIDATION": "evaluation/manifests/rl_v3_phase_c2_validation.json",
+        "HASH_TRAIN_GEN": "evaluation/manifests/rl_v3_phase_c2_train_generator.json",
+        "HASH_CONFIG": "configs/rl_v3_phase_c2.json",
+        "HASH_REWARD": "tools/verification/r2_pb_wrapper.py",
+        "HASH_OBSERVATION": "rl_v3/observations.py",
+    }
+    
+    for var, fpath in file_mapping.items():
+        canonical_bytes = subprocess.check_output(["git", "show", f"HEAD:{fpath}"])
+        canonical_hash = hashlib.sha256(canonical_bytes).hexdigest()
+        assert canonical_hash == hashes[var], f"Hash mismatch for {var} ({fpath}): expected {canonical_hash}, got {hashes[var]}"
+
