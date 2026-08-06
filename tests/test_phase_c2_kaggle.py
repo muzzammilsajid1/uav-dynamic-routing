@@ -81,9 +81,10 @@ def test_bundle_creation_and_resume():
     import subprocess
     import shutil
     
-    # Run 1 step of M2 to create bundle
-    out_dir = ROOT / "runs" / "uav_phase_c2_resume_test"
-    if out_dir.exists(): shutil.rmtree(out_dir)
+    # Run 10 steps of M2 to create bundle
+    out_dir = ROOT / "runs" / "uav_phase_c2_local_test"
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
     
     cmd = [
         sys.executable, str(ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py"),
@@ -92,8 +93,9 @@ def test_bundle_creation_and_resume():
     ]
     subprocess.run(cmd, check=True)
     
-    bundle_path = out_dir.parent / "latest_checkpoint_bundle.zip"
-    assert bundle_path.exists()
+    # Bundle must be INSIDE out_dir (v4 fix)
+    bundle_path = out_dir / "latest_checkpoint_bundle.zip"
+    assert bundle_path.exists(), f"Bundle not found at {bundle_path}"
     
     # Resume it for 10 more steps
     cmd = [
@@ -150,32 +152,28 @@ def test_m2_scalar_contract():
     obs, info = env.reset(seed=42)
     scalars = obs["scalars"]
     
-    # Verify shape and type
     assert scalars.shape == (4,), f"Expected 4 scalars, got {scalars.shape}"
     assert scalars.dtype == np.float32, f"Expected float32, got {scalars.dtype}"
-    
-    # Verify no local_map or global_map
     assert "local_map" not in obs
     assert "global_map" not in obs
-    
-    # Verify containment
     assert env.observation_space.contains(obs), "Observation space does not contain the observation"
     
-    # Specifically reproduce the reported invalid observation check: [0, 0, -1, 0]
     invalid_obs = {"scalars": np.array([0, 0, -1, 0], dtype=np.float32)}
     assert not env.observation_space.contains(invalid_obs), "Observation space incorrectly contains invalid observation"
+
+
+# ---------------------------------------------------------------------------
+# v3: device propagation tests
+# ---------------------------------------------------------------------------
 
 def test_device_propagation():
     import numpy as np
     from rl_v3.run_phase_c2 import PhaseC2Runner
-    from sb3_contrib import MaskablePPO
     
-    # Test valid device
     runner = PhaseC2Runner(ROOT / "configs/rl_v3_phase_c2.json", out_dir=str(ROOT / "runs/test_dev"), model_type="M2", device="cpu")
     assert runner.device == "cpu"
     assert runner.model.device.type == "cpu"
     
-    # Test invalid device
     try:
         PhaseC2Runner(ROOT / "configs/rl_v3_phase_c2.json", out_dir=str(ROOT / "runs/test_dev2"), model_type="M2", device="invalid_dev")
         assert False, "Should reject invalid device"
@@ -210,3 +208,151 @@ def test_preflight_command():
     
     res = subprocess.run([sys.executable, "-m", "rl_v3.run_phase_c2", "preflight", str(out_dir)], check=True)
     assert res.returncode == 0
+
+
+# ---------------------------------------------------------------------------
+# v4: bundle-path regression tests
+# ---------------------------------------------------------------------------
+
+def test_bundle_inside_out_dir_m1():
+    """latest_checkpoint_bundle.zip must be inside out_dir, not in parent."""
+    import shutil
+    out_dir = ROOT / "runs/test_bundle_path_m1"
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+
+    from cloud.kaggle.phase_c2_kaggle_runner import KagglePhaseC2Runner
+    from rl_v3.run_phase_c2 import PhaseC2Runner
+    config_path = ROOT / "configs" / "rl_v3_phase_c2.json"
+    runner = KagglePhaseC2Runner.__new__(KagglePhaseC2Runner)
+    PhaseC2Runner.__init__(runner, config_path=config_path, out_dir=str(out_dir),
+                            model_type="M1", resume=False, device="cpu")
+    runner.max_interactions = 10
+    runner.bundle_path = None
+    runner.run(10)
+
+    latest = out_dir / "latest_checkpoint_bundle.zip"
+    assert latest.exists(), f"Bundle not found inside out_dir: {latest}"
+
+    parent_bundle = out_dir.parent / "latest_checkpoint_bundle.zip"
+    assert not parent_bundle.exists(), f"Bundle leaked to parent: {parent_bundle}"
+
+    shutil.rmtree(out_dir)
+
+
+def test_bundle_inside_out_dir_m2():
+    """Same check for M2."""
+    import shutil
+    out_dir = ROOT / "runs/test_bundle_path_m2"
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+
+    from cloud.kaggle.phase_c2_kaggle_runner import KagglePhaseC2Runner
+    from rl_v3.run_phase_c2 import PhaseC2Runner
+    config_path = ROOT / "configs" / "rl_v3_phase_c2.json"
+    runner = KagglePhaseC2Runner.__new__(KagglePhaseC2Runner)
+    PhaseC2Runner.__init__(runner, config_path=config_path, out_dir=str(out_dir),
+                            model_type="M2", resume=False, device="cpu")
+    runner.max_interactions = 10
+    runner.bundle_path = None
+    runner.run(10)
+
+    latest = out_dir / "latest_checkpoint_bundle.zip"
+    assert latest.exists(), f"Bundle not found inside out_dir: {latest}"
+
+    parent_bundle = out_dir.parent / "latest_checkpoint_bundle.zip"
+    assert not parent_bundle.exists(), f"Bundle leaked to parent: {parent_bundle}"
+
+    shutil.rmtree(out_dir)
+
+
+def test_no_nested_zip_in_bundle():
+    """checkpoint bundle must contain no nested .zip file."""
+    import zipfile
+    import shutil
+    out_dir = ROOT / "runs/test_no_nested_zip"
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+
+    from cloud.kaggle.phase_c2_kaggle_runner import KagglePhaseC2Runner
+    from rl_v3.run_phase_c2 import PhaseC2Runner
+    config_path = ROOT / "configs" / "rl_v3_phase_c2.json"
+    runner = KagglePhaseC2Runner.__new__(KagglePhaseC2Runner)
+    PhaseC2Runner.__init__(runner, config_path=config_path, out_dir=str(out_dir),
+                            model_type="M1", resume=False, device="cpu")
+    runner.max_interactions = 10
+    runner.bundle_path = None
+    runner.run(10)
+
+    latest = out_dir / "latest_checkpoint_bundle.zip"
+    assert latest.exists()
+    with zipfile.ZipFile(latest, "r") as zf:
+        names = zf.namelist()
+    nested_zips = [n for n in names if "bundle" in n or "_raw_artifacts" in n]
+    assert not nested_zips, f"Nested zips found in bundle: {nested_zips}"
+
+    shutil.rmtree(out_dir)
+
+
+def test_resume_from_in_root_bundle():
+    """Resume must work when bundle is inside out_dir (not parent)."""
+    import shutil
+    import subprocess
+    import sys
+
+    actual_out = ROOT / "runs/uav_phase_c2_local_test"
+    if actual_out.exists():
+        shutil.rmtree(actual_out)
+
+    subprocess.run(
+        [sys.executable, "cloud/kaggle/phase_c2_kaggle_runner.py",
+         "--model", "M1", "--interactions", "10", "--device", "cpu"],
+        check=True, cwd=str(ROOT)
+    )
+
+    bundle_in_root = actual_out / "latest_checkpoint_bundle.zip"
+    assert bundle_in_root.exists(), f"Bundle not found at in-root path: {bundle_in_root}"
+    assert not (actual_out.parent / "latest_checkpoint_bundle.zip").exists(), \
+        "Bundle should not exist in parent"
+
+    subprocess.run(
+        [sys.executable, "cloud/kaggle/phase_c2_kaggle_runner.py",
+         "--model", "M1", "--interactions", "20", "--device", "cpu",
+         "--resume", "--bundle-path", str(bundle_in_root)],
+        check=True, cwd=str(ROOT)
+    )
+
+    if actual_out.exists():
+        shutil.rmtree(actual_out)
+
+
+def test_no_parent_dir_bundles():
+    """No checkpoint_bundle_*.zip should exist in parent of out_dir after a run."""
+    import shutil
+    import subprocess
+    import sys
+
+    actual_out = ROOT / "runs/uav_phase_c2_local_test"
+    if actual_out.exists():
+        shutil.rmtree(actual_out)
+
+    subprocess.run(
+        [sys.executable, "cloud/kaggle/phase_c2_kaggle_runner.py",
+         "--model", "M2", "--interactions", "10", "--device", "cpu"],
+        check=True, cwd=str(ROOT)
+    )
+    parent = actual_out.parent
+
+    leaked = list(parent.glob("checkpoint_bundle_*.zip")) + \
+             list(parent.glob("latest_checkpoint_bundle.zip"))
+    assert not leaked, f"Bundles leaked to parent dir: {leaked}"
+
+    if actual_out.exists():
+        shutil.rmtree(actual_out)
+
+
+def test_runner_no_parent_zip_leakage():
+    """Verify the runner source does not reference out_dir.parent for bundles."""
+    runner_src = (ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py").read_text()
+    assert 'out_dir).parent / "latest_checkpoint_bundle' not in runner_src
+    assert 'out_dir).parent / f"checkpoint_bundle_' not in runner_src

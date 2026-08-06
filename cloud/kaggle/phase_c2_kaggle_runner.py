@@ -16,7 +16,7 @@ from rl_v3.run_phase_c2 import PhaseC2Runner
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 
-EXPECTED_TAG = "rl-v3-c2-kaggle-v2"
+EXPECTED_TAG = "rl-v3-c2-kaggle-v4"
 
 def hash_file(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -118,27 +118,71 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         with open(self.out_dir / "provenance.json", "w") as f:
             json.dump(prov, f, indent=2)
             
-        # Atomic Bundle Creation
+        # Atomic Bundle Creation — bundles live inside self.out_dir, never in parent.
+        # Build from an explicit whitelist of checkpoint-state files only.
+        # Excluded from bundles: any *.zip file (avoids nested archives and raw-artifact
+        # archives), final_inventory.txt (only written at run end), and
+        # partial/temporary files.
         import tempfile
-        tmp_zip = Path(tempfile.mktemp(suffix=".zip"))
-        
-        # inventory
+
+        _BUNDLE_EXCLUDES = {
+            "latest_checkpoint_bundle.zip",
+            "final_inventory.txt",
+        }
+
+        def _is_excluded(fpath: Path) -> bool:
+            """Return True if this file must not appear in the checkpoint bundle."""
+            name = fpath.name
+            if name in _BUNDLE_EXCLUDES:
+                return True
+            # Exclude timestamped checkpoint bundles and raw-artifact archives.
+            # Include model checkpoint zips (model_<ts>.zip) — they are needed for resume.
+            if name.startswith("checkpoint_bundle_") and name.endswith(".zip"):
+                return True
+            if "_raw_artifacts" in name and name.endswith(".zip"):
+                return True
+            return False
+
+        # 1. Build inventory from whitelisted files.
         inventory_lines = []
-        for fpath in self.out_dir.iterdir():
-            if fpath.is_file() and fpath.name != "inventory.txt":
-                h = hash_file(fpath)
-                inventory_lines.append(f"{h}  {fpath.name}")
+        checkpoint_files = []
+        for fpath in sorted(self.out_dir.iterdir()):
+            if not fpath.is_file():
+                continue
+            if _is_excluded(fpath):
+                continue
+            if fpath.name == "inventory.txt":
+                continue
+            h = hash_file(fpath)
+            inventory_lines.append(f"{h}  {fpath.name}")
+            checkpoint_files.append(fpath)
+
         with open(self.out_dir / "inventory.txt", "w") as f:
             f.write("\n".join(inventory_lines) + "\n")
-            
-        shutil.make_archive(str(tmp_zip)[:-4], 'zip', str(self.out_dir))
-        
-        bundle_path = Path(self.out_dir).parent / "latest_checkpoint_bundle.zip"
-        shutil.move(str(tmp_zip), str(bundle_path))
-        
-        timestamped_bundle = Path(self.out_dir).parent / f"checkpoint_bundle_{ts:06d}.zip"
+        checkpoint_files.append(self.out_dir / "inventory.txt")
+
+        # 2. Stage whitelisted files in a temp directory and zip from there.
+        #    The archive base MUST be outside the staging dir to avoid the zip
+        #    including itself (make_archive writes <base>.zip before it finishes).
+        with tempfile.TemporaryDirectory() as staging_dir:
+            staging = Path(staging_dir)
+            for src in checkpoint_files:
+                shutil.copy2(str(src), str(staging / src.name))
+
+            # Write zip base to a sibling temp file, not inside staging_dir.
+            with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as _tf:
+                tmp_zip_path = Path(_tf.name)
+            tmp_zip_base = str(tmp_zip_path)[:-4]  # strip .zip for make_archive
+            shutil.make_archive(tmp_zip_base, "zip", str(staging))
+            # tmp_zip_base + ".zip" now exists outside staging_dir.
+
+        # 3. Move into self.out_dir — both paths are inside the output root.
+        bundle_path = self.out_dir / "latest_checkpoint_bundle.zip"
+        shutil.move(str(tmp_zip_base) + ".zip", str(bundle_path))
+
+        timestamped_bundle = self.out_dir / f"checkpoint_bundle_{ts:06d}.zip"
         shutil.copy2(str(bundle_path), str(timestamped_bundle))
-        
+
         logger.info(f"Bundle archived to: {bundle_path}\n")
 
 if __name__ == "__main__":
@@ -162,25 +206,30 @@ if __name__ == "__main__":
     
     is_kaggle = os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
     out_dir = Path("/kaggle/working/uav_phase_c2" if is_kaggle else str(ROOT / "runs" / "uav_phase_c2_local_test"))
-    
-    # Create in parent to avoid infinite recursion, then move inside
-    temp_archive = out_dir.parent / f"rl_v3_phase_c2_{args.model}_raw_artifacts"
-    shutil.make_archive(str(temp_archive), 'zip', str(out_dir))
-    
-    final_archive = out_dir / f"rl_v3_phase_c2_{args.model}_raw_artifacts.zip"
-    shutil.move(str(temp_archive) + ".zip", str(final_archive))
-    
-    # Final Inventory
+
+    # Stage the raw-artifact archive in a tempdir, then move into out_dir.
+    # This prevents shutil.make_archive from recursing into out_dir while
+    # the archive is being created inside it.
+    import tempfile as _tf
+    with _tf.TemporaryDirectory() as _stage:
+        _stage_path = Path(_stage)
+        _archive_base = _stage_path / f"rl_v3_phase_c2_{args.model}_raw_artifacts"
+        shutil.make_archive(str(_archive_base), 'zip', str(out_dir))
+        final_archive = out_dir / f"rl_v3_phase_c2_{args.model}_raw_artifacts.zip"
+        shutil.move(str(_archive_base) + ".zip", str(final_archive))
+
+    # Final Inventory — skip all .zip files (bundles + raw-artifact archives).
     lines = []
     for root, dirs, files in os.walk(str(out_dir)):
         for file in files:
             p = Path(root) / file
-            if p.suffix == ".zip" and "raw_artifacts" in p.name: continue
+            if p.suffix == ".zip":
+                continue
             h = hash_file(p)
             rel = p.relative_to(out_dir)
             lines.append(f"{h}  {rel}  {p.stat().st_size} bytes")
-    
+
     with open(out_dir / "final_inventory.txt", "w") as f:
         f.write("\n".join(lines))
-        
+
     logger.info(f"Final artifacts archived to: {final_archive}")
