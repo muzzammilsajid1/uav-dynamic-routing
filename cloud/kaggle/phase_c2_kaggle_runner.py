@@ -16,7 +16,7 @@ from rl_v3.run_phase_c2 import PhaseC2Runner
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 
-EXPECTED_COMMIT = "8531041"
+EXPECTED_TAG = "rl-v3-c2-kaggle-v1"
 
 def hash_file(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()

@@ -116,7 +116,7 @@ def test_hashes_exist_in_notebook():
     nb_path = ROOT / "cloud/kaggle/phase_c2_kaggle.ipynb"
     with open(nb_path) as f:
         src = f.read()
-    assert "EXPECTED_COMMIT =" in src
+    assert "EXPECTED_TAG =" in src
     assert "HASH_VALIDATION =" in src
     assert "HASH_TRAIN_GEN =" in src
     assert "HASH_CONFIG =" in src
