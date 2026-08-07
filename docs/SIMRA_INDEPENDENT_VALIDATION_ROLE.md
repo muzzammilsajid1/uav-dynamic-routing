@@ -133,3 +133,13 @@ never inside â€” the active modeling work.
 - Default pytest temp dir (%LOCALAPPDATA%\Temp\pytest-of-User) is blocked by Windows permissions on this machine — environment issue, not a code defect.
 - Note: earlier project memory referenced 57/58 and 58/58 test counts; actual current suite is 79 tests total. Worth flagging to Bug/Muzzammil — could be suite growth over time or a different subset being run previously.
 
+
+## Ledger Entry -- 2026-08-07 -- Phase B regeneration check
+- Attempted to regenerate phase_b_summary.json via rl_v3/summarize_phase_b.py.
+- Script requires runs/rl_v3/phase_b/<pilot>/evaluation/step_100000/aggregates.json and episodes.csv for each pilot.
+- Confirmed via git log --all that these paths have never existed in git history on any branch.
+- Root cause: .gitignore excludes runs/ (all training artifacts) and *.csv (local data/results) globally. Explicit exceptions exist for evaluation/manifests/, evaluation/results/, and two week3_*.csv files, but NOT for runs/rl_v3/phase_b/*/evaluation/step_100000/.
+- status.json and learning_curve.png under each pilot folder appear to have been force-added, bypassing the ignore rule; the raw per-episode data was not.
+- Conclusion: phase_b_summary.json can currently be verified for internal consistency (cross-checked against the report) but CANNOT be regenerated from source using only what is committed to the repo. Raw evaluation data must be sourced separately (likely from Muzzammil's local training environment) to complete a true regeneration check.
+- Action needed: ask Muzzammil whether raw step_100000 evaluation data exists locally and can be shared, or whether it should be committed going forward (with .gitignore exception added) for future reproducibility.
+
