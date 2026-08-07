@@ -409,24 +409,48 @@ def test_kaggle_environment_regression(tmp_path):
     import os
     
     os.environ["KAGGLE_KERNEL_RUN_TYPE"] = "Interactive"
+    
+    # Create the simulated production root
+    prod_root = tmp_path / "simulated_working"
+    prod_root.mkdir()
+    prod_dir = prod_root / "uav_phase_c2"
+    prod_dir.mkdir()
+    
+    # Create sentinel log file
+    sentinel_file = prod_dir / "pytest_kaggle.log"
+    sentinel_file.write_text("Test Kaggle Log\n")
+    
+    # Set the test prod dir variable
+    os.environ["KAGGLE_TEST_PROD_DIR"] = str(prod_root)
+    
     try:
-        out_dir = tmp_path / "uav_phase_c2"
-        prod_dir = Path("/kaggle/working/uav_phase_c2")
+        out_dir = tmp_path / "uav_phase_c2_out"
+        
+        env = local_runner_env(out_dir)
+        env["KAGGLE_TEST_PROD_DIR"] = str(prod_root)
+        env["KAGGLE_KERNEL_RUN_TYPE"] = "Interactive"
         
         cmd = [
             sys.executable, str(ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py"),
             "--model", "M2",
             "--interactions", "10"
         ]
-        subprocess.run(cmd, check=True, env=local_runner_env(out_dir))
+        subprocess.run(cmd, check=True, env=env)
         
         assert out_dir.exists(), "Output not in local test directory"
         bundle_path = out_dir / "latest_checkpoint_bundle.zip"
         assert bundle_path.exists(), "Bundle not found in isolated directory"
         
-        if prod_dir.exists():
-            assert not (prod_dir / "latest_checkpoint_bundle.zip").exists()
-            assert not (prod_dir / "pytest_kaggle.log").exists() # Ensure it didn't create anything there
+        # Verify production directory is untouched but sentinel log still exists
+        assert sentinel_file.exists()
+        assert sentinel_file.read_text() == "Test Kaggle Log\n"
+        
+        assert not (prod_dir / "latest_checkpoint_bundle.zip").exists()
+        assert not list(prod_dir.glob("checkpoint_bundle_*.zip"))
+        assert not list(prod_dir.glob("rl_v3_phase_c2_*_raw_artifacts.zip"))
+        assert not list(prod_dir.glob("model_*.zip"))
+        assert not (prod_dir / "provenance.json").exists()
+        assert not (prod_dir / "status.json").exists()
         
         resume_cmd = [
             sys.executable, str(ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py"),
@@ -435,8 +459,37 @@ def test_kaggle_environment_regression(tmp_path):
             "--resume",
             "--bundle-path", str(bundle_path)
         ]
-        res = subprocess.run(resume_cmd, capture_output=True, env=local_runner_env(out_dir))
+        res = subprocess.run(resume_cmd, capture_output=True, env=env)
         assert res.returncode == 0
         
     finally:
         os.environ.pop("KAGGLE_KERNEL_RUN_TYPE", None)
+        os.environ.pop("KAGGLE_TEST_PROD_DIR", None)
+
+def test_notebook_contract():
+    import json
+    path = ROOT / 'cloud/kaggle/phase_c2_kaggle.ipynb'
+    with open(path, 'r', encoding='utf-8') as f:
+        nb = json.load(f)
+    
+    full_src = ""
+    for cell in nb['cells']:
+        if cell['cell_type'] == 'code':
+            full_src += "".join(cell['source']) + "\n"
+            
+    assert 'Path("/kaggle/working/uav_phase_c2").mkdir(' in full_src
+    assert 'open("/kaggle/working/uav_phase_c2/pytest_kaggle.log"' in full_src
+    # Check that pytest is invoked before preflight
+    pytest_idx = full_src.find('["pytest"')
+    if pytest_idx == -1:
+        pytest_idx = full_src.find('"-m", "pytest"')
+    preflight_idx = full_src.find('"preflight"')
+    assert pytest_idx != -1
+    assert preflight_idx != -1
+    assert pytest_idx < preflight_idx
+    
+    assert "pytest_kaggle.log" in full_src
+    assert 'os.environ["KAGGLE_TEST_OUT_DIR"]' not in full_src
+    assert 'os.environ.setdefault("KAGGLE_TEST_OUT_DIR"' not in full_src
+    assert 'KAGGLE_TEST_OUT_DIR' not in full_src
+    assert 'if not Path("/kaggle/working/uav_phase_c2/pytest_kaggle.log").exists():' in full_src
