@@ -493,3 +493,5 @@ def test_notebook_contract():
     assert 'os.environ.setdefault("KAGGLE_TEST_OUT_DIR"' not in full_src
     assert 'KAGGLE_TEST_OUT_DIR' not in full_src
     assert 'if not Path("/kaggle/working/uav_phase_c2/pytest_kaggle.log").exists():' in full_src
+    assert '--basetemp=/kaggle/working/pytest-phase-c2-temp' in full_src
+    assert '--basetemp=/kaggle/working/uav_phase_c2' not in full_src
