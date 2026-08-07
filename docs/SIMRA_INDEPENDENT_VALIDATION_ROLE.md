@@ -127,3 +127,9 @@ Simra should not, until instructed otherwise:
 
 Her mandate is verification and organization, run in parallel with â€”
 never inside â€” the active modeling work.
+
+## Ledger Entry — 2026-08-07
+- Full test suite: 79/79 passed (using --basetemp override).
+- Default pytest temp dir (%LOCALAPPDATA%\Temp\pytest-of-User) is blocked by Windows permissions on this machine — environment issue, not a code defect.
+- Note: earlier project memory referenced 57/58 and 58/58 test counts; actual current suite is 79 tests total. Worth flagging to Bug/Muzzammil — could be suite growth over time or a different subset being run previously.
+
