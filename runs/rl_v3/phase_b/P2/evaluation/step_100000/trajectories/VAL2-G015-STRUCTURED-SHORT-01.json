@@ -1,0 +1,151 @@
+{
+  "summary": {
+    "scenario_id": "VAL2-G015-STRUCTURED-SHORT-01",
+    "grid_size": 15,
+    "route_bucket": "short",
+    "scenario_family": "structured",
+    "success": true,
+    "collision": false,
+    "timeout": false,
+    "two_cell_oscillation": false,
+    "longer_loop": false,
+    "excessive_detour": true,
+    "failure_label": "success",
+    "post_change_completion": "",
+    "dynamic_event_count": 0,
+    "path_cost": 8.242640687119286,
+    "fresh_astar_cost": 3.414213562373095,
+    "path_cost_gap": 4.828427124746191,
+    "decisions": 7,
+    "mean_decision_latency_ms": 2.0683000163574303,
+    "decision_computation_seconds": 0.014478100114502013,
+    "episode_computation_seconds": 0.019725600024685264
+  },
+  "trajectory": [
+    [
+      2,
+      4
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      1
+    ]
+  ],
+  "actions": [
+    2,
+    4,
+    4,
+    2,
+    1,
+    0,
+    7
+  ],
+  "legal_action_masks": [
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+    ],
+    [
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1
+    ]
+  ],
+  "rewards": [
+    -0.006666666666666667,
+    -0.006666666666666667,
+    -0.006666666666666667,
+    -0.006666666666666667,
+    -0.006666666666666667,
+    -0.006666666666666667,
+    1.0
+  ],
+  "fresh_astar_costs_at_initial_and_dynamic_events": [
+    3.414213562373095
+  ]
+}

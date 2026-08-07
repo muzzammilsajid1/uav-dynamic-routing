@@ -1,0 +1,119 @@
+{
+  "summary": {
+    "scenario_id": "VAL2-G015-EMPTY-SHORT-02",
+    "grid_size": 15,
+    "route_bucket": "short",
+    "scenario_family": "empty",
+    "success": true,
+    "collision": false,
+    "timeout": false,
+    "two_cell_oscillation": false,
+    "longer_loop": false,
+    "excessive_detour": false,
+    "failure_label": "success",
+    "post_change_completion": "",
+    "dynamic_event_count": 0,
+    "path_cost": 7.0710678118654755,
+    "fresh_astar_cost": 4.242640687119286,
+    "path_cost_gap": 2.82842712474619,
+    "decisions": 5,
+    "mean_decision_latency_ms": 2.8462599962949753,
+    "decision_computation_seconds": 0.014231299981474876,
+    "episode_computation_seconds": 0.02168909995816648
+  },
+  "trajectory": [
+    [
+      11,
+      11
+    ],
+    [
+      10,
+      12
+    ],
+    [
+      11,
+      11
+    ],
+    [
+      12,
+      10
+    ],
+    [
+      13,
+      9
+    ],
+    [
+      14,
+      8
+    ]
+  ],
+  "actions": [
+    5,
+    6,
+    6,
+    6,
+    6
+  ],
+  "legal_action_masks": [
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  ],
+  "rewards": [
+    -0.006666666666666667,
+    -0.006666666666666667,
+    -0.006666666666666667,
+    -0.006666666666666667,
+    1.0
+  ],
+  "fresh_astar_costs_at_initial_and_dynamic_events": [
+    4.242640687119286
+  ]
+}

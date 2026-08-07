@@ -1,0 +1,87 @@
+{
+  "summary": {
+    "scenario_id": "VAL2-G015-EMPTY-SHORT-01",
+    "grid_size": 15,
+    "route_bucket": "short",
+    "scenario_family": "empty",
+    "success": true,
+    "collision": false,
+    "timeout": false,
+    "two_cell_oscillation": false,
+    "longer_loop": false,
+    "excessive_detour": false,
+    "failure_label": "success",
+    "post_change_completion": "",
+    "dynamic_event_count": 0,
+    "path_cost": 3.0,
+    "fresh_astar_cost": 3.0,
+    "path_cost_gap": 0.0,
+    "decisions": 3,
+    "mean_decision_latency_ms": 2.857033357334634,
+    "decision_computation_seconds": 0.008571100072003901,
+    "episode_computation_seconds": 0.012371100019663572
+  },
+  "trajectory": [
+    [
+      0,
+      9
+    ],
+    [
+      0,
+      8
+    ],
+    [
+      0,
+      7
+    ],
+    [
+      0,
+      6
+    ]
+  ],
+  "actions": [
+    2,
+    2,
+    2
+  ],
+  "legal_action_masks": [
+    [
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1
+    ]
+  ],
+  "rewards": [
+    -0.006666666666666667,
+    -0.006666666666666667,
+    1.0
+  ],
+  "fresh_astar_costs_at_initial_and_dynamic_events": [
+    3.0
+  ]
+}

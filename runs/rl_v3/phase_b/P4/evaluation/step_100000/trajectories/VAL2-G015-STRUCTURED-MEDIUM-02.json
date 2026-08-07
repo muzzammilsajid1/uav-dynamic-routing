@@ -1,0 +1,135 @@
+{
+  "summary": {
+    "scenario_id": "VAL2-G015-STRUCTURED-MEDIUM-02",
+    "grid_size": 15,
+    "route_bucket": "medium",
+    "scenario_family": "structured",
+    "success": true,
+    "collision": false,
+    "timeout": false,
+    "two_cell_oscillation": false,
+    "longer_loop": false,
+    "excessive_detour": false,
+    "failure_label": "success",
+    "post_change_completion": "",
+    "dynamic_event_count": 0,
+    "path_cost": 6.0,
+    "fresh_astar_cost": 6.0,
+    "path_cost_gap": 0.0,
+    "decisions": 6,
+    "mean_decision_latency_ms": 3.7980833440087736,
+    "decision_computation_seconds": 0.02278850006405264,
+    "episode_computation_seconds": 0.03508609998971224
+  },
+  "trajectory": [
+    [
+      7,
+      8
+    ],
+    [
+      8,
+      8
+    ],
+    [
+      9,
+      8
+    ],
+    [
+      10,
+      8
+    ],
+    [
+      11,
+      8
+    ],
+    [
+      12,
+      8
+    ],
+    [
+      13,
+      8
+    ]
+  ],
+  "actions": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "legal_action_masks": [
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1
+    ]
+  ],
+  "rewards": [
+    -0.0013633658077675595,
+    -0.0014138734349951679,
+    -0.001464381062222785,
+    -0.0015148886894503907,
+    -0.0015653963166780025,
+    1.0
+  ],
+  "fresh_astar_costs_at_initial_and_dynamic_events": [
+    6.0
+  ]
+}
