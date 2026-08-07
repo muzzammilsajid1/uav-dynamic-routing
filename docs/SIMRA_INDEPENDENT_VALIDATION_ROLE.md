@@ -154,3 +154,12 @@ never inside — the active modeling work.
 - Open item: phase_a/manifest_separation.json references a 36-scenario hash, distinct from this 96-scenario v2 manifest -- likely an older v1 manifest, not yet reconciled with Bug/Muzzammil.
 - Process note: raw Phase B eval data is git-ignored by design; canonical copy currently lives on rl-v3-c2-empty-multiscale, worth confirming that's intentional.
 
+
+## Ledger Entry -- 2026-08-08 -- Phase A verification (partial -- BLOCKED on checkpoint)
+- run_phase_a.py loads a frozen DDQN checkpoint (models/research/full/seed_011/02_dynamic_full_final.zip) and runs evaluation-only diagnostics against it; does not train. checkpoint_smoke step uses timesteps=3, confirmed a smoke test not a training run.
+- Checkpoint file confirmed MISSING: not present locally (Test-Path False), not in git history on any branch (git log --all -- checkpoint path returned nothing). This is a bigger gap than the Phase B raw-data case -- that data at least existed on rl-v3-c2-empty-multiscale; this checkpoint does not exist anywhere in git.
+- BLOCKED: cannot regenerate the DDQN diagnostic numbers (41.7% baseline success rate, failure taxonomy counts in phase_a_summary.json) until Muzzammil provides this checkpoint. Requested via message 2026-08-08.
+- COMPLETED (does not require checkpoint): verified manifest_separation.json is byte-identical to the copy embedded in phase_a_summary.json. Confirmed train/validation and validation/final-private seed overlaps are both empty lists as claimed.
+- Working hypothesis on the 36 vs 96 scenario question (open since earlier session): Phase A uses evaluation/manifests/rl_v3_validation.json (v1, 36 scenarios); Phase B uses rl_v3_validation_v2.json (96 scenarios). These appear to be two intentionally separate, versioned manifests, not an error. Diagnostics run only 24 of the 36 available Phase A scenarios due to --limit-validation-per-grid 6 x 4 grid sizes. Not yet confirmed with Bug/Muzzammil -- still open.
+- CAVEAT: manifest_separation.json consistency check confirms the two stored copies agree with each other, not that validation_sha256/generator_hash were correctly computed from actual manifest content in the first place. Lower priority than the checkpoint blocker, but worth a follow-up hash recomputation once the checkpoint unblocks the rest of Phase A.
+
