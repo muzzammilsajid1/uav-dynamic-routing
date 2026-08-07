@@ -33,6 +33,8 @@ class PotentialShapingWrapper(gym.Wrapper):
     def reset(self, **kwargs):
         obs, info = self.env.reset(**kwargs)
         
+        self.max_dist = self.env.unwrapped._grid_size * np.sqrt(2)
+        
         pos = self.env.unwrapped._v2.uav_pos
         goal = self.env.unwrapped._v2.goal_pos
         

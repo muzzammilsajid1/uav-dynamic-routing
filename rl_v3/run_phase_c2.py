@@ -89,23 +89,61 @@ def preflight(config_path, out_dir):
     with open(config_path) as f:
         config = json.load(f)
         
-    # Test env properties
+    # Test env properties across all grid sizes
+    from tools.verification.oracle import solve_astar
+    
+    test_manifest = [
+        {"grid_size": 15, "start": [10, 7], "goal": [12, 4]},
+        {"grid_size": 30, "start": [29, 26], "goal": [24, 16]},
+        {"grid_size": 50, "start": [5, 16], "goal": [24, 27]},
+        {"grid_size": 100, "start": [36, 48], "goal": [12, 33]}
+    ]
+    gen.val_manifest = test_manifest
+    
     try:
         env = PhaseC2Env(config, mode="eval", generator=gen)
         env = PotentialShapingWrapper(env, gamma=config["reward"]["gamma"], lambda_=config["reward"]["lambda_"])
-        obs, info = env.reset()
         
-        if obs["global_map"].shape != (8, 32, 32):
-            errors.append(f"Global map shape != (8, 32, 32): {obs['global_map'].shape}")
+        for i in range(4):
+            obs, info = env.reset()
+            sz = test_manifest[i]["grid_size"]
             
-        # Check NaNs
-        if np.isnan(obs["global_map"]).any() or np.isnan(obs["scalars"]).any():
-            errors.append("NaN detected in observations")
-            
-        obs, reward, term, trunc, info = env.step(0)
-        if not np.isfinite(reward):
-            errors.append(f"R2-PB reward is not finite: {reward}")
-            
+            if info["grid_size"] != sz:
+                errors.append(f"Expected grid size {sz}, got {info['grid_size']}")
+                
+            native_shape = env.unwrapped._v2.grid.shape
+            if native_shape != (sz, sz):
+                errors.append(f"Expected native shape ({sz}, {sz}), got {native_shape}")
+                
+            expected_max_dist = sz * np.sqrt(2)
+            if not np.isclose(env.max_dist, expected_max_dist):
+                errors.append(f"Expected max_dist {expected_max_dist}, got {env.max_dist}")
+                
+            if obs["global_map"].shape != (8, 32, 32):
+                errors.append(f"Global map shape != (8, 32, 32): {obs['global_map'].shape}")
+                
+            if np.isnan(obs["global_map"]).any() or np.isnan(obs["scalars"]).any():
+                errors.append("NaN detected in observations")
+                
+            # Quick A* oracle test
+            path = solve_astar((sz, sz), info["start"], info["goal"], set())
+            if not path:
+                errors.append(f"No path found for size {sz}")
+                
+            for step_idx in range(1, len(path)):
+                s = path[step_idx-1]
+                nxt = path[step_idx]
+                dx, dy = nxt[0]-s[0], nxt[1]-s[1]
+                
+                # Derive action mapping
+                actions = {(0,-1):0, (0,1):1, (-1,0):2, (1,0):3, (-1,-1):4, (-1,1):5, (1,-1):6, (1,1):7}
+                a = actions.get((dx, dy))
+                
+                obs, reward, term, trunc, step_info = env.step(a)
+                if step_info.get("is_collision", False):
+                    errors.append(f"Collision in preflight oracle for size {sz}")
+                    break
+                    
     except Exception as e:
         errors.append(f"Environment initialization/step failed: {e}")
         
@@ -126,7 +164,7 @@ def preflight(config_path, out_dir):
 
 
 class PhaseC2Runner:
-    def __init__(self, config_path, out_dir, model_type="M1", resume=False, device="auto"):
+    def __init__(self, config_path, out_dir, model_type="M1", resume=False, device="auto", seed=None, deterministic_cuda=False):
         with open(config_path) as f:
             self.config = json.load(f)
             
@@ -135,6 +173,22 @@ class PhaseC2Runner:
         self.model_type = model_type
         self.resume = resume
         
+        self.seed = seed if seed is not None else self.config.get("training", {}).get("seed", 42)
+        self.deterministic_cuda = deterministic_cuda
+
+        import random
+        import torch
+        random.seed(self.seed)
+        np.random.seed(self.seed)
+        torch.manual_seed(self.seed)
+        torch.cuda.manual_seed_all(self.seed)
+        if self.deterministic_cuda:
+            # Note: This reduces a major source of nondeterminism in cuDNN convolutions,
+            # but does NOT guarantee strict bit-for-bit determinism across differing
+            # GPU architectures (e.g. Kaggle T4 vs local RTX), Driver versions, or CUDA toolkits.
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+        
         if device not in {"cpu", "cuda", "auto"}:
             raise ValueError(f"Invalid device: {device}. Must be cpu, cuda, or auto.")
         self.device = device
@@ -142,7 +196,7 @@ class PhaseC2Runner:
         self.checkpoints = [25000, 50000, 75000, 100000, 150000]
         self.history = {}
         
-        self.generator = PhaseC2EndpointGenerator(seed=42)
+        self.generator = PhaseC2EndpointGenerator(seed=self.seed)
         
         self.generator.set_active_sizes(self.config["curriculum"]["stages"][0]["active_sizes"])
         
@@ -167,6 +221,7 @@ class PhaseC2Runner:
                         "features_extractor_class": PhaseBFeatureExtractor,
                         "features_extractor_kwargs": {"features_dim": 256}
                     },
+                    seed=self.seed,
                     **self.config["model"]
                 )
             else:
@@ -174,6 +229,7 @@ class PhaseC2Runner:
                     "MultiInputPolicy",
                     self.train_env,
                     device=self.device,
+                    seed=self.seed,
                     **self.config["model"]
                 )
         else:
@@ -222,15 +278,32 @@ class PhaseC2Runner:
         with open(self.out_dir / f"generator_{ts:06d}.json", "w") as f:
             json.dump(gen_state, f)
             
+        status_info = {
+            "history": self.history,
+            "provenance": {
+                "seed": self.seed,
+                "deterministic_cuda": self.deterministic_cuda
+            }
+        }
         with open(self.out_dir / "status.json", "w") as f:
-            json.dump({"history": self.history}, f, indent=2)
+            json.dump(status_info, f, indent=2)
 
     def run(self, max_interactions=150000):
         cb = CurriculumCallback(self.config["curriculum"]["stages"], self.generator, self)
         logger.info(f"Starting Phase C2 training for {max_interactions} interactions")
-        # In resume, total_timesteps should be adjusted if needed, but learn allows resetting num_timesteps=False
         reset_num = not self.resume
-        self.model.learn(total_timesteps=max_interactions, callback=cb, reset_num_timesteps=reset_num)
+        
+        remaining_interactions = max_interactions
+        if self.resume:
+            remaining_interactions = max(0, max_interactions - self.model.num_timesteps)
+            logger.info(f"Resuming at {self.model.num_timesteps}. Remaining interactions to train: {remaining_interactions}")
+            if remaining_interactions <= 0:
+                logger.info("Training already complete.")
+                if max_interactions not in self.history:
+                    self.evaluate_and_save(max_interactions)
+                return
+                
+        self.model.learn(total_timesteps=remaining_interactions, callback=cb, reset_num_timesteps=reset_num)
         
         if max_interactions not in self.history:
             self.evaluate_and_save(max_interactions)

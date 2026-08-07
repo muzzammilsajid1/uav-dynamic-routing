@@ -136,5 +136,43 @@ def eval_all_pairs():
     
     print(f"Oracle test completed. Gap > 0 routes: {metrics['non_zero_gap_routes']}")
 
+def solve_astar(grid_shape, start, goal, obstacles):
+    import heapq
+    def octile(a, b):
+        dx = abs(a[0] - b[0])
+        dy = abs(a[1] - b[1])
+        return max(dx, dy) + (math.sqrt(2) - 1) * min(dx, dy)
+
+    open_set = []
+    heapq.heappush(open_set, (0, start))
+    came_from = {}
+    g_score = {start: 0}
+
+    w, h = grid_shape
+    dirs = [(0,1), (1,0), (0,-1), (-1,0), (1,1), (-1,-1), (1,-1), (-1,1)]
+    costs = [1, 1, 1, 1, math.sqrt(2), math.sqrt(2), math.sqrt(2), math.sqrt(2)]
+
+    while open_set:
+        _, current = heapq.heappop(open_set)
+
+        if current == goal:
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            return path[::-1]
+
+        for (dx, dy), cost in zip(dirs, costs):
+            neighbor = (current[0] + dx, current[1] + dy)
+            if 0 <= neighbor[0] < w and 0 <= neighbor[1] < h and neighbor not in obstacles:
+                tg = g_score[current] + cost
+                if neighbor not in g_score or tg < g_score[neighbor]:
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tg
+                    f = tg + octile(neighbor, goal)
+                    heapq.heappush(open_set, (f, neighbor))
+    return None
+
 if __name__ == "__main__":
     eval_all_pairs()

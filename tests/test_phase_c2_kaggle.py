@@ -384,7 +384,11 @@ def test_canonical_hashes():
                         val = parts[1].strip().strip('",\\n')
                         hashes[name] = val
 
-    expected_vars = ["HASH_VALIDATION", "HASH_TRAIN_GEN", "HASH_CONFIG", "HASH_REWARD", "HASH_OBSERVATION"]
+    expected_vars = [
+        "HASH_VALIDATION", "HASH_TRAIN_GEN", "HASH_CONFIG", 
+        "HASH_REWARD", "HASH_OBSERVATION",
+        "HASH_C2_ENV", "HASH_C2_RUNNER", "HASH_C0_ENV", "HASH_ACTION_MASK"
+    ]
     for var in expected_vars:
         assert var in hashes, f"Missing {var} in notebook"
 
@@ -394,6 +398,10 @@ def test_canonical_hashes():
         "HASH_CONFIG": "configs/rl_v3_phase_c2.json",
         "HASH_REWARD": "tools/verification/r2_pb_wrapper.py",
         "HASH_OBSERVATION": "rl_v3/observations.py",
+        "HASH_C2_ENV": "rl_v3/phase_c2_env.py",
+        "HASH_C2_RUNNER": "rl_v3/run_phase_c2.py",
+        "HASH_C0_ENV": "rl_v3/phase_c0_env.py",
+        "HASH_ACTION_MASK": "rl_v3/action_masking.py",
     }
     
     for var, fpath in file_mapping.items():

@@ -39,7 +39,8 @@
   },
   "training": {
     "episode_budget_astar_multiplier": 2.0,
-    "minimum_episode_budget": 10
+    "minimum_episode_budget": 10,
+    "seed": 42
   },
   "scenario": {
     "grid_size": 15,

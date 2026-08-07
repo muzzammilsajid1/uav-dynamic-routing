@@ -88,6 +88,7 @@ class PhaseC2Env(PhaseC0Env):
             self.val_idx = (self.val_idx + 1) % len(self.generator.val_manifest)
             
         self.config["scenario"]["grid_size"] = spec["grid_size"]
+        self._grid_size = spec["grid_size"]
         
         self._start = tuple(spec["start"])
         self._goal = tuple(spec["goal"])

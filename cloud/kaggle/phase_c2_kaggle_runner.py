@@ -114,10 +114,24 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         logger.info("==============================================\n")
         
         # Provenance
+        import subprocess
+        try:
+            git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(ROOT)).decode("utf-8").strip()
+        except Exception:
+            git_commit = "unknown"
+            
         prov = {
             "model_type": self.model_type,
             "device": self.device,
             "completed_interactions": ts,
+            "seed": getattr(self, "seed", None),
+            "deterministic_cuda_requested": getattr(self, "deterministic_cuda", False),
+            "deterministic_backend_flags": {
+                "cudnn.deterministic": getattr(self, "deterministic_cuda", False),
+                "cudnn.benchmark": not getattr(self, "deterministic_cuda", False)
+            },
+            "is_resumed_run": self.resume,
+            "git_commit": git_commit,
             "hashes": {
                 "config": hash_file(ROOT / "configs" / "rl_v3_phase_c2.json"),
                 "validation_manifest": hash_file(ROOT / "evaluation/manifests/rl_v3_phase_c2_validation.json"),
