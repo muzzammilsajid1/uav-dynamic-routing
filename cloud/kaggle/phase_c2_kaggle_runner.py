@@ -192,6 +192,13 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         timestamped_bundle = self.out_dir / f"checkpoint_bundle_{ts:06d}.zip"
         shutil.copy2(str(bundle_path), str(timestamped_bundle))
 
+        logger.info("\n DURABILITY BACKUP SAVED:")
+        logger.info(f"  Timestep: {ts}")
+        logger.info(f"  Latest bundle: {bundle_path} ({bundle_path.stat().st_size} bytes)")
+        logger.info(f"  Latest SHA-256: {hash_file(bundle_path)}")
+        logger.info(f"  Timestamped bundle: {timestamped_bundle} ({timestamped_bundle.stat().st_size} bytes)")
+        logger.info(f"  Timestamped SHA-256: {hash_file(timestamped_bundle)}\n")
+
         logger.info(f"Bundle archived to: {bundle_path}\n")
 
 if __name__ == "__main__":
@@ -251,3 +258,19 @@ if __name__ == "__main__":
         f.write("\n".join(lines))
 
     logger.info(f"Final artifacts archived to: {final_archive}")
+
+    # Create final complete backup archive
+    complete_archive_base = out_dir.parent / f"phase_c2_{args.model}_COMPLETE"
+    with _tf.TemporaryDirectory() as _stage2:
+        _stage_path2 = Path(_stage2)
+        _complete_base = _stage_path2 / complete_archive_base.name
+        shutil.make_archive(str(_complete_base), 'zip', str(out_dir))
+        final_complete_archive = complete_archive_base.with_suffix(".zip")
+        shutil.move(str(_complete_base) + ".zip", str(final_complete_archive))
+
+    logger.info(f"COMPLETE BACKUP CREATED: {final_complete_archive}")
+    logger.info("********************************************************************************")
+    logger.info(" DO NOT DISCONNECT THE NOTEBOOK KERNEL YET!")
+    logger.info(f" WAIT UNTIL {final_complete_archive.name} HAS BEEN DOWNLOADED")
+    logger.info(" OR THE NOTEBOOK VERSION HAS BEEN SAVED SUCCESSFULLY WITH ALL OUTPUTS.")
+    logger.info("********************************************************************************")

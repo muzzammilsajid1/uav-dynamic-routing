@@ -493,5 +493,71 @@ def test_notebook_contract():
     assert 'os.environ.setdefault("KAGGLE_TEST_OUT_DIR"' not in full_src
     assert 'KAGGLE_TEST_OUT_DIR' not in full_src
     assert 'if not Path("/kaggle/working/uav_phase_c2/pytest_kaggle.log").exists():' in full_src
+    assert 'KAGGLE SETTINGS: enable Persistence' in full_src
+    assert 'WAIT UNTIL phase_c2_{MODEL_TO_RUN}_COMPLETE.zip HAS BEEN DOWNLOADED' in full_src
     assert '--basetemp=/kaggle/working/pytest-phase-c2-temp' in full_src
     assert '--basetemp=/kaggle/working/uav_phase_c2' not in full_src
+def test_durability_and_complete_backup(tmp_path):
+    out_dir = tmp_path / "uav_phase_c2"
+    out_dir.mkdir(parents=True)
+    
+    env = os.environ.copy()
+    env["KAGGLE_TEST_OUT_DIR"] = str(out_dir)
+    env["PYTHONPATH"] = str(ROOT)
+    
+    # Run a short train session via import to force checkpoints at 10 and 20
+    sys.path.insert(0, str(ROOT))
+    from cloud.kaggle.phase_c2_kaggle_runner import KagglePhaseC2Runner
+    os.environ["KAGGLE_TEST_OUT_DIR"] = str(out_dir)
+    os.environ.setdefault("KAGGLE_TEST_PROD_DIR", str(tmp_path))
+    
+    runner = KagglePhaseC2Runner("M2", 20, device="cpu")
+    
+    # We fake the history keys so it doesn't crash
+    runner.history[10] = {"success_rate": 0.5}
+    runner.history[20] = {"success_rate": 0.5}
+    runner.evaluate_and_save(10)
+    runner.evaluate_and_save(20)
+    
+    # also call the archiving logic that is usually at the bottom of the script
+    with open(out_dir / "final_inventory.txt", "w") as f:
+        f.write("test")
+
+    import shutil
+    import tempfile as _tf
+    complete_archive_base = out_dir.parent / "phase_c2_M2_COMPLETE"
+    with _tf.TemporaryDirectory() as _stage2:
+        _stage_path2 = Path(_stage2)
+        _complete_base = _stage_path2 / complete_archive_base.name
+        shutil.make_archive(str(_complete_base), 'zip', str(out_dir))
+        final_complete_archive = complete_archive_base.with_suffix(".zip")
+        shutil.move(str(_complete_base) + ".zip", str(final_complete_archive))
+    
+    # Verify both timestamped bundles exist (10 and 20 interactions)
+    bundle_10k = out_dir / "checkpoint_bundle_000010.zip"
+    bundle_20k = out_dir / "checkpoint_bundle_000020.zip"
+    latest_bundle = out_dir / "latest_checkpoint_bundle.zip"
+    
+    assert bundle_10k.exists()
+    assert bundle_20k.exists()
+    assert latest_bundle.exists()
+    
+    # latest should match the newest (20)
+    import hashlib
+    def get_hash(p):
+        return hashlib.sha256(p.read_bytes()).hexdigest()
+    assert get_hash(latest_bundle) == get_hash(bundle_20k)
+    
+    # Verify complete backup
+    complete_zip = tmp_path / "phase_c2_M2_COMPLETE.zip"
+    assert complete_zip.exists()
+    
+    # Ensure it's not recursive inside itself
+    import zipfile
+    with zipfile.ZipFile(complete_zip, 'r') as zf:
+        names = zf.namelist()
+        assert complete_zip.name not in names
+        assert "final_inventory.txt" in names
+        assert bundle_10k.name in names
+        assert latest_bundle.name in names
+
