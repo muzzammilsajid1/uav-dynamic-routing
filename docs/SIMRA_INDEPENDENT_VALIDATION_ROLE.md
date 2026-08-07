@@ -143,3 +143,14 @@ never inside — the active modeling work.
 - Conclusion: phase_b_summary.json can currently be verified for internal consistency (cross-checked against the report) but CANNOT be regenerated from source using only what is committed to the repo. Raw evaluation data must be sourced separately (likely from Muzzammil's local training environment) to complete a true regeneration check.
 - Action needed: ask Muzzammil whether raw step_100000 evaluation data exists locally and can be shared, or whether it should be committed going forward (with .gitignore exception added) for future reproducibility.
 
+
+## Ledger Entry -- 2026-08-08 -- Phase B regeneration CONFIRMED (independent)
+- Muzzammil provided raw step_100000 evaluation data (aggregates.json, episodes.csv, 96 trajectories per pilot) via zip; canonical source also committed at commit a0c97e2 on branch rl-v3-c2-empty-multiscale (not rl-v3-development).
+- Ran rl_v3/summarize_phase_b.py's summarize() directly (the __main__ block only prints the decision block, not the full summary -- noted for future reference) against raw data for all 4 pilots on my own machine.
+- Deep-diffed regenerated output against committed runs/rl_v3/phase_b/phase_b_summary.json.
+- RESULT: 0 differences. Independently confirmed reproducible.
+- Also verified validation_v2_hash: manifest_sha256 field inside evaluation/manifests/rl_v3_validation_v2.json matches the hash recorded in phase_b_summary.json exactly. Manifest contains 96 scenarios.
+- Manifest has a top-level final_test field; confirmed type only (bool, False) as a placeholder/status flag -- not an embedded final-test manifest. No boundary crossed.
+- Open item: phase_a/manifest_separation.json references a 36-scenario hash, distinct from this 96-scenario v2 manifest -- likely an older v1 manifest, not yet reconciled with Bug/Muzzammil.
+- Process note: raw Phase B eval data is git-ignored by design; canonical copy currently lives on rl-v3-c2-empty-multiscale, worth confirming that's intentional.
+
