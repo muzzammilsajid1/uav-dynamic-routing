@@ -163,3 +163,16 @@ never inside — the active modeling work.
 - Working hypothesis on the 36 vs 96 scenario question (open since earlier session): Phase A uses evaluation/manifests/rl_v3_validation.json (v1, 36 scenarios); Phase B uses rl_v3_validation_v2.json (96 scenarios). These appear to be two intentionally separate, versioned manifests, not an error. Diagnostics run only 24 of the 36 available Phase A scenarios due to --limit-validation-per-grid 6 x 4 grid sizes. Not yet confirmed with Bug/Muzzammil -- still open.
 - CAVEAT: manifest_separation.json consistency check confirms the two stored copies agree with each other, not that validation_sha256/generator_hash were correctly computed from actual manifest content in the first place. Lower priority than the checkpoint blocker, but worth a follow-up hash recomputation once the checkpoint unblocks the rest of Phase A.
 
+
+## Ledger Entry -- 2026-08-08 -- Validation suite balance audit (item 2, COMPLETE)
+- Audited evaluation/manifests/rl_v3_validation_v2.json (96 scenarios) across all charter dimensions.
+- Grid size: perfectly balanced, 24/24/24/24 across 15/30/50/100.
+- Route length: perfectly balanced, 32/32/32 across short/medium/long.
+- Scenario family: perfectly balanced, 24/24/24/24 across empty/random_static/structured/dynamic.
+- Cross-tab grid_size x family: exactly 6 per combination, no skew. Cross-tab grid_size x route_bucket: exactly 8 per combination, no skew.
+- Seeds: all 96 episode_seed values unique, no duplicates. All 96 scenario_id values unique.
+- Obstacle density: varies continuously and correlates with family as expected by design (empty near-zero, random_static widest spread 0.03-0.16) -- not a balance concern.
+- FINDING: generation_attempts (retries needed by the scenario generator to produce a valid scenario) is NOT evenly distributed. dynamic family averaged 4.42 attempts (max 19) vs empty family's 3.12 (max 7). Short-route dynamic scenarios dominate the hardest-to-generate list, e.g. VAL2-G015-DYNAMIC-SHORT-02 needed 19 attempts.
+- INTERPRETATION (observation, not conclusion): this suggests dynamic+short-route scenarios sit closer to the edge of what the generator's validity constraints allow, meaning the accepted scenarios in that cell may be systematically different/harder in ways unrelated to the family label itself. Worth cross-referencing against P1-P4 failure rates for dynamic-short specifically once failure trajectory work (item 3) begins.
+- Overall verdict: category counts are genuinely balanced; scenario construction difficulty is not, concentrated in dynamic+short-route. Flag to Bug/Muzzammil as a modeling-relevant note, not a defect.
+
