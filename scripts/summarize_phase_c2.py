@@ -79,7 +79,13 @@ def checkpoint_record(path: Path) -> dict:
     return record
 
 
-def plot_summary(records: list[dict], final_evaluation: dict, output: Path) -> None:
+def plot_summary(
+    records: list[dict],
+    final_evaluation: dict,
+    output: Path,
+    model_type: str,
+    seed: int,
+) -> None:
     plt.rcParams.update({
         "font.family": "DejaVu Sans",
         "font.size": 10,
@@ -111,7 +117,7 @@ def plot_summary(records: list[dict], final_evaluation: dict, output: Path) -> N
         )
     curve_axis.axvline(151.552, color="#6B7280", linestyle="--", linewidth=1.0)
     curve_axis.text(154, 3, "original ceiling", color="#4B5563", fontsize=8)
-    curve_axis.set_title("Corrected M1 validation learning curve")
+    curve_axis.set_title(f"Corrected {model_type} validation learning curve")
     curve_axis.set_xlabel("Completed interactions (thousands)")
     curve_axis.set_ylabel("Success rate (%)")
     curve_axis.set_ylim(0, 103)
@@ -143,7 +149,7 @@ def plot_summary(records: list[dict], final_evaluation: dict, output: Path) -> N
     colorbar = figure.colorbar(image, ax=matrix_axis, fraction=0.046, pad=0.04)
     colorbar.set_label("Success rate (%)")
     figure.suptitle(
-        "Phase C2 corrected M1 seed-42 development run",
+        f"Phase C2 corrected {model_type} seed-{seed} development run",
         fontsize=14,
         fontweight="bold",
     )
@@ -164,6 +170,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run_dir", type=Path)
     parser.add_argument("output_dir", type=Path)
+    parser.add_argument(
+        "--output-stem",
+        help="Output filename stem; defaults to phase_c2_<model>_seed<seed>",
+    )
     args = parser.parse_args()
     evaluation_paths = sorted(args.run_dir.glob("evaluation_*.json"))
     if not evaluation_paths:
@@ -178,6 +188,10 @@ def main() -> None:
     provenance_path = args.run_dir / "provenance.json"
     status_path = args.run_dir / "status.json"
     model_path = args.run_dir / f"model_{records[-1]['completed_interactions']:06d}.zip"
+    provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+    model_type = str(provenance["model_type"])
+    seed = int(provenance["seed"])
+    output_stem = args.output_stem or f"phase_c2_{model_type.lower()}_seed{seed}"
     summary = {
         "schema_version": 1,
         "classification": "development_validation_single_seed",
@@ -187,7 +201,7 @@ def main() -> None:
         ),
         "run_directory": str(args.run_dir.resolve()),
         "validation_manifest_sha256": next(iter(manifest_hashes)),
-        "provenance": json.loads(provenance_path.read_text(encoding="utf-8")),
+        "provenance": provenance,
         "checkpoints": records,
         "best_checkpoint_by_overall_validation": max(
             records, key=lambda record: record["success_rate"]
@@ -208,12 +222,14 @@ def main() -> None:
         },
     }
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    summary_path = args.output_dir / "phase_c2_v11_m1_seed42_summary.json"
+    summary_path = args.output_dir / f"{output_stem}_summary.json"
     summary_path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     plot_summary(
         records,
         final_evaluation,
-        args.output_dir / "phase_c2_v11_m1_seed42_learning_curve.png",
+        args.output_dir / f"{output_stem}_learning_curve.png",
+        model_type,
+        seed,
     )
     print(summary_path)
 

@@ -1,0 +1,766 @@
+{
+  "schema_version": 1,
+  "classification": "development_validation_single_seed",
+  "claim_limit": "Route-level Wilson intervals do not capture training-seed variability; confirmatory multi-seed evidence is still required.",
+  "run_directory": "D:\\UAV Dynamic Routing\\phase-c2-v12-M2-seed42\\artifacts",
+  "validation_manifest_sha256": "07648ae0c1319124ac52f38f29b960edb63e1c17828e39fccd4e2aac483b4ba4",
+  "provenance": {
+    "model_type": "M2",
+    "device": "cpu",
+    "resolved_device": "cpu",
+    "completed_interactions": 301056,
+    "requested_interactions": 300000,
+    "rollout_size": 2048,
+    "checkpoint_is_ppo_update_aligned": true,
+    "seed": 42,
+    "deterministic_cuda_requested": false,
+    "deterministic_backend_flags": {
+      "cudnn.deterministic": false,
+      "cudnn.benchmark": false,
+      "deterministic_algorithms_enabled": false
+    },
+    "is_resumed_run": false,
+    "resume_semantics": "statistically_equivalent",
+    "resume_limit": "SB3 does not serialize the partially active environment episode or rollout buffer.",
+    "git_commit": "eda350fe2b5b5944ca1bfe0f3ce3656448f77a70",
+    "source_hash_mode": "lf_normalized_sha256_v1",
+    "hashes": {
+      "config": "8325bd79f505ab76ecd380fdb34701dc05bb4b8eef72b222af13691a06c5a430",
+      "validation_manifest": "9987f93aecdfdcf7868277db7a2d89d8e0dd617487da3875df431af418c03270",
+      "train_generator": "6f5e30f6ba6f23432db89a18bb04e070e5fce06d85f58c9c9a17d3d49087d476",
+      "reward_wrapper": "7d508a145edd4689f160432f0c2a4165afdeeaabd4059ca974f2ad77e7ff3ddf",
+      "observations": "261ecb534ee33f126baf1d966a4f6fe125b393eee49131ade141382788d0c418",
+      "phase_c2_env": "3e63edcac16708e9582a4c8ae8b4dd8c432ff1d1a507d1c4dd02b7a07d2f7d17",
+      "phase_c2_runner": "2026361337d932f7d5a78ff668c438b092917129e5d906469156deac09489cc0",
+      "phase_c0_env": "f20cdcbf46cc0bb7d40603b12bc40202edbd3e2eec5a254ec786df5ef64ceb26",
+      "action_masking": "c3f42a278c53a9c2953e01da25c31bc6935ff2e01da481e4fe834675a83d857d",
+      "kaggle_runner": "971ea17b0bec6c13ebc2a1c20757431920b01fccfc5ef3f92cc28fc985ec04e1"
+    },
+    "checkpoint_schedule": [
+      {
+        "requested_interactions": 25000,
+        "completed_interactions": 26624
+      },
+      {
+        "requested_interactions": 50000,
+        "completed_interactions": 51200
+      },
+      {
+        "requested_interactions": 75000,
+        "completed_interactions": 75776
+      },
+      {
+        "requested_interactions": 100000,
+        "completed_interactions": 100352
+      },
+      {
+        "requested_interactions": 150000,
+        "completed_interactions": 151552
+      },
+      {
+        "requested_interactions": 200000,
+        "completed_interactions": 200704
+      },
+      {
+        "requested_interactions": 250000,
+        "completed_interactions": 251904
+      },
+      {
+        "requested_interactions": 300000,
+        "completed_interactions": 301056
+      }
+    ]
+  },
+  "checkpoints": [
+    {
+      "source_file": "evaluation_026624.json",
+      "source_sha256": "5ebb489b3cc532912167d81f345c203e8d03cb70234415b3c09fcc54e43a5026",
+      "validation_manifest_sha256": "07648ae0c1319124ac52f38f29b960edb63e1c17828e39fccd4e2aac483b4ba4",
+      "requested_interactions": 25000,
+      "completed_interactions": 26624,
+      "successes": 181,
+      "episodes": 240,
+      "success_rate": 0.7541666666666667,
+      "success_rate_wilson_95": [
+        0.6959703060101055,
+        0.8043547846862689
+      ],
+      "collisions": 0,
+      "invalid_actions": 0,
+      "by_scale": {
+        "15": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "30": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "50": {
+          "successes": 53,
+          "episodes": 60,
+          "success_rate": 0.8833333333333333,
+          "success_rate_wilson_95": [
+            0.7782121197582914,
+            0.9423227935994396
+          ]
+        },
+        "100": {
+          "successes": 8,
+          "episodes": 60,
+          "success_rate": 0.13333333333333333,
+          "success_rate_wilson_95": [
+            0.06914109480586972,
+            0.24165159676499615
+          ]
+        }
+      },
+      "by_distance": {
+        "short": {
+          "successes": 57,
+          "episodes": 80,
+          "success_rate": 0.7125,
+          "success_rate_wilson_95": [
+            0.6053965378701002,
+            0.8001307570773007
+          ]
+        },
+        "medium": {
+          "successes": 62,
+          "episodes": 80,
+          "success_rate": 0.775,
+          "success_rate_wilson_95": [
+            0.6721321021639265,
+            0.8526679265915337
+          ]
+        },
+        "long": {
+          "successes": 62,
+          "episodes": 80,
+          "success_rate": 0.775,
+          "success_rate_wilson_95": [
+            0.6721321021639265,
+            0.8526679265915337
+          ]
+        }
+      }
+    },
+    {
+      "source_file": "evaluation_051200.json",
+      "source_sha256": "1ac210dcf5d47e9db20a8a6849adacec61bdf0ce9d4adc4ed0c034a194e45b5d",
+      "validation_manifest_sha256": "07648ae0c1319124ac52f38f29b960edb63e1c17828e39fccd4e2aac483b4ba4",
+      "requested_interactions": 50000,
+      "completed_interactions": 51200,
+      "successes": 240,
+      "episodes": 240,
+      "success_rate": 1.0,
+      "success_rate_wilson_95": [
+        0.9842460800584412,
+        1.0
+      ],
+      "collisions": 0,
+      "invalid_actions": 0,
+      "by_scale": {
+        "15": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "30": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "50": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "100": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        }
+      },
+      "by_distance": {
+        "short": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "medium": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "long": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        }
+      }
+    },
+    {
+      "source_file": "evaluation_075776.json",
+      "source_sha256": "2c02f17731cb27e2bf22738d6374e54c03b8233b88bb7c4349678066c5f820d4",
+      "validation_manifest_sha256": "07648ae0c1319124ac52f38f29b960edb63e1c17828e39fccd4e2aac483b4ba4",
+      "requested_interactions": 75000,
+      "completed_interactions": 75776,
+      "successes": 189,
+      "episodes": 240,
+      "success_rate": 0.7875,
+      "success_rate_wilson_95": [
+        0.731426260787346,
+        0.8345152352462576
+      ],
+      "collisions": 0,
+      "invalid_actions": 0,
+      "by_scale": {
+        "15": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "30": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "50": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "100": {
+          "successes": 9,
+          "episodes": 60,
+          "success_rate": 0.15,
+          "success_rate_wilson_95": [
+            0.08097440580167739,
+            0.2611458906977855
+          ]
+        }
+      },
+      "by_distance": {
+        "short": {
+          "successes": 63,
+          "episodes": 80,
+          "success_rate": 0.7875,
+          "success_rate_wilson_95": [
+            0.6857784426940333,
+            0.8628761328230384
+          ]
+        },
+        "medium": {
+          "successes": 64,
+          "episodes": 80,
+          "success_rate": 0.8,
+          "success_rate_wilson_95": [
+            0.6995375627182917,
+            0.8729715595603921
+          ]
+        },
+        "long": {
+          "successes": 62,
+          "episodes": 80,
+          "success_rate": 0.775,
+          "success_rate_wilson_95": [
+            0.6721321021639265,
+            0.8526679265915337
+          ]
+        }
+      }
+    },
+    {
+      "source_file": "evaluation_100352.json",
+      "source_sha256": "51ee0610705c2b7e49e3c2c7b8ea492038e5a4e20b75caba0cb81f558a9e0d0a",
+      "validation_manifest_sha256": "07648ae0c1319124ac52f38f29b960edb63e1c17828e39fccd4e2aac483b4ba4",
+      "requested_interactions": 100000,
+      "completed_interactions": 100352,
+      "successes": 240,
+      "episodes": 240,
+      "success_rate": 1.0,
+      "success_rate_wilson_95": [
+        0.9842460800584412,
+        1.0
+      ],
+      "collisions": 0,
+      "invalid_actions": 0,
+      "by_scale": {
+        "15": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "30": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "50": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "100": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        }
+      },
+      "by_distance": {
+        "short": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "medium": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "long": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        }
+      }
+    },
+    {
+      "source_file": "evaluation_151552.json",
+      "source_sha256": "51204b4dcc2e5496723b924bcecd5f3a0b13e6a9e50fe07119c53e3ddddeb9f1",
+      "validation_manifest_sha256": "07648ae0c1319124ac52f38f29b960edb63e1c17828e39fccd4e2aac483b4ba4",
+      "requested_interactions": 150000,
+      "completed_interactions": 151552,
+      "successes": 240,
+      "episodes": 240,
+      "success_rate": 1.0,
+      "success_rate_wilson_95": [
+        0.9842460800584412,
+        1.0
+      ],
+      "collisions": 0,
+      "invalid_actions": 0,
+      "by_scale": {
+        "15": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "30": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "50": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "100": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        }
+      },
+      "by_distance": {
+        "short": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "medium": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "long": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        }
+      }
+    },
+    {
+      "source_file": "evaluation_200704.json",
+      "source_sha256": "98afcd757e1a7fe1afcd5682b0db6570799b70c0ffeee4d31aebb33862cfeac6",
+      "validation_manifest_sha256": "07648ae0c1319124ac52f38f29b960edb63e1c17828e39fccd4e2aac483b4ba4",
+      "requested_interactions": 200000,
+      "completed_interactions": 200704,
+      "successes": 240,
+      "episodes": 240,
+      "success_rate": 1.0,
+      "success_rate_wilson_95": [
+        0.9842460800584412,
+        1.0
+      ],
+      "collisions": 0,
+      "invalid_actions": 0,
+      "by_scale": {
+        "15": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "30": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "50": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "100": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        }
+      },
+      "by_distance": {
+        "short": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "medium": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "long": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        }
+      }
+    },
+    {
+      "source_file": "evaluation_251904.json",
+      "source_sha256": "3661a9e2d0ad655c469f890279f656ec287fc444e8e691c6b4ed3a48564c574c",
+      "validation_manifest_sha256": "07648ae0c1319124ac52f38f29b960edb63e1c17828e39fccd4e2aac483b4ba4",
+      "requested_interactions": 250000,
+      "completed_interactions": 251904,
+      "successes": 240,
+      "episodes": 240,
+      "success_rate": 1.0,
+      "success_rate_wilson_95": [
+        0.9842460800584412,
+        1.0
+      ],
+      "collisions": 0,
+      "invalid_actions": 0,
+      "by_scale": {
+        "15": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "30": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "50": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "100": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        }
+      },
+      "by_distance": {
+        "short": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "medium": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "long": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        }
+      }
+    },
+    {
+      "source_file": "evaluation_301056.json",
+      "source_sha256": "fe6710c9b86b2f11b4f3e11c477f09e611a71cebabcec966e3557d5f3bed777a",
+      "validation_manifest_sha256": "07648ae0c1319124ac52f38f29b960edb63e1c17828e39fccd4e2aac483b4ba4",
+      "requested_interactions": 300000,
+      "completed_interactions": 301056,
+      "successes": 240,
+      "episodes": 240,
+      "success_rate": 1.0,
+      "success_rate_wilson_95": [
+        0.9842460800584412,
+        1.0
+      ],
+      "collisions": 0,
+      "invalid_actions": 0,
+      "by_scale": {
+        "15": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "30": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "50": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        },
+        "100": {
+          "successes": 60,
+          "episodes": 60,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.93982814785791,
+            0.9999999999999998
+          ]
+        }
+      },
+      "by_distance": {
+        "short": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "medium": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        },
+        "long": {
+          "successes": 80,
+          "episodes": 80,
+          "success_rate": 1.0,
+          "success_rate_wilson_95": [
+            0.9541818704644728,
+            0.9999999999999999
+          ]
+        }
+      }
+    }
+  ],
+  "best_checkpoint_by_overall_validation": 51200,
+  "final_checkpoint": 301056,
+  "final_checkpoint_metrics": {
+    "episodes": 240,
+    "successes": 240,
+    "collisions": 0,
+    "timeouts": 0,
+    "success_rate": 1.0,
+    "two_cell_oscillation_rate": 0.0,
+    "longer_loop_rate": 0.0,
+    "mean_decisions": 26.058333333333334,
+    "mean_episode_return": 1.9859884344830412,
+    "mean_final_octile_distance": 0.0,
+    "mean_success_path_cost_gap": 3.5358489510638504,
+    "mean_success_path_cost_ratio": 1.1349648859356682,
+    "mean_policy_inference_latency_ms": 1.0357502638383307,
+    "mean_masked_action_latency_ms": 1.1366358224636515
+  },
+  "final_failure_labels": {},
+  "artifact_sha256": {
+    "final_evaluation": "fe6710c9b86b2f11b4f3e11c477f09e611a71cebabcec966e3557d5f3bed777a",
+    "final_model": "6a07ffba99599a572139c5735852022fe5fbbf442ced443f89345c698364a17f",
+    "provenance": "c9dfa7b1d60cbf9c26a24a42a253324fb2d877e0675d3aec99da695c9b841118",
+    "status": "69ec9f83d77d44afee711fa81bfd77913787a02d9235a4760bfe4492dfd12547",
+    "latest_checkpoint_bundle": "0cdd67258f2fe3de2a065dabe422019e3835305e9a823f389613ac32f1dd960b"
+  }
+}

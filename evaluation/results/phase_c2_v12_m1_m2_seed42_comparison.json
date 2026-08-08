@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "classification": "paired_development_validation_single_training_seed",
+  "claim_limit": "The paired route comparison and exact McNemar test do not capture training-seed variability; confirmatory multi-seed evidence is required.",
+  "identical_route_order": true,
+  "completed_interactions": [
+    26624,
+    51200,
+    75776,
+    100352,
+    151552,
+    200704,
+    251904,
+    301056
+  ],
+  "models": {
+    "M1": {
+      "git_commit": "6b1ccda125aaa7973dac3196e45643379180b926",
+      "seed": 42,
+      "trainable_parameters": 428937,
+      "final_model_bytes": 5388317,
+      "final_model_sha256": "0068ec527eb63c2d51128659a739bb3f3484b90c6837b0ab16febd95c88f82d9",
+      "final_evaluation_sha256": "e01efb6bb779880e6aa254cbf33c3c7224bd085c1eb415ac1947f7563b06a6d7",
+      "latest_checkpoint_bundle_sha256": "a2f5243460235ecfb1b9b60853dba7915ff707b6a724e09c4102878a72c6699d",
+      "overall_curve": [
+        {
+          "completed_interactions": 26624,
+          "success_rate": 0.25
+        },
+        {
+          "completed_interactions": 51200,
+          "success_rate": 0.4625
+        },
+        {
+          "completed_interactions": 75776,
+          "success_rate": 0.6666666666666666
+        },
+        {
+          "completed_interactions": 100352,
+          "success_rate": 0.7041666666666667
+        },
+        {
+          "completed_interactions": 151552,
+          "success_rate": 0.7875
+        },
+        {
+          "completed_interactions": 200704,
+          "success_rate": 0.75
+        },
+        {
+          "completed_interactions": 251904,
+          "success_rate": 0.7125
+        },
+        {
+          "completed_interactions": 301056,
+          "success_rate": 0.8333333333333334
+        }
+      ],
+      "final_all": {
+        "episodes": 240,
+        "successes": 200,
+        "collisions": 0,
+        "timeouts": 40,
+        "success_rate": 0.8333333333333334,
+        "two_cell_oscillation_rate": 0.1,
+        "longer_loop_rate": 0.15,
+        "mean_decisions": 42.725,
+        "mean_episode_return": 1.8126021822809137,
+        "mean_final_octile_distance": 2.4014892962515852,
+        "mean_success_path_cost_gap": 7.505052301026318,
+        "mean_success_path_cost_ratio": 1.2628667150555895,
+        "mean_policy_inference_latency_ms": 2.933416698382129,
+        "mean_masked_action_latency_ms": 3.0816093325538203
+      },
+      "final_by_scale": {
+        "15": {
+          "episodes": 60,
+          "successes": 59,
+          "collisions": 0,
+          "timeouts": 1,
+          "success_rate": 0.9833333333333333,
+          "two_cell_oscillation_rate": 0.016666666666666666,
+          "longer_loop_rate": 0.016666666666666666,
+          "mean_decisions": 10.05,
+          "mean_episode_return": 1.8910633742467826,
+          "mean_final_octile_distance": 0.016666666666666666,
+          "mean_success_path_cost_gap": 1.8600019554267402,
+          "mean_success_path_cost_ratio": 1.1671958287609512,
+          "mean_policy_inference_latency_ms": 2.9672558108726506,
+          "mean_masked_action_latency_ms": 3.11416874808915
+        },
+        "30": {
+          "episodes": 60,
+          "successes": 58,
+          "collisions": 0,
+          "timeouts": 2,
+          "success_rate": 0.9666666666666667,
+          "two_cell_oscillation_rate": 0.016666666666666666,
+          "longer_loop_rate": 0.03333333333333333,
+          "mean_decisions": 21.65,
+          "mean_episode_return": 1.9418028000747358,
+          "mean_final_octile_distance": 0.3287987010226309,
+          "mean_success_path_cost_gap": 5.1064424985570165,
+          "mean_success_path_cost_ratio": 1.2510681814693352,
+          "mean_policy_inference_latency_ms": 2.867222441000682,
+          "mean_masked_action_latency_ms": 3.013087817412798
+        },
+        "50": {
+          "episodes": 60,
+          "successes": 53,
+          "collisions": 0,
+          "timeouts": 7,
+          "success_rate": 0.8833333333333333,
+          "two_cell_oscillation_rate": 0.05,
+          "longer_loop_rate": 0.08333333333333333,
+          "mean_decisions": 37.55,
+          "mean_episode_return": 1.8339411178592981,
+          "mean_final_octile_distance": 1.1673605093390436,
+          "mean_success_path_cost_gap": 9.288786778722086,
+          "mean_success_path_cost_ratio": 1.3166792845819901,
+          "mean_policy_inference_latency_ms": 2.906549861384967,
+          "mean_masked_action_latency_ms": 3.0531341222537542
+        },
+        "100": {
+          "episodes": 60,
+          "successes": 30,
+          "collisions": 0,
+          "timeouts": 30,
+          "success_rate": 0.5,
+          "two_cell_oscillation_rate": 0.31666666666666665,
+          "longer_loop_rate": 0.4666666666666667,
+          "mean_decisions": 101.65,
+          "mean_episode_return": 1.5836014369428393,
+          "mean_final_octile_distance": 8.093131307978,
+          "mean_success_path_cost_gap": 20.09303268821695,
+          "mean_success_path_cost_ratio": 1.378761083538495,
+          "mean_policy_inference_latency_ms": 2.992638680270216,
+          "mean_masked_action_latency_ms": 3.14604664245958
+        }
+      }
+    },
+    "M2": {
+      "git_commit": "eda350fe2b5b5944ca1bfe0f3ce3656448f77a70",
+      "seed": 42,
+      "trainable_parameters": 9545,
+      "final_model_bytes": 144242,
+      "final_model_sha256": "6a07ffba99599a572139c5735852022fe5fbbf442ced443f89345c698364a17f",
+      "final_evaluation_sha256": "fe6710c9b86b2f11b4f3e11c477f09e611a71cebabcec966e3557d5f3bed777a",
+      "latest_checkpoint_bundle_sha256": "0cdd67258f2fe3de2a065dabe422019e3835305e9a823f389613ac32f1dd960b",
+      "overall_curve": [
+        {
+          "completed_interactions": 26624,
+          "success_rate": 0.7541666666666667
+        },
+        {
+          "completed_interactions": 51200,
+          "success_rate": 1.0
+        },
+        {
+          "completed_interactions": 75776,
+          "success_rate": 0.7875
+        },
+        {
+          "completed_interactions": 100352,
+          "success_rate": 1.0
+        },
+        {
+          "completed_interactions": 151552,
+          "success_rate": 1.0
+        },
+        {
+          "completed_interactions": 200704,
+          "success_rate": 1.0
+        },
+        {
+          "completed_interactions": 251904,
+          "success_rate": 1.0
+        },
+        {
+          "completed_interactions": 301056,
+          "success_rate": 1.0
+        }
+      ],
+      "final_all": {
+        "episodes": 240,
+        "successes": 240,
+        "collisions": 0,
+        "timeouts": 0,
+        "success_rate": 1.0,
+        "two_cell_oscillation_rate": 0.0,
+        "longer_loop_rate": 0.0,
+        "mean_decisions": 26.058333333333334,
+        "mean_episode_return": 1.9859884344830412,
+        "mean_final_octile_distance": 0.0,
+        "mean_success_path_cost_gap": 3.5358489510638504,
+        "mean_success_path_cost_ratio": 1.1349648859356682,
+        "mean_policy_inference_latency_ms": 1.0357502638383307,
+        "mean_masked_action_latency_ms": 1.1366358224636515
+      },
+      "final_by_scale": {
+        "15": {
+          "episodes": 60,
+          "successes": 60,
+          "collisions": 0,
+          "timeouts": 0,
+          "success_rate": 1.0,
+          "two_cell_oscillation_rate": 0.0,
+          "longer_loop_rate": 0.0,
+          "mean_decisions": 8.55,
+          "mean_episode_return": 1.9079729060406512,
+          "mean_final_octile_distance": 0.0,
+          "mean_success_path_cost_gap": 1.4533850361304976,
+          "mean_success_path_cost_ratio": 1.1759634868826694,
+          "mean_policy_inference_latency_ms": 1.133008394195038,
+          "mean_masked_action_latency_ms": 1.2458472195470873
+        },
+        "30": {
+          "episodes": 60,
+          "successes": 60,
+          "collisions": 0,
+          "timeouts": 0,
+          "success_rate": 1.0,
+          "two_cell_oscillation_rate": 0.0,
+          "longer_loop_rate": 0.0,
+          "mean_decisions": 17.183333333333334,
+          "mean_episode_return": 1.9800944854966582,
+          "mean_final_octile_distance": 0.0,
+          "mean_success_path_cost_gap": 2.391981711797798,
+          "mean_success_path_cost_ratio": 1.1193001486176357,
+          "mean_policy_inference_latency_ms": 0.940976868850112,
+          "mean_masked_action_latency_ms": 1.029876511543485
+        },
+        "50": {
+          "episodes": 60,
+          "successes": 60,
+          "collisions": 0,
+          "timeouts": 0,
+          "success_rate": 1.0,
+          "two_cell_oscillation_rate": 0.0,
+          "longer_loop_rate": 0.0,
+          "mean_decisions": 26.933333333333334,
+          "mean_episode_return": 1.959811872585292,
+          "mean_final_octile_distance": 0.0,
+          "mean_success_path_cost_gap": 3.7938948853521395,
+          "mean_success_path_cost_ratio": 1.1274799011374526,
+          "mean_policy_inference_latency_ms": 1.0000452358971332,
+          "mean_masked_action_latency_ms": 1.0961302456605337
+        },
+        "100": {
+          "episodes": 60,
+          "successes": 60,
+          "collisions": 0,
+          "timeouts": 0,
+          "success_rate": 1.0,
+          "two_cell_oscillation_rate": 0.0,
+          "longer_loop_rate": 0.0,
+          "mean_decisions": 51.56666666666667,
+          "mean_episode_return": 2.096074473809564,
+          "mean_final_octile_distance": 0.0,
+          "mean_success_path_cost_gap": 6.504134170974968,
+          "mean_success_path_cost_ratio": 1.1171160071049149,
+          "mean_policy_inference_latency_ms": 1.0689705564110394,
+          "mean_masked_action_latency_ms": 1.1746893131034997
+        }
+      }
+    }
+  },
+  "paired_final_comparison": {
+    "m1_only_successes": 0,
+    "m2_only_successes": 40,
+    "exact_mcnemar_two_sided_p": 1.8189894035458565e-12,
+    "m2_minus_m1_success_rate_percentage_points": 16.666666666666664,
+    "m1_to_m2_parameter_ratio": 44.938397066526974,
+    "m1_to_m2_model_file_size_ratio": 37.356089072530885,
+    "m1_to_m2_inference_latency_ratio": 2.8321660160735456,
+    "m2_relative_reduction_in_mean_success_path_ratio": 0.10127896126733467
+  }
+}
