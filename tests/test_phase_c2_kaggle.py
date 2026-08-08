@@ -118,6 +118,20 @@ def test_bundle_creation_and_resume(tmp_path):
     ]
     res = subprocess.run(cmd, capture_output=True, env=local_runner_env(out_dir))
     assert res.returncode == 0
+
+    mismatch_cmd = [
+        sys.executable, str(ROOT / "cloud/kaggle/phase_c2_kaggle_runner.py"),
+        "--model", "M2",
+        "--interactions", "20",
+        "--seed", "11",
+        "--resume",
+        "--bundle-path", str(bundle_path),
+    ]
+    mismatch = subprocess.run(
+        mismatch_cmd, capture_output=True, text=True, env=local_runner_env(out_dir)
+    )
+    assert mismatch.returncode != 0
+    assert "Bundle seed 42 != requested seed 11" in mismatch.stderr
     
 def test_git_token_hygiene():
     nb_path = ROOT / "cloud/kaggle/phase_c2_kaggle.ipynb"
@@ -433,7 +447,7 @@ def test_canonical_hashes():
         "HASH_VALIDATION", "HASH_TRAIN_GEN", "HASH_CONFIG", 
         "HASH_REWARD", "HASH_OBSERVATION",
         "HASH_C2_ENV", "HASH_C2_RUNNER", "HASH_C0_ENV", "HASH_ACTION_MASK",
-        "HASH_KAGGLE_RUNNER"
+        "HASH_KAGGLE_RUNNER", "HASH_CONFIRMATORY_QUEUE"
     ]
     for var in expected_vars:
         assert var in hashes, f"Missing {var} in notebook"
@@ -449,6 +463,7 @@ def test_canonical_hashes():
         "HASH_C0_ENV": "rl_v3/phase_c0_env.py",
         "HASH_ACTION_MASK": "rl_v3/action_masking.py",
         "HASH_KAGGLE_RUNNER": "cloud/kaggle/phase_c2_kaggle_runner.py",
+        "HASH_CONFIRMATORY_QUEUE": "scripts/run_phase_c2_confirmatory.py",
     }
     
     for var, fpath in file_mapping.items():
@@ -557,6 +572,8 @@ def test_notebook_contract():
     assert 'evaluation_002048.json' in full_src
     assert 'checkpoint_is_ppo_update_aligned' in full_src
     assert 'invalid_action_count' in full_src
+    assert 'TRAINING_SEED = 11' in full_src
+    assert '"--seed"' in full_src
 def test_durability_and_complete_backup(tmp_path):
     out_dir = tmp_path / "uav_phase_c2"
     out_dir.mkdir(parents=True)

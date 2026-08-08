@@ -58,6 +58,7 @@ def source_hash_files():
         "phase_c0_env": ROOT / "rl_v3" / "phase_c0_env.py",
         "action_masking": ROOT / "rl_v3" / "action_masking.py",
         "kaggle_runner": Path(__file__).resolve(),
+        "confirmatory_queue": ROOT / "scripts" / "run_phase_c2_confirmatory.py",
     }
 
 
@@ -138,16 +139,33 @@ def resolve_output_dir(smoke=False):
 
 
 class KagglePhaseC2Runner(PhaseC2Runner):
-    def __init__(self, model_type, max_interactions, resume=False, bundle_path=None, device="auto", smoke=False):
+    def __init__(
+        self,
+        model_type,
+        max_interactions,
+        resume=False,
+        bundle_path=None,
+        device="auto",
+        smoke=False,
+        seed=None,
+    ):
         out_dir = resolve_output_dir(smoke)
         
         config_path = ROOT / "configs" / "rl_v3_phase_c2.json"
         
         self.bundle_path = bundle_path
         if resume:
-            self._handle_resume(bundle_path, out_dir, model_type)
+            self._handle_resume(bundle_path, out_dir, model_type, seed)
+            seed = self.resume_seed
             
-        super().__init__(config_path=config_path, out_dir=out_dir, model_type=model_type, resume=resume, device=device)
+        super().__init__(
+            config_path=config_path,
+            out_dir=out_dir,
+            model_type=model_type,
+            resume=resume,
+            device=device,
+            seed=seed,
+        )
         self.max_interactions = max_interactions
         
         if resume:
@@ -162,7 +180,7 @@ class KagglePhaseC2Runner(PhaseC2Runner):
             self.restore_rng_state(self.resume_rng_path)
             logger.info(f"Successfully resumed at timestep {self.resume_ts} on device {self.device}")
 
-    def _handle_resume(self, bundle_path, out_dir, expected_model):
+    def _handle_resume(self, bundle_path, out_dir, expected_model, expected_seed=None):
         if not bundle_path or not Path(bundle_path).exists():
             raise FileNotFoundError(f"Resume bundle not found at {bundle_path}")
             
@@ -192,6 +210,11 @@ class KagglePhaseC2Runner(PhaseC2Runner):
             
         if prov["model_type"] != expected_model:
             raise ValueError(f"Bundle model type {prov['model_type']} != {expected_model}")
+        self.resume_seed = int(prov["seed"])
+        if expected_seed is not None and self.resume_seed != int(expected_seed):
+            raise ValueError(
+                f"Bundle seed {self.resume_seed} != requested seed {int(expected_seed)}"
+            )
             
         # Verify every training/evaluation-relevant source captured by v11.
         source_hash_mode = prov.get("source_hash_mode")
@@ -348,16 +371,24 @@ if __name__ == "__main__":
     parser.add_argument("--bundle-path", type=str, default=None)
     parser.add_argument("--device", type=str, default="auto", choices=["cpu", "cuda", "auto"])
     parser.add_argument("--smoke", action="store_true", help="Use an isolated smoke output directory")
+    parser.add_argument("--seed", type=int, default=None)
     args = parser.parse_args()
     
     logger.info(f"\n Launching Phase C2 Kaggle Runner")
     logger.info(f"Model: {args.model}")
     logger.info(f"Interactions: {args.interactions}")
     logger.info(f"Resume: {args.resume}")
+    logger.info(f"Seed: {args.seed if args.seed is not None else 'config default'}")
     logger.info(f"Device: {args.device}\n")
     
     runner = KagglePhaseC2Runner(
-        args.model, args.interactions, args.resume, args.bundle_path, args.device, args.smoke
+        args.model,
+        args.interactions,
+        args.resume,
+        args.bundle_path,
+        args.device,
+        args.smoke,
+        args.seed,
     )
     runner.run(args.interactions)
     
