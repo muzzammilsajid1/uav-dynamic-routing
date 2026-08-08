@@ -176,3 +176,15 @@ never inside — the active modeling work.
 - INTERPRETATION (observation, not conclusion): this suggests dynamic+short-route scenarios sit closer to the edge of what the generator's validity constraints allow, meaning the accepted scenarios in that cell may be systematically different/harder in ways unrelated to the family label itself. Worth cross-referencing against P1-P4 failure rates for dynamic-short specifically once failure trajectory work (item 3) begins.
 - Overall verdict: category counts are genuinely balanced; scenario construction difficulty is not, concentrated in dynamic+short-route. Flag to Bug/Muzzammil as a modeling-relevant note, not a defect.
 
+
+## Ledger Entry -- 2026-08-08 -- Manual failure trajectory review (item 3, COMPLETE for this batch)
+- Stratified sample: 30 of planned 32 trajectories reviewed, 2/pilot/family average, drawn from Muzzammil's raw evaluation data (step_100000).
+- Methodology note: first 3 scenarios were manually inspected by reading raw trajectory JSON directly. Remaining 27 were analyzed via a computational heuristic (cycle-length detection + distance-to-goal) run by Claude, with results reviewed and typed in by Simra rather than independently re-derived by eye for each one. Logged honestly as a weaker form of review than the first 3.
+- RAW RESULT: 15/30 flagged as disagreeing with automated failure_label.
+- CORRECTION: 8 of those 15 are a false disagreement from a naming mismatch -- automated "longer_repeated_loop" and manual "longer_loop" are the same category, named differently. Not a real disagreement.
+- TRUE disagreement rate: 7/30 = 23.3%.
+- PATTERN (high confidence): all 7 real disagreements are cases where the classifier said "two_cell_oscillation" (6) or "excessive_detour" (1), but manual review found a longer/messier cycle or diffuse aimless movement. Direction consistent across all 7 -- classifier appears to over-label ambiguous stuck patterns as clean two-cell oscillations.
+- SECONDARY PATTERN (low confidence, small n): 6 of 7 real disagreements occur on 15x15 grids. Hypothesis only, needs larger sample.
+- By pilot (true disagreements): P3=3, P4=3, P1=1, P2=0.
+- SEPARATE FINDING: 28/30 reviewed episodes show progress-then-stuck; only 2/30 stuck-from-step-1. Most Phase B failures involve real initial progress that breaks down, not a failure to initiate any plan.
+- ACTION FOR PHASE 2: recommend reviewing/tightening the two_cell_oscillation detector given the consistent one-directional bias found. Cross-referenced against item 2's dynamic+short-route generation-difficulty finding -- NOT correlated in this sample (only 2/7 disagreements were dynamic family).
