@@ -188,3 +188,18 @@ never inside — the active modeling work.
 - By pilot (true disagreements): P3=3, P4=3, P1=1, P2=0.
 - SEPARATE FINDING: 28/30 reviewed episodes show progress-then-stuck; only 2/30 stuck-from-step-1. Most Phase B failures involve real initial progress that breaks down, not a failure to initiate any plan.
 - ACTION FOR PHASE 2: recommend reviewing/tightening the two_cell_oscillation detector given the consistent one-directional bias found. Cross-referenced against item 2's dynamic+short-route generation-difficulty finding -- NOT correlated in this sample (only 2/7 disagreements were dynamic family).
+
+## Ledger Entry -- 2026-08-08 -- Phase B learning curve inspection (item 4)
+- Source: runs/rl_v3/phase_b/phase_b_summary.json learning_curve field (3 checkpoints per pilot: 25k/50k/100k interactions).
+- SCOPE GAP: learning_curve only contains CPU/GPU utilization, environment_steps_per_second, interactions, training_wall_seconds, validation_episodes, validation_success_rate. NO reward, NO episode length, NO entropy fields exist in committed data. logs/ (TensorBoard) is git-ignored, not present in git history on any branch checked.
+- Confirmed via grep that model.predict(..., deterministic=True) is used everywhere validation_success_rate is computed -- these are genuine deterministic-eval snapshots.
+- ANSWERABLE:
+  - Did any checkpoint outperform final? YES for 3 of 4 pilots.
+    P1: 2/96 -> 1/96 -> 2/96 (final). Flat/noisy.
+    P2: 2/96 -> 4/96 (peak@50k) -> 3/96 (final).
+    P3: 1/96 -> 2/96 (peak@50k) -> 0/96 (final). Collapsed to zero.
+    P4: 4/96 (peak@25k) -> 3/96 -> 1/96 (final). Monotonic decline.
+  - Did P4 improve then degrade? YES, confirmed with exact numbers above.
+- NOT ANSWERABLE from current data: training reward improvement, episode length reduction, success-in-training-vs-deterministic-eval gap, entropy collapse, early-stopped exploration. All require data not present in committed artifacts.
+- ACTION: request TensorBoard logs / reward-episode-length CSVs from Muzzammil, same pattern as prior blockers.
+- Headline finding for Bug/Muzzammil: 3 of 4 pilots peaked before their final checkpoint; P3 collapsed from 2/96 to 0/96. Worth asking whether best-checkpoint, not final-checkpoint, should be each pilot's reported result.
