@@ -11,6 +11,7 @@ def test_generator_state_restoration():
         
     # serialize state
     state = gen1.get_state()
+    assert state["active_sizes"] == [15, 30]
     
     # generate next N endpoints and record them
     expected_endpoints = []
@@ -19,10 +20,11 @@ def test_generator_state_restoration():
         
     # construct a new generator
     gen2 = PhaseC2EndpointGenerator(seed=5678)  # Different seed to ensure state overwrites it
-    gen2.set_active_sizes([15, 30])
+    gen2.set_active_sizes([100])
     
     # restore serialized state
     gen2.set_state(state)
+    assert gen2.active_sizes == [15, 30]
     
     # verify next N endpoints are exactly identical
     actual_endpoints = []
@@ -45,6 +47,9 @@ def test_runner_level_resume(tmp_path, monkeypatch):
     # Run a tiny 5-step run
     runner = KagglePhaseC2Runner("M1", 5, device="cpu")
     runner.checkpoints = [5]
+    # Use one interaction per rollout so this unit test exercises exact resume
+    # arithmetic without invoking the production 2,048-step alignment policy.
+    runner.model.n_steps = 1
     
     # Mock learn to just increment num_timesteps
     def mock_learn(total_timesteps, callback, reset_num_timesteps):

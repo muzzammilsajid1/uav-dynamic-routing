@@ -1,4 +1,4 @@
-# Phase C2 Kaggle Runner
+# Phase C2 Kaggle Runner (v11 candidate)
 
 This directory contains the necessary components to run Phase C2 training efficiently on Kaggle using GPUs or CPUs.
 
@@ -19,10 +19,25 @@ To resume a training session:
 3. Point the notebook to the uploaded dataset path when prompted (or modify the `RESUME_BUNDLE_PATH` variable in the notebook).
 4. Run the notebook. The runner will transparently load the model, generator states, curriculum stage, and interactions, reporting them as statistically equivalent.
 
+The notebook will not launch the production run until the tagged source hashes,
+full test suite, native multiscale preflight, device benchmark, and an isolated
+2,048-interaction end-to-end smoke all pass. Smoke artifacts are written to
+`/kaggle/working/uav_phase_c2_smoke`; production artifacts remain in
+`/kaggle/working/uav_phase_c2`.
+
+PPO updates use 2,048-interaction rollout blocks. Requested checkpoints are
+therefore saved only after a completed gradient update, at the next rollout
+boundary: 26,624; 51,200; 75,776; 100,352; and 151,552 actual interactions for
+the nominal 25k/50k/75k/100k/150k schedule. Both requested and actual counts
+are recorded in every evaluation and provenance file.
+
 ## Output Structure
 Outputs are saved in `/kaggle/working/uav_phase_c2/`:
 - `model_{step}.zip`
 - `generator_{step}.json`
 - `status.json`
 - `latest_checkpoint_bundle.zip` (Contains all above for easy recovery)
+- `evaluation_<actual>.json` (Per-route trajectories, masks, failure labels,
+  latency, and scale/distance aggregates)
+- `rng_<actual>.pt` (Python, NumPy, PyTorch CPU, and CUDA RNG states)
 - `rl_v3_phase_c2_<MODEL>_raw_artifacts.zip` (Final archive)

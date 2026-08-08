@@ -11,29 +11,40 @@ from sb3_contrib import MaskablePPO
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT))
 
-from rl_v3.run_phase_c2 import PhaseC2Runner
+from rl_v3.run_phase_c2 import PhaseC2Runner, _write_json_atomic
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 
-EXPECTED_TAG = "rl-v3-c2-kaggle-v4"
-
 def hash_file(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
+
+def resolve_output_dir(smoke=False):
+    is_kaggle = os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
+    if smoke:
+        override = os.environ.get("KAGGLE_SMOKE_OUT_DIR")
+        if override:
+            return Path(override)
+        if is_kaggle:
+            return Path("/kaggle/working/uav_phase_c2_smoke")
+        return ROOT / "runs" / "uav_phase_c2_smoke"
+
+    test_out = os.environ.get("KAGGLE_TEST_OUT_DIR")
+    if test_out:
+        return Path(test_out)
+    test_prod = os.environ.get("KAGGLE_TEST_PROD_DIR")
+    kaggle_path = (
+        Path(test_prod) / "uav_phase_c2"
+        if test_prod
+        else Path("/kaggle/working/uav_phase_c2")
+    )
+    return kaggle_path if is_kaggle else ROOT / "runs" / "uav_phase_c2_local_test"
+
+
 class KagglePhaseC2Runner(PhaseC2Runner):
-    def __init__(self, model_type, max_interactions, resume=False, bundle_path=None, device="auto"):
-        is_kaggle = os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
-        test_out = os.environ.get("KAGGLE_TEST_OUT_DIR")
-        test_prod = os.environ.get("KAGGLE_TEST_PROD_DIR")
-        if test_out:
-            out_dir = test_out
-        else:
-            if test_prod:
-                kaggle_path = str(Path(test_prod) / "uav_phase_c2")
-            else:
-                kaggle_path = "/kaggle/working/uav_phase_c2"
-            out_dir = kaggle_path if is_kaggle else str(ROOT / "runs" / "uav_phase_c2_local_test")
+    def __init__(self, model_type, max_interactions, resume=False, bundle_path=None, device="auto", smoke=False):
+        out_dir = resolve_output_dir(smoke)
         
         config_path = ROOT / "configs" / "rl_v3_phase_c2.json"
         
@@ -45,11 +56,15 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         self.max_interactions = max_interactions
         
         if resume:
+            self.generator.set_state(self.resume_gen_state)
+            # SB3 does not serialize the partially active episode. The resumed
+            # environment therefore starts a fresh episode from the curriculum
+            # stage governing the next absolute interaction.
+            self.generator.set_active_sizes(self.active_sizes_for_interaction(self.resume_ts + 1))
             self.model = MaskablePPO.load(self.resume_model_path, env=self.train_env, device=self.device)
-            # Override num_timesteps
             self.model.num_timesteps = self.resume_ts
             self.history = self.resume_history
-            self.generator.set_state(self.resume_gen_state)
+            self.restore_rng_state(self.resume_rng_path)
             logger.info(f"Successfully resumed at timestep {self.resume_ts} on device {self.device}")
 
     def _handle_resume(self, bundle_path, out_dir, expected_model):
@@ -83,17 +98,32 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         if prov["model_type"] != expected_model:
             raise ValueError(f"Bundle model type {prov['model_type']} != {expected_model}")
             
-        # Verify hashes
-        curr_cfg_hash = hash_file(ROOT / "configs" / "rl_v3_phase_c2.json")
-        curr_val_hash = hash_file(ROOT / "evaluation/manifests/rl_v3_phase_c2_validation.json")
-        
-        if prov["hashes"]["config"] != curr_cfg_hash:
-            raise ValueError("Config hash mismatch on resume")
-        if prov["hashes"]["validation_manifest"] != curr_val_hash:
-            raise ValueError("Validation manifest mismatch on resume")
+        # Verify every training/evaluation-relevant source captured by v11.
+        resume_hash_files = {
+            "config": ROOT / "configs" / "rl_v3_phase_c2.json",
+            "validation_manifest": ROOT / "evaluation" / "manifests" / "rl_v3_phase_c2_validation.json",
+            "train_generator": ROOT / "evaluation" / "manifests" / "rl_v3_phase_c2_train_generator.json",
+            "reward_wrapper": ROOT / "tools" / "verification" / "r2_pb_wrapper.py",
+            "observations": ROOT / "rl_v3" / "observations.py",
+            "phase_c2_env": ROOT / "rl_v3" / "phase_c2_env.py",
+            "phase_c2_runner": ROOT / "rl_v3" / "run_phase_c2.py",
+            "phase_c0_env": ROOT / "rl_v3" / "phase_c0_env.py",
+            "action_masking": ROOT / "rl_v3" / "action_masking.py",
+            "kaggle_runner": Path(__file__).resolve(),
+        }
+        for name, path in resume_hash_files.items():
+            expected = prov.get("hashes", {}).get(name)
+            if expected is None:
+                raise ValueError(f"Resume provenance is missing source hash: {name}")
+            current = hash_file(path)
+            if expected != current:
+                raise ValueError(f"Resume source hash mismatch for {name}")
             
         self.resume_ts = prov["completed_interactions"]
         self.resume_model_path = extract_dir / f"model_{self.resume_ts:06d}.zip"
+        self.resume_rng_path = extract_dir / f"rng_{self.resume_ts:06d}.pt"
+        if not self.resume_rng_path.exists():
+            raise RuntimeError(f"Resume bundle is missing RNG state: {self.resume_rng_path.name}")
         
         with open(extract_dir / f"generator_{self.resume_ts:06d}.json", "r") as f:
             self.resume_gen_state = json.load(f)
@@ -104,8 +134,8 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         # Also clean up string keys back to int if needed
         self.resume_history = {int(k): v for k, v in self.resume_history.items()}
 
-    def evaluate_and_save(self, ts):
-        super().evaluate_and_save(ts)
+    def evaluate_and_save(self, ts, requested_ts=None):
+        super().evaluate_and_save(ts, requested_ts)
         
         logger.info("\n==============================================")
         logger.info(f" CHECKPOINT SAVED: {ts} interactions")
@@ -120,26 +150,40 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         except Exception:
             git_commit = "unknown"
             
+        import torch
         prov = {
             "model_type": self.model_type,
             "device": self.device,
+            "resolved_device": str(self.model.device),
             "completed_interactions": ts,
+            "requested_interactions": int(ts if requested_ts is None else requested_ts),
+            "rollout_size": self.rollout_size(),
+            "checkpoint_is_ppo_update_aligned": int(ts) % self.rollout_size() == 0,
             "seed": getattr(self, "seed", None),
             "deterministic_cuda_requested": getattr(self, "deterministic_cuda", False),
             "deterministic_backend_flags": {
-                "cudnn.deterministic": getattr(self, "deterministic_cuda", False),
-                "cudnn.benchmark": not getattr(self, "deterministic_cuda", False)
+                "cudnn.deterministic": bool(torch.backends.cudnn.deterministic),
+                "cudnn.benchmark": bool(torch.backends.cudnn.benchmark),
+                "deterministic_algorithms_enabled": bool(torch.are_deterministic_algorithms_enabled())
             },
             "is_resumed_run": self.resume,
+            "resume_semantics": "statistically_equivalent",
+            "resume_limit": "SB3 does not serialize the partially active environment episode or rollout buffer.",
             "git_commit": git_commit,
             "hashes": {
                 "config": hash_file(ROOT / "configs" / "rl_v3_phase_c2.json"),
                 "validation_manifest": hash_file(ROOT / "evaluation/manifests/rl_v3_phase_c2_validation.json"),
-                "train_generator": hash_file(ROOT / "evaluation/manifests/rl_v3_phase_c2_train_generator.json")
+                "train_generator": hash_file(ROOT / "evaluation/manifests/rl_v3_phase_c2_train_generator.json"),
+                "reward_wrapper": hash_file(ROOT / "tools" / "verification" / "r2_pb_wrapper.py"),
+                "observations": hash_file(ROOT / "rl_v3" / "observations.py"),
+                "phase_c2_env": hash_file(ROOT / "rl_v3" / "phase_c2_env.py"),
+                "phase_c2_runner": hash_file(ROOT / "rl_v3" / "run_phase_c2.py"),
+                "phase_c0_env": hash_file(ROOT / "rl_v3" / "phase_c0_env.py"),
+                "action_masking": hash_file(ROOT / "rl_v3" / "action_masking.py"),
+                "kaggle_runner": hash_file(Path(__file__).resolve())
             }
         }
-        with open(self.out_dir / "provenance.json", "w") as f:
-            json.dump(prov, f, indent=2)
+        _write_json_atomic(self.out_dir / "provenance.json", prov)
             
         # Atomic Bundle Creation — bundles live inside self.out_dir, never in parent.
         # Build from an explicit whitelist of checkpoint-state files only.
@@ -223,6 +267,7 @@ if __name__ == "__main__":
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--bundle-path", type=str, default=None)
     parser.add_argument("--device", type=str, default="auto", choices=["cpu", "cuda", "auto"])
+    parser.add_argument("--smoke", action="store_true", help="Use an isolated smoke output directory")
     args = parser.parse_args()
     
     logger.info(f"\n Launching Phase C2 Kaggle Runner")
@@ -231,20 +276,12 @@ if __name__ == "__main__":
     logger.info(f"Resume: {args.resume}")
     logger.info(f"Device: {args.device}\n")
     
-    runner = KagglePhaseC2Runner(args.model, args.interactions, args.resume, args.bundle_path, args.device)
+    runner = KagglePhaseC2Runner(
+        args.model, args.interactions, args.resume, args.bundle_path, args.device, args.smoke
+    )
     runner.run(args.interactions)
     
-    is_kaggle = os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None
-    test_out = os.environ.get("KAGGLE_TEST_OUT_DIR")
-    test_prod = os.environ.get("KAGGLE_TEST_PROD_DIR")
-    if test_out:
-        out_dir = Path(test_out)
-    else:
-        if test_prod:
-            kaggle_path = Path(test_prod) / "uav_phase_c2"
-        else:
-            kaggle_path = Path("/kaggle/working/uav_phase_c2")
-        out_dir = kaggle_path if is_kaggle else Path(str(ROOT / "runs" / "uav_phase_c2_local_test"))
+    out_dir = resolve_output_dir(args.smoke)
 
     # Stage the raw-artifact archive in a tempdir, then move into out_dir.
     # This prevents shutil.make_archive from recursing into out_dir while
@@ -252,9 +289,10 @@ if __name__ == "__main__":
     import tempfile as _tf
     with _tf.TemporaryDirectory() as _stage:
         _stage_path = Path(_stage)
-        _archive_base = _stage_path / f"rl_v3_phase_c2_{args.model}_raw_artifacts"
+        archive_stem = f"rl_v3_phase_c2_{args.model}_{'smoke_' if args.smoke else ''}raw_artifacts"
+        _archive_base = _stage_path / archive_stem
         shutil.make_archive(str(_archive_base), 'zip', str(out_dir))
-        final_archive = out_dir / f"rl_v3_phase_c2_{args.model}_raw_artifacts.zip"
+        final_archive = out_dir / f"{archive_stem}.zip"
         shutil.move(str(_archive_base) + ".zip", str(final_archive))
 
     # Final Inventory — skip all .zip files (bundles + raw-artifact archives).
@@ -274,7 +312,8 @@ if __name__ == "__main__":
     logger.info(f"Final artifacts archived to: {final_archive}")
 
     # Create final complete backup archive
-    complete_archive_base = out_dir.parent / f"phase_c2_{args.model}_COMPLETE"
+    complete_suffix = "SMOKE_COMPLETE" if args.smoke else "COMPLETE"
+    complete_archive_base = out_dir.parent / f"phase_c2_{args.model}_{complete_suffix}"
     with _tf.TemporaryDirectory() as _stage2:
         _stage_path2 = Path(_stage2)
         _complete_base = _stage_path2 / complete_archive_base.name

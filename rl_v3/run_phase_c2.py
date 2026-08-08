@@ -1,15 +1,70 @@
 import json
 import logging
+import math
+import random
 import sys
+import time
 import numpy as np
+import torch
 from pathlib import Path
-from stable_baselines3 import PPO
 from sb3_contrib import MaskablePPO
-from stable_baselines3.common.callbacks import BaseCallback
 
 from rl_v3.phase_c2_env import PhaseC2Env, PhaseC2EndpointGenerator
 from tools.verification.r2_pb_wrapper import PotentialShapingWrapper
 import gymnasium as gym
+from rl_v3.diagnostics import has_longer_loop, has_two_cell_oscillation
+
+
+def _octile_distance(start, goal):
+    dr = abs(int(start[0]) - int(goal[0]))
+    dc = abs(int(start[1]) - int(goal[1]))
+    return max(dr, dc) + (math.sqrt(2.0) - 1.0) * min(dr, dc)
+
+
+def _mean(values):
+    return float(sum(values) / len(values)) if values else None
+
+
+def _write_json_atomic(path, payload):
+    path = Path(path)
+    temporary = path.with_name(f"{path.name}.tmp")
+    temporary.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(path)
+
+
+def _aggregate_validation(rows):
+    groups = {"all": rows}
+    for row in rows:
+        groups.setdefault(f"scale/{row['grid_size']}", []).append(row)
+        groups.setdefault(f"distance/{row['distance_bin']}", []).append(row)
+        groups.setdefault(
+            f"scale_distance/{row['grid_size']}/{row['distance_bin']}", []
+        ).append(row)
+    aggregates = {}
+    for name, group in sorted(groups.items()):
+        count = len(group)
+        successes = [row for row in group if row["is_success"]]
+        aggregates[name] = {
+            "episodes": count,
+            "successes": len(successes),
+            "collisions": sum(bool(row["crashed"]) for row in group),
+            "timeouts": sum(bool(row["is_timeout"]) for row in group),
+            "success_rate": len(successes) / max(1, count),
+            "two_cell_oscillation_rate": sum(bool(row["two_cell_oscillation"]) for row in group) / max(1, count),
+            "longer_loop_rate": sum(bool(row["longer_loop"]) for row in group) / max(1, count),
+            "mean_decisions": _mean([row["decisions"] for row in group]),
+            "mean_episode_return": _mean([row["episode_return"] for row in group]),
+            "mean_final_octile_distance": _mean([row["final_octile_distance"] for row in group]),
+            "mean_success_path_cost_gap": _mean([row["path_cost_gap"] for row in successes]),
+            "mean_success_path_cost_ratio": _mean([row["path_cost_ratio"] for row in successes]),
+            "mean_policy_inference_latency_ms": _mean(
+                [row["mean_policy_inference_latency_ms"] for row in group]
+            ),
+            "mean_masked_action_latency_ms": _mean(
+                [row["mean_masked_action_latency_ms"] for row in group]
+            ),
+        }
+    return aggregates
 
 class M2ScalarWrapper(gym.ObservationWrapper):
     def __init__(self, env):
@@ -24,33 +79,6 @@ class M2ScalarWrapper(gym.ObservationWrapper):
 
 logger = logging.getLogger(__name__)
 
-class CurriculumCallback(BaseCallback):
-    def __init__(self, stages, generator, runner, verbose=0):
-        super().__init__(verbose)
-        self.stages = stages
-        self.generator = generator
-        self.runner = runner
-
-    def _on_step(self):
-        ts = self.num_timesteps
-        active_sizes = None
-        for stage in self.stages:
-            if ts <= stage["max_interactions"]:
-                active_sizes = stage["active_sizes"]
-                break
-        
-        if active_sizes is None:
-            active_sizes = self.stages[-1]["active_sizes"]
-            
-        if self.generator.active_sizes != active_sizes:
-            logger.info(f"[{ts}] Curriculum shift: Active sizes now {active_sizes}")
-            self.generator.set_active_sizes(active_sizes)
-            
-        if ts in self.runner.checkpoints and ts not in self.runner.history:
-            self.runner.evaluate_and_save(ts)
-            
-        return True
-
 def preflight(config_path, out_dir):
     logger.info("=== PHASE C2 PREFLIGHT ===")
     out_dir = Path(out_dir)
@@ -59,6 +87,7 @@ def preflight(config_path, out_dir):
     gen = PhaseC2EndpointGenerator(seed=42)
     
     errors = []
+    oracle_success_sizes = []
     
     # Check val manifest
     if len(gen.val_manifest) != 240:
@@ -85,6 +114,20 @@ def preflight(config_path, out_dir):
         if (sz, s, g) in seen or (sz, g, s) in seen:
             errors.append(f"Duplicate or reverse leakage found: {sz} {s} {g}")
         seen.add((sz, s, g))
+
+    # Validation must remain disjoint from every training pair, including the
+    # reverse direction of a training route.
+    training_pairs = set()
+    for size, buckets in gen.train_pool.items():
+        for pairs in buckets.values():
+            for start, goal in pairs:
+                key = (int(size), tuple(start), tuple(goal))
+                reverse = (int(size), tuple(goal), tuple(start))
+                training_pairs.add(key)
+                training_pairs.add(reverse)
+    overlap = seen & training_pairs
+    if overlap:
+        errors.append(f"Training/validation endpoint overlap: {len(overlap)}")
         
     with open(config_path) as f:
         config = json.load(f)
@@ -129,27 +172,45 @@ def preflight(config_path, out_dir):
             path = solve_astar((sz, sz), info["start"], info["goal"], set())
             if not path:
                 errors.append(f"No path found for size {sz}")
-                
+                continue
+
+            action_by_delta = {
+                tuple(int(value) for value in delta): action
+                for action, delta in enumerate(env.unwrapped._v2.ACTION_DELTAS)
+            }
+            step_info = {}
+
             for step_idx in range(1, len(path)):
                 s = path[step_idx-1]
                 nxt = path[step_idx]
                 dx, dy = nxt[0]-s[0], nxt[1]-s[1]
-                
-                # Derive action mapping
-                actions = {(0,-1):0, (0,1):1, (-1,0):2, (1,0):3, (-1,-1):4, (-1,1):5, (1,-1):6, (1,1):7}
-                a = actions.get((dx, dy))
-                
+                a = action_by_delta.get((dx, dy))
+                if a is None:
+                    errors.append(f"No native action for oracle delta {(dx, dy)} at size {sz}")
+                    break
+                mask = env.unwrapped.action_masks()
+                if not mask[a]:
+                    errors.append(f"Oracle selected an illegal action at size {sz}")
+                    break
                 obs, reward, term, trunc, step_info = env.step(a)
-                if step_info.get("is_collision", False):
+                if step_info.get("crashed", False):
                     errors.append(f"Collision in preflight oracle for size {sz}")
                     break
-                    
+            if step_info.get("is_success", False):
+                oracle_success_sizes.append(sz)
+            else:
+                errors.append(f"Oracle did not reach the goal for size {sz}")
+
     except Exception as e:
         errors.append(f"Environment initialization/step failed: {e}")
+    finally:
+        if "env" in locals():
+            env.close()
         
     res = {
         "status": "PASS" if not errors else "FAIL",
-        "errors": errors
+        "errors": errors,
+        "oracle_success_sizes": oracle_success_sizes,
     }
     
     with open(out_dir / "preflight_verification.json", "w") as f:
@@ -176,8 +237,6 @@ class PhaseC2Runner:
         self.seed = seed if seed is not None else self.config.get("training", {}).get("seed", 42)
         self.deterministic_cuda = deterministic_cuda
 
-        import random
-        import torch
         random.seed(self.seed)
         np.random.seed(self.seed)
         torch.manual_seed(self.seed)
@@ -236,7 +295,39 @@ class PhaseC2Runner:
             # We will handle resume manually by loading the model file.
             pass
             
-    def evaluate_and_save(self, ts):
+    def rollout_size(self):
+        return int(self.model.n_steps) * int(self.model.n_envs)
+
+    def aligned_interactions(self, requested_interactions):
+        requested = int(requested_interactions)
+        if requested <= 0:
+            raise ValueError("requested interactions must be positive")
+        rollout = self.rollout_size()
+        return int(math.ceil(requested / rollout) * rollout)
+
+    def checkpoint_plan(self, max_interactions):
+        requested = [value for value in self.checkpoints if value < max_interactions]
+        requested.append(int(max_interactions))
+        plan = []
+        for target in requested:
+            actual = self.aligned_interactions(target)
+            if plan and plan[-1][1] == actual:
+                plan[-1] = (target, actual)
+            else:
+                plan.append((target, actual))
+        return plan
+
+    def active_sizes_for_interaction(self, interaction):
+        for stage in self.config["curriculum"]["stages"]:
+            if interaction <= int(stage["max_interactions"]):
+                return [int(size) for size in stage["active_sizes"]]
+        return [
+            int(size)
+            for size in self.config["curriculum"]["stages"][-1]["active_sizes"]
+        ]
+
+    def evaluate_and_save(self, ts, requested_ts=None):
+        requested_ts = int(ts if requested_ts is None else requested_ts)
         logger.info(f"[{ts}] Evaluating 240 validation routes...")
         val_env = PhaseC2Env(self.config, mode="eval", generator=self.generator)
         if self.config["reward"]["type"] == "R2-PB-empty-v1":
@@ -248,65 +339,218 @@ class PhaseC2Runner:
         if self.model_type == "M2":
             val_env = M2ScalarWrapper(val_env)
             
-        successes, collisions, timeouts = 0, 0, 0
         n_eval = len(self.generator.val_manifest)
-        
+        rows = []
+        validation_started = time.perf_counter()
+
         for i in range(n_eval):
             obs, info = val_env.reset()
+            scenario = self.generator.val_manifest[i]
+            start = tuple(int(value) for value in info["start"])
+            goal = tuple(int(value) for value in info["goal"])
+            initial_cost = _octile_distance(start, goal)
+            trajectory = [start]
+            actions = []
+            masks = []
+            inference_seconds = 0.0
+            masked_action_seconds = 0.0
+            path_cost = 0.0
+            episode_return = 0.0
+            invalid_action_count = 0
+            episode_budget = int(info["budget"])
             done = False
             while not done:
-                action, _ = self.model.predict(obs, deterministic=True)
+                masked_action_started = time.perf_counter()
+                mask = np.asarray(val_env.unwrapped.action_masks(), dtype=bool)
+                inference_started = time.perf_counter()
+                action, _ = self.model.predict(
+                    obs, deterministic=True, action_masks=mask
+                )
+                inference_seconds += time.perf_counter() - inference_started
+                masked_action_seconds += time.perf_counter() - masked_action_started
+                action = int(action)
+                if not mask[action]:
+                    invalid_action_count += 1
+                delta = val_env.unwrapped._v2.ACTION_DELTAS[action]
+                path_cost += 1.0 if delta[0] == 0 or delta[1] == 0 else math.sqrt(2.0)
                 obs, reward, term, trunc, info = val_env.step(int(action))
+                episode_return += float(reward)
+                trajectory.append(tuple(int(value) for value in val_env.unwrapped._v2.uav_pos))
+                actions.append(action)
+                masks.append(mask.astype(int).tolist())
                 done = term or trunc
-                
-            if info.get("is_success", False): successes += 1
-            elif info.get("is_collision", False): collisions += 1
-            else: timeouts += 1
-            
-        val_sr = successes / max(1, n_eval)
+            success = bool(info.get("is_success", False))
+            crashed = bool(info.get("crashed", False))
+            oscillation = has_two_cell_oscillation(trajectory)
+            longer_loop = has_longer_loop(trajectory)
+            if success:
+                failure_label = "success"
+            elif crashed:
+                failure_label = "collision"
+            elif oscillation:
+                failure_label = "two_cell_oscillation"
+            elif longer_loop:
+                failure_label = "longer_repeated_loop"
+            else:
+                failure_label = "step_limit_timeout"
+            final_distance = _octile_distance(trajectory[-1], goal)
+            rows.append({
+                "episode": i,
+                "grid_size": int(info["grid_size"]),
+                "distance_bin": scenario["distance_bin"],
+                "start": list(start),
+                "goal": list(goal),
+                "is_success": success,
+                "crashed": crashed,
+                "is_timeout": not success and not crashed,
+                "failure_label": failure_label,
+                "two_cell_oscillation": oscillation,
+                "longer_loop": longer_loop,
+                "decisions": len(actions),
+                "episode_budget": episode_budget,
+                "episode_return": episode_return,
+                "initial_octile_cost": initial_cost,
+                "path_cost": path_cost if success else None,
+                "path_cost_gap": path_cost - initial_cost if success else None,
+                "path_cost_ratio": path_cost / initial_cost if success else None,
+                "final_octile_distance": final_distance,
+                "invalid_action_count": invalid_action_count,
+                "mean_policy_inference_latency_ms": 1000.0 * inference_seconds / max(1, len(actions)),
+                "mean_masked_action_latency_ms": 1000.0 * masked_action_seconds / max(1, len(actions)),
+                "trajectory": [list(cell) for cell in trajectory],
+                "actions": actions,
+                "legal_action_masks": masks,
+            })
+
+        aggregates = _aggregate_validation(rows)
+        overall = aggregates["all"]
+        successes = int(overall["successes"])
+        collisions = int(overall["collisions"])
+        timeouts = int(overall["timeouts"])
+        val_sr = float(overall["success_rate"])
         logger.info(f"[{ts}] Val SR: {val_sr:.3f}")
-        
+
+        evaluation = {
+            "schema_version": 1,
+            "requested_interactions": requested_ts,
+            "completed_interactions": int(ts),
+            "checkpoint_is_ppo_update_aligned": int(ts) % self.rollout_size() == 0,
+            "model_type": self.model_type,
+            "validation_manifest_sha256": self.generator.val_hash,
+            "action_masking_applied": True,
+            "collision_field": "crashed",
+            "invalid_action_count": sum(row["invalid_action_count"] for row in rows),
+            "validation_wall_seconds": time.perf_counter() - validation_started,
+            "aggregates": aggregates,
+            "episodes": rows,
+        }
+        evaluation_path = self.out_dir / f"evaluation_{ts:06d}.json"
+        _write_json_atomic(evaluation_path, evaluation)
+
         self.history[ts] = {
             "success_rate": val_sr,
             "collisions": collisions,
-            "timeouts": timeouts
+            "timeouts": timeouts,
+            "evaluation_file": evaluation_path.name,
+            "action_masking_applied": True,
+            "collision_field": "crashed",
+            "requested_interactions": requested_ts,
+            "completed_interactions": int(ts),
         }
         
-        self.model.save(str(self.out_dir / f"model_{ts:06d}.zip"))
+        model_path = self.out_dir / f"model_{ts:06d}.zip"
+        temporary_model = model_path.with_name(f"{model_path.stem}.tmp.zip")
+        self.model.save(str(temporary_model))
+        temporary_model.replace(model_path)
         
         gen_state = self.generator.get_state()
-        with open(self.out_dir / f"generator_{ts:06d}.json", "w") as f:
-            json.dump(gen_state, f)
+        _write_json_atomic(self.out_dir / f"generator_{ts:06d}.json", gen_state)
+
+        self.save_rng_state(self.out_dir / f"rng_{ts:06d}.pt")
             
         status_info = {
             "history": self.history,
             "provenance": {
                 "seed": self.seed,
-                "deterministic_cuda": self.deterministic_cuda
-            }
+                "deterministic_cuda": self.deterministic_cuda,
+                "resume_semantics": "statistically_equivalent",
+            },
+            "completed_interactions": int(ts),
+            "requested_interactions": requested_ts,
+            "rollout_size": self.rollout_size(),
         }
-        with open(self.out_dir / "status.json", "w") as f:
-            json.dump(status_info, f, indent=2)
+        _write_json_atomic(self.out_dir / "status.json", status_info)
+
+        val_env.close()
+
+    def save_rng_state(self, path):
+        payload = {
+            "python": random.getstate(),
+            "numpy": np.random.get_state(),
+            "torch_cpu": torch.random.get_rng_state(),
+            "torch_cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else [],
+        }
+        path = Path(path)
+        temporary = path.with_name(f"{path.name}.tmp")
+        torch.save(payload, temporary)
+        temporary.replace(path)
+
+    @staticmethod
+    def restore_rng_state(path):
+        payload = torch.load(path, map_location="cpu", weights_only=False)
+        random.setstate(payload["python"])
+        np.random.set_state(payload["numpy"])
+        torch.random.set_rng_state(payload["torch_cpu"])
+        if torch.cuda.is_available() and payload.get("torch_cuda"):
+            torch.cuda.set_rng_state_all(payload["torch_cuda"])
 
     def run(self, max_interactions=150000):
-        cb = CurriculumCallback(self.config["curriculum"]["stages"], self.generator, self)
-        logger.info(f"Starting Phase C2 training for {max_interactions} interactions")
-        reset_num = not self.resume
-        
-        remaining_interactions = max_interactions
-        if self.resume:
-            remaining_interactions = max(0, max_interactions - self.model.num_timesteps)
-            logger.info(f"Resuming at {self.model.num_timesteps}. Remaining interactions to train: {remaining_interactions}")
-            if remaining_interactions <= 0:
-                logger.info("Training already complete.")
-                if max_interactions not in self.history:
-                    self.evaluate_and_save(max_interactions)
-                return
-                
-        self.model.learn(total_timesteps=remaining_interactions, callback=cb, reset_num_timesteps=reset_num)
-        
-        if max_interactions not in self.history:
-            self.evaluate_and_save(max_interactions)
+        plan = self.checkpoint_plan(int(max_interactions))
+        logger.info(
+            "Starting Phase C2 training: requested=%s, update-aligned=%s, rollout=%s",
+            max_interactions,
+            plan[-1][1],
+            self.rollout_size(),
+        )
+        current = int(self.model.num_timesteps)
+        valid_boundaries = {actual for _, actual in plan}
+        if self.resume and current not in valid_boundaries:
+            raise ValueError(
+                f"Resume interaction {current} is not an update-aligned checkpoint "
+                f"in the requested plan: {sorted(valid_boundaries)}"
+            )
+
+        first_learn = not self.resume and current == 0
+        for requested_target, actual_target in plan:
+            if actual_target < current:
+                continue
+            if actual_target == current:
+                if actual_target not in self.history:
+                    self.evaluate_and_save(actual_target, requested_target)
+                continue
+
+            active_sizes = self.active_sizes_for_interaction(current + 1)
+            self.generator.set_active_sizes(active_sizes)
+            remaining = actual_target - current
+            logger.info(
+                "Training segment %s -> %s interactions (requested checkpoint %s); sizes=%s",
+                current,
+                actual_target,
+                requested_target,
+                active_sizes,
+            )
+            self.model.learn(
+                total_timesteps=remaining,
+                callback=None,
+                reset_num_timesteps=first_learn,
+            )
+            first_learn = False
+            current = int(self.model.num_timesteps)
+            if current != actual_target:
+                raise RuntimeError(
+                    f"PPO interaction accounting mismatch: expected {actual_target}, got {current}"
+                )
+            self.evaluate_and_save(actual_target, requested_target)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'preflight':

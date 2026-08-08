@@ -66,3 +66,7 @@ evaluation/results/*.tmp.csv
 /output/pdf/
 /tmp/
 /.codex-remote-attachments/
+
+# Preserved local Phase C2 invalid-run forensics (never release inputs)
+/phase_c2_M1_extracted/
+/phase_c2_audit_results.json

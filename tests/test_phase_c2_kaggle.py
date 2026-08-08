@@ -86,6 +86,7 @@ def test_preflight_command_exists():
     with open(out_dir / "preflight_verification.json") as f:
         v = json.load(f)
     assert v["status"] == "PASS"
+    assert v["oracle_success_sizes"] == [15, 30, 50, 100]
 
 def test_bundle_creation_and_resume(tmp_path):
     import sys
@@ -132,6 +133,7 @@ def test_hashes_exist_in_notebook():
     assert "HASH_VALIDATION =" in src
     assert "HASH_TRAIN_GEN =" in src
     assert "HASH_CONFIG =" in src
+    assert "HASH_KAGGLE_RUNNER =" in src
 
 def test_m2_no_map_tensors():
     import json
@@ -387,7 +389,8 @@ def test_canonical_hashes():
     expected_vars = [
         "HASH_VALIDATION", "HASH_TRAIN_GEN", "HASH_CONFIG", 
         "HASH_REWARD", "HASH_OBSERVATION",
-        "HASH_C2_ENV", "HASH_C2_RUNNER", "HASH_C0_ENV", "HASH_ACTION_MASK"
+        "HASH_C2_ENV", "HASH_C2_RUNNER", "HASH_C0_ENV", "HASH_ACTION_MASK",
+        "HASH_KAGGLE_RUNNER"
     ]
     for var in expected_vars:
         assert var in hashes, f"Missing {var} in notebook"
@@ -402,10 +405,11 @@ def test_canonical_hashes():
         "HASH_C2_RUNNER": "rl_v3/run_phase_c2.py",
         "HASH_C0_ENV": "rl_v3/phase_c0_env.py",
         "HASH_ACTION_MASK": "rl_v3/action_masking.py",
+        "HASH_KAGGLE_RUNNER": "cloud/kaggle/phase_c2_kaggle_runner.py",
     }
     
     for var, fpath in file_mapping.items():
-        canonical_bytes = subprocess.check_output(["git", "show", f"HEAD:{fpath}"])
+        canonical_bytes = (ROOT / fpath).read_bytes().replace(b"\r\n", b"\n")
         canonical_hash = hashlib.sha256(canonical_bytes).hexdigest()
         assert canonical_hash == hashes[var], f"Hash mismatch for {var} ({fpath}): expected {canonical_hash}, got {hashes[var]}"
 
@@ -505,6 +509,11 @@ def test_notebook_contract():
     assert 'WAIT UNTIL phase_c2_{MODEL_TO_RUN}_COMPLETE.zip HAS BEEN DOWNLOADED' in full_src
     assert '--basetemp=/kaggle/working/pytest-phase-c2-temp' in full_src
     assert '--basetemp=/kaggle/working/uav_phase_c2' not in full_src
+    assert '=== ISOLATED END-TO-END RELEASE SMOKE (2,048 interactions) ===' in full_src
+    assert '"--smoke"' in full_src
+    assert 'evaluation_002048.json' in full_src
+    assert 'checkpoint_is_ppo_update_aligned' in full_src
+    assert 'invalid_action_count' in full_src
 def test_durability_and_complete_backup(tmp_path):
     out_dir = tmp_path / "uav_phase_c2"
     out_dir.mkdir(parents=True)

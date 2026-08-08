@@ -7,13 +7,15 @@ import gymnasium as gym
 
 from rl_v3.phase_c0_env import PhaseC0Env
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 class PhaseC2EndpointGenerator:
     """Generates start-goal pairs for Phase C2 with multi-scale empty grids."""
     def __init__(self, seed: int = 42):
         self.rng = np.random.RandomState(seed)
         
-        manifest_path = Path("evaluation/manifests/rl_v3_phase_c2_validation.json")
-        train_path = Path("evaluation/manifests/rl_v3_phase_c2_train_generator.json")
+        manifest_path = PROJECT_ROOT / "evaluation/manifests/rl_v3_phase_c2_validation.json"
+        train_path = PROJECT_ROOT / "evaluation/manifests/rl_v3_phase_c2_train_generator.json"
         if not manifest_path.exists() or not train_path.exists():
             raise FileNotFoundError("Phase C2 manifests not found.")
             
@@ -29,10 +31,14 @@ class PhaseC2EndpointGenerator:
         self.active_sizes = [15, 30] # Updated by curriculum
         
     def set_active_sizes(self, sizes):
-        self.active_sizes = sizes
+        normalized = [int(size) for size in sizes]
+        unknown = sorted(set(normalized) - {15, 30, 50, 100})
+        if not normalized or unknown:
+            raise ValueError(f"invalid active grid sizes: {normalized}")
+        self.active_sizes = normalized
 
     def sample_train(self) -> dict:
-        sz = self.rng.choice(self.active_sizes)
+        sz = int(self.rng.choice(self.active_sizes))
         b = self.rng.choice(["short", "medium", "long"])
         idx = self.rng.randint(0, len(self.train_pool[str(sz)][b]))
         pair = self.train_pool[str(sz)][b][idx]
@@ -49,7 +55,8 @@ class PhaseC2EndpointGenerator:
             "keys": state[1].tolist(),
             "pos": state[2],
             "has_gauss": state[3],
-            "cached_gauss": state[4]
+            "cached_gauss": state[4],
+            "active_sizes": [int(size) for size in self.active_sizes],
         }
         
     def set_state(self, state_dict: dict):
@@ -61,6 +68,9 @@ class PhaseC2EndpointGenerator:
             state_dict["cached_gauss"]
         )
         self.rng.set_state(state)
+        if "active_sizes" not in state_dict:
+            raise ValueError("generator state is missing active_sizes")
+        self.set_active_sizes([int(size) for size in state_dict["active_sizes"]])
 
 
 class PhaseC2Env(PhaseC0Env):
@@ -93,15 +103,15 @@ class PhaseC2Env(PhaseC0Env):
         self._start = tuple(spec["start"])
         self._goal = tuple(spec["goal"])
         
-        # PhaseC0Env initializes V2 in __init__. We must update V2 here!
-        self._v2 = self._make_v2()
-        
         # We pass dummy astar cost since empty grid octile distance is A* cost.
         cost = self.octile_distance(self._start, self._goal)
         multiplier = float(self.config["env"].get("max_steps_multiplier", 2.0))
-        minimum = 10
+        minimum = int(self.config["training"]["minimum_episode_budget"])
         self._max_steps = max(minimum, int(math.ceil(cost * multiplier)))
         
+        # PhaseC0Env.reset() constructs the native environment from the updated
+        # runtime fields. Do not construct it here as well: that would double
+        # every episode-reset cost without changing the resulting state.
         obs, info = super().reset(seed=seed, options=options)
         
         info["start"] = self._start
