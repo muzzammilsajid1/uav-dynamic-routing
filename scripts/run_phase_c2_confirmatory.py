@@ -15,6 +15,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 DEFAULT_SEEDS = (11, 22, 33, 44, 55)
 ROLLOUT_SIZE = 2048
 
@@ -170,6 +172,11 @@ def main() -> None:
     parser.add_argument("--interactions", type=int, default=150000)
     parser.add_argument("--device", choices=("cpu", "cuda", "auto"), default="cpu")
     parser.add_argument("--expected-commit")
+    parser.add_argument(
+        "--verify-only",
+        action="store_true",
+        help="Verify existing seed outputs without launching training",
+    )
     args = parser.parse_args()
 
     if tuple(args.seeds) != DEFAULT_SEEDS:
@@ -195,6 +202,20 @@ def main() -> None:
         "status": "running",
     }
     write_json_atomic(queue_path, queue)
+    if args.verify_only:
+        for seed in DEFAULT_SEEDS:
+            out_dir = args.output_root / f"seed_{seed:03d}" / "artifacts"
+            queue["runs"][str(seed)] = (
+                inspect_seed(out_dir, seed, args.interactions, commit)
+                if out_dir.exists()
+                else {"complete": False, "bundle_path": None}
+            )
+        queue["status"] = "verification_complete"
+        queue["active_seed"] = None
+        write_json_atomic(queue_path, queue)
+        print(queue_path)
+        return
+
     try:
         for seed in DEFAULT_SEEDS:
             queue["active_seed"] = seed
