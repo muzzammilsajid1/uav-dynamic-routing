@@ -73,12 +73,28 @@ def verify_bundle(bundle_path: Path) -> dict:
     return {"sha256": sha256(bundle_path), "entries": len(inventory)}
 
 
+def core_training_sources_match(provenance: dict) -> tuple[bool, list[str]]:
+    """Compare every hashed source except this orchestration-only queue."""
+    from cloud.kaggle.phase_c2_kaggle_runner import hash_source_file, source_hash_files
+
+    mismatches = []
+    for name, path in source_hash_files().items():
+        if name == "confirmatory_queue":
+            continue
+        if provenance.get("hashes", {}).get(name) != hash_source_file(path):
+            mismatches.append(name)
+    return not mismatches, mismatches
+
+
 def inspect_seed(out_dir: Path, seed: int, requested: int, expected_commit: str) -> dict:
     status_path = out_dir / "status.json"
     provenance_path = out_dir / "provenance.json"
     bundle_path = out_dir / "latest_checkpoint_bundle.zip"
     if not (status_path.exists() and provenance_path.exists() and bundle_path.exists()):
-        return {"complete": False, "bundle": bundle_path if bundle_path.exists() else None}
+        return {
+            "complete": False,
+            "bundle_path": str(bundle_path) if bundle_path.exists() else None,
+        }
 
     status = json.loads(status_path.read_text(encoding="utf-8"))
     provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
@@ -86,10 +102,14 @@ def inspect_seed(out_dir: Path, seed: int, requested: int, expected_commit: str)
         raise RuntimeError(f"{out_dir}: expected M2, found {provenance['model_type']}")
     if int(provenance["seed"]) != seed:
         raise RuntimeError(f"{out_dir}: expected seed {seed}, found {provenance['seed']}")
-    if provenance["git_commit"] != expected_commit:
-        raise RuntimeError(
-            f"{out_dir}: commit {provenance['git_commit']} != queue commit {expected_commit}"
-        )
+    prior_queue_only_commit = provenance["git_commit"] != expected_commit
+    if prior_queue_only_commit:
+        sources_match, mismatches = core_training_sources_match(provenance)
+        if not sources_match:
+            raise RuntimeError(
+                f"{out_dir}: commit {provenance['git_commit']} != queue commit "
+                f"{expected_commit}; changed core sources={mismatches}"
+            )
     bundle = verify_bundle(bundle_path)
     completed = int(status["completed_interactions"])
     target = aligned_target(requested)
@@ -101,9 +121,10 @@ def inspect_seed(out_dir: Path, seed: int, requested: int, expected_commit: str)
     return {
         "complete": complete,
         "completed_interactions": completed,
-        "bundle": bundle_path,
+        "bundle_path": str(bundle_path),
         "bundle_sha256": bundle["sha256"],
         "bundle_entries": bundle["entries"],
+        "prior_queue_only_commit": prior_queue_only_commit,
     }
 
 
@@ -111,12 +132,12 @@ def run_seed(output_root: Path, seed: int, requested: int, device: str, commit: 
     out_dir = output_root / f"seed_{seed:03d}" / "artifacts"
     state = inspect_seed(out_dir, seed, requested, commit) if out_dir.exists() else {
         "complete": False,
-        "bundle": None,
+        "bundle_path": None,
     }
     if state["complete"]:
         return {"seed": seed, "status": "already_complete", **state}
 
-    if out_dir.exists() and any(out_dir.iterdir()) and state["bundle"] is None:
+    if out_dir.exists() and any(out_dir.iterdir()) and state["bundle_path"] is None:
         raise RuntimeError(f"{out_dir}: partial output exists without a resumable bundle")
 
     environment = os.environ.copy()
@@ -133,8 +154,8 @@ def run_seed(output_root: Path, seed: int, requested: int, device: str, commit: 
         "--seed",
         str(seed),
     ]
-    if state["bundle"] is not None:
-        command.extend(["--resume", "--bundle-path", str(state["bundle"])])
+    if state["bundle_path"] is not None:
+        command.extend(["--resume", "--bundle-path", state["bundle_path"]])
     subprocess.run(command, cwd=ROOT, env=environment, check=True)
     verified = inspect_seed(out_dir, seed, requested, commit)
     if not verified["complete"]:

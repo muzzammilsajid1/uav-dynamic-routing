@@ -55,6 +55,34 @@ def test_confirmatory_completed_seed_inspection(tmp_path):
     assert result["complete"] is True
     assert result["completed_interactions"] == target
     assert result["bundle_entries"] == 1
+    json.dumps(result)
+
+
+def test_completed_seed_allows_queue_only_commit_change(tmp_path, monkeypatch):
+    import scripts.run_phase_c2_confirmatory as queue_module
+
+    out_dir = tmp_path / "seed_011" / "artifacts"
+    out_dir.mkdir(parents=True)
+    target = aligned_target(150000)
+    (out_dir / "status.json").write_text(
+        json.dumps({"completed_interactions": target}), encoding="utf-8"
+    )
+    (out_dir / "provenance.json").write_text(
+        json.dumps({"model_type": "M2", "seed": 11, "git_commit": "prior"}),
+        encoding="utf-8",
+    )
+    (out_dir / f"evaluation_{target:06d}.json").write_text("{}", encoding="utf-8")
+    (out_dir / f"model_{target:06d}.zip").write_bytes(b"model")
+    _write_bundle(out_dir / "latest_checkpoint_bundle.zip", {"state.json": b"{}"})
+    monkeypatch.setattr(
+        queue_module, "core_training_sources_match", lambda provenance: (True, [])
+    )
+
+    result = inspect_seed(out_dir, 11, 150000, "repaired")
+
+    assert result["complete"] is True
+    assert result["prior_queue_only_commit"] is True
+    json.dumps(result)
 
 
 def test_bundle_verification_rejects_changed_payload(tmp_path):
