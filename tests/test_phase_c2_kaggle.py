@@ -304,6 +304,49 @@ def test_no_nested_zip_in_bundle():
     shutil.rmtree(out_dir)
 
 
+def test_source_hash_is_line_ending_independent(tmp_path):
+    from cloud.kaggle.phase_c2_kaggle_runner import (
+        _legacy_source_hash_candidates,
+        hash_file,
+        hash_source_file,
+    )
+
+    lf = tmp_path / "lf.py"
+    crlf = tmp_path / "crlf.py"
+    lf.write_bytes(b"alpha\nbeta\n")
+    crlf.write_bytes(b"alpha\r\nbeta\r\n")
+
+    assert hash_source_file(lf) == hash_source_file(crlf)
+    assert hash_file(crlf) in _legacy_source_hash_candidates(lf)
+
+
+def test_final_archives_exclude_prior_archives_and_are_repeatable(tmp_path):
+    import zipfile
+
+    from cloud.kaggle.phase_c2_kaggle_runner import create_final_archives
+
+    out_dir = tmp_path / "uav_phase_c2"
+    out_dir.mkdir()
+    (out_dir / "evaluation_002048.json").write_text("{}", encoding="utf-8")
+    (out_dir / "model_002048.zip").write_bytes(b"model archive")
+    (out_dir / "latest_checkpoint_bundle.zip").write_bytes(b"bundle")
+    (out_dir / "checkpoint_bundle_002048.zip").write_bytes(b"timestamped bundle")
+    (out_dir / "rl_v3_phase_c2_M2_raw_artifacts.zip").write_bytes(b"old raw")
+
+    raw_archive, complete_archive = create_final_archives(out_dir, "M2")
+    raw_archive, complete_archive = create_final_archives(out_dir, "M2")
+
+    expected = {"evaluation_002048.json", "model_002048.zip", "final_inventory.txt"}
+    for archive in (raw_archive, complete_archive):
+        with zipfile.ZipFile(archive) as handle:
+            assert set(handle.namelist()) == expected
+            inventory = handle.read("final_inventory.txt").decode("utf-8")
+            assert "evaluation_002048.json" in inventory
+            assert "model_002048.zip" in inventory
+            assert "checkpoint_bundle" not in inventory
+            assert "raw_artifacts" not in inventory
+
+
 def test_resume_from_in_root_bundle(tmp_path):
     """Resume must work when bundle is inside out_dir (not parent)."""
     import shutil

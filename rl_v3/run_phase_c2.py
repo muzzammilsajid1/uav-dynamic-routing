@@ -252,7 +252,9 @@ class PhaseC2Runner:
             raise ValueError(f"Invalid device: {device}. Must be cpu, cuda, or auto.")
         self.device = device
         
-        self.checkpoints = [25000, 50000, 75000, 100000, 150000]
+        self.checkpoints = [
+            25000, 50000, 75000, 100000, 150000, 200000, 250000, 300000
+        ]
         self.history = {}
         
         self.generator = PhaseC2EndpointGenerator(seed=self.seed)
@@ -506,6 +508,10 @@ class PhaseC2Runner:
 
     def run(self, max_interactions=150000):
         plan = self.checkpoint_plan(int(max_interactions))
+        self.runtime_checkpoint_plan = [
+            {"requested_interactions": requested, "completed_interactions": actual}
+            for requested, actual in plan
+        ]
         logger.info(
             "Starting Phase C2 training: requested=%s, update-aligned=%s, rollout=%s",
             max_interactions,
@@ -513,12 +519,17 @@ class PhaseC2Runner:
             self.rollout_size(),
         )
         current = int(self.model.num_timesteps)
-        valid_boundaries = {actual for _, actual in plan}
-        if self.resume and current not in valid_boundaries:
-            raise ValueError(
-                f"Resume interaction {current} is not an update-aligned checkpoint "
-                f"in the requested plan: {sorted(valid_boundaries)}"
-            )
+        if self.resume:
+            if current <= 0 or current % self.rollout_size() != 0:
+                raise ValueError(
+                    f"Resume interaction {current} is not a positive complete PPO "
+                    f"rollout boundary (rollout size {self.rollout_size()})"
+                )
+            if current > plan[-1][1]:
+                raise ValueError(
+                    f"Resume interaction {current} exceeds the requested update-aligned "
+                    f"target {plan[-1][1]}"
+                )
 
         first_learn = not self.resume and current == 0
         for requested_target, actual_target in plan:

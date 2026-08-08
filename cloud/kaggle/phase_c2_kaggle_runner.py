@@ -5,6 +5,7 @@ import json
 import logging
 import zipfile
 import hashlib
+import tempfile
 from pathlib import Path
 from sb3_contrib import MaskablePPO
 
@@ -18,6 +19,100 @@ logger = logging.getLogger(__name__)
 
 def hash_file(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+SOURCE_HASH_MODE = "lf_normalized_sha256_v1"
+
+
+def _lf_normalized_bytes(path):
+    data = Path(path).read_bytes()
+    return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
+def hash_source_file(path):
+    """Hash text source independently of Windows versus Linux line endings."""
+    return hashlib.sha256(_lf_normalized_bytes(path)).hexdigest()
+
+
+def _legacy_source_hash_candidates(path):
+    """Accept a v11 raw hash on either platform without weakening content checks."""
+    raw = Path(path).read_bytes()
+    lf = _lf_normalized_bytes(path)
+    crlf = lf.replace(b"\n", b"\r\n")
+    return {
+        hashlib.sha256(raw).hexdigest(),
+        hashlib.sha256(lf).hexdigest(),
+        hashlib.sha256(crlf).hexdigest(),
+    }
+
+
+def source_hash_files():
+    return {
+        "config": ROOT / "configs" / "rl_v3_phase_c2.json",
+        "validation_manifest": ROOT / "evaluation" / "manifests" / "rl_v3_phase_c2_validation.json",
+        "train_generator": ROOT / "evaluation" / "manifests" / "rl_v3_phase_c2_train_generator.json",
+        "reward_wrapper": ROOT / "tools" / "verification" / "r2_pb_wrapper.py",
+        "observations": ROOT / "rl_v3" / "observations.py",
+        "phase_c2_env": ROOT / "rl_v3" / "phase_c2_env.py",
+        "phase_c2_runner": ROOT / "rl_v3" / "run_phase_c2.py",
+        "phase_c0_env": ROOT / "rl_v3" / "phase_c0_env.py",
+        "action_masking": ROOT / "rl_v3" / "action_masking.py",
+        "kaggle_runner": Path(__file__).resolve(),
+    }
+
+
+def _is_final_evidence_file(path):
+    """Select direct evidence while excluding prior/container archives."""
+    name = Path(path).name
+    if name.endswith(".tmp") or ".tmp." in name:
+        return False
+    if name == "latest_checkpoint_bundle.zip":
+        return False
+    if name.startswith("checkpoint_bundle_") and name.endswith(".zip"):
+        return False
+    if "_raw_artifacts" in name and name.endswith(".zip"):
+        return False
+    if name.startswith("phase_c2_") and name.endswith("_COMPLETE.zip"):
+        return False
+    return True
+
+
+def _archive_files(files, destination):
+    """Create an archive atomically from an explicit, flat file list."""
+    destination = Path(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with (
+        tempfile.TemporaryDirectory() as staging_dir,
+        tempfile.TemporaryDirectory(dir=destination.parent) as archive_dir,
+    ):
+        staging = Path(staging_dir)
+        for source in files:
+            shutil.copy2(source, staging / Path(source).name)
+        temporary_base = Path(archive_dir) / f"{destination.stem}.building"
+        temporary_zip = Path(shutil.make_archive(str(temporary_base), "zip", str(staging)))
+        temporary_zip.replace(destination)
+
+
+def create_final_archives(out_dir, model_type, smoke=False):
+    """Create non-nesting raw and complete backups plus a direct-file inventory."""
+    out_dir = Path(out_dir)
+    inventory_path = out_dir / "final_inventory.txt"
+    payload = [
+        path for path in sorted(out_dir.iterdir())
+        if path.is_file() and path.name != inventory_path.name and _is_final_evidence_file(path)
+    ]
+    lines = [f"{hash_file(path)}  {path.name}  {path.stat().st_size} bytes" for path in payload]
+    inventory_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    archive_payload = payload + [inventory_path]
+
+    archive_stem = f"rl_v3_phase_c2_{model_type}_{'smoke_' if smoke else ''}raw_artifacts"
+    raw_archive = out_dir / f"{archive_stem}.zip"
+    _archive_files(archive_payload, raw_archive)
+
+    complete_suffix = "SMOKE_COMPLETE" if smoke else "COMPLETE"
+    complete_archive = out_dir.parent / f"phase_c2_{model_type}_{complete_suffix}.zip"
+    _archive_files(archive_payload, complete_archive)
+    return raw_archive, complete_archive
 
 
 def resolve_output_dir(smoke=False):
@@ -99,24 +194,18 @@ class KagglePhaseC2Runner(PhaseC2Runner):
             raise ValueError(f"Bundle model type {prov['model_type']} != {expected_model}")
             
         # Verify every training/evaluation-relevant source captured by v11.
-        resume_hash_files = {
-            "config": ROOT / "configs" / "rl_v3_phase_c2.json",
-            "validation_manifest": ROOT / "evaluation" / "manifests" / "rl_v3_phase_c2_validation.json",
-            "train_generator": ROOT / "evaluation" / "manifests" / "rl_v3_phase_c2_train_generator.json",
-            "reward_wrapper": ROOT / "tools" / "verification" / "r2_pb_wrapper.py",
-            "observations": ROOT / "rl_v3" / "observations.py",
-            "phase_c2_env": ROOT / "rl_v3" / "phase_c2_env.py",
-            "phase_c2_runner": ROOT / "rl_v3" / "run_phase_c2.py",
-            "phase_c0_env": ROOT / "rl_v3" / "phase_c0_env.py",
-            "action_masking": ROOT / "rl_v3" / "action_masking.py",
-            "kaggle_runner": Path(__file__).resolve(),
-        }
-        for name, path in resume_hash_files.items():
+        source_hash_mode = prov.get("source_hash_mode")
+        for name, path in source_hash_files().items():
             expected = prov.get("hashes", {}).get(name)
             if expected is None:
                 raise ValueError(f"Resume provenance is missing source hash: {name}")
-            current = hash_file(path)
-            if expected != current:
+            if source_hash_mode == SOURCE_HASH_MODE:
+                matches = expected == hash_source_file(path)
+            elif source_hash_mode is None:
+                matches = expected in _legacy_source_hash_candidates(path)
+            else:
+                raise ValueError(f"Unsupported resume source hash mode: {source_hash_mode}")
+            if not matches:
                 raise ValueError(f"Resume source hash mismatch for {name}")
             
         self.resume_ts = prov["completed_interactions"]
@@ -170,18 +259,11 @@ class KagglePhaseC2Runner(PhaseC2Runner):
             "resume_semantics": "statistically_equivalent",
             "resume_limit": "SB3 does not serialize the partially active environment episode or rollout buffer.",
             "git_commit": git_commit,
+            "source_hash_mode": SOURCE_HASH_MODE,
             "hashes": {
-                "config": hash_file(ROOT / "configs" / "rl_v3_phase_c2.json"),
-                "validation_manifest": hash_file(ROOT / "evaluation/manifests/rl_v3_phase_c2_validation.json"),
-                "train_generator": hash_file(ROOT / "evaluation/manifests/rl_v3_phase_c2_train_generator.json"),
-                "reward_wrapper": hash_file(ROOT / "tools" / "verification" / "r2_pb_wrapper.py"),
-                "observations": hash_file(ROOT / "rl_v3" / "observations.py"),
-                "phase_c2_env": hash_file(ROOT / "rl_v3" / "phase_c2_env.py"),
-                "phase_c2_runner": hash_file(ROOT / "rl_v3" / "run_phase_c2.py"),
-                "phase_c0_env": hash_file(ROOT / "rl_v3" / "phase_c0_env.py"),
-                "action_masking": hash_file(ROOT / "rl_v3" / "action_masking.py"),
-                "kaggle_runner": hash_file(Path(__file__).resolve())
-            }
+                name: hash_source_file(path) for name, path in source_hash_files().items()
+            },
+            "checkpoint_schedule": getattr(self, "runtime_checkpoint_plan", None),
         }
         _write_json_atomic(self.out_dir / "provenance.json", prov)
             
@@ -190,8 +272,6 @@ class KagglePhaseC2Runner(PhaseC2Runner):
         # Excluded from bundles: any *.zip file (avoids nested archives and raw-artifact
         # archives), final_inventory.txt (only written at run end), and
         # partial/temporary files.
-        import tempfile
-
         _BUNDLE_EXCLUDES = {
             "latest_checkpoint_bundle.zip",
             "final_inventory.txt",
@@ -283,44 +363,10 @@ if __name__ == "__main__":
     
     out_dir = resolve_output_dir(args.smoke)
 
-    # Stage the raw-artifact archive in a tempdir, then move into out_dir.
-    # This prevents shutil.make_archive from recursing into out_dir while
-    # the archive is being created inside it.
-    import tempfile as _tf
-    with _tf.TemporaryDirectory() as _stage:
-        _stage_path = Path(_stage)
-        archive_stem = f"rl_v3_phase_c2_{args.model}_{'smoke_' if args.smoke else ''}raw_artifacts"
-        _archive_base = _stage_path / archive_stem
-        shutil.make_archive(str(_archive_base), 'zip', str(out_dir))
-        final_archive = out_dir / f"{archive_stem}.zip"
-        shutil.move(str(_archive_base) + ".zip", str(final_archive))
-
-    # Final Inventory — skip all .zip files (bundles + raw-artifact archives).
-    lines = []
-    for root, dirs, files in os.walk(str(out_dir)):
-        for file in files:
-            p = Path(root) / file
-            if p.suffix == ".zip":
-                continue
-            h = hash_file(p)
-            rel = p.relative_to(out_dir)
-            lines.append(f"{h}  {rel}  {p.stat().st_size} bytes")
-
-    with open(out_dir / "final_inventory.txt", "w") as f:
-        f.write("\n".join(lines))
-
+    final_archive, final_complete_archive = create_final_archives(
+        out_dir, args.model, smoke=args.smoke
+    )
     logger.info(f"Final artifacts archived to: {final_archive}")
-
-    # Create final complete backup archive
-    complete_suffix = "SMOKE_COMPLETE" if args.smoke else "COMPLETE"
-    complete_archive_base = out_dir.parent / f"phase_c2_{args.model}_{complete_suffix}"
-    with _tf.TemporaryDirectory() as _stage2:
-        _stage_path2 = Path(_stage2)
-        _complete_base = _stage_path2 / complete_archive_base.name
-        shutil.make_archive(str(_complete_base), 'zip', str(out_dir))
-        final_complete_archive = complete_archive_base.with_suffix(".zip")
-        shutil.move(str(_complete_base) + ".zip", str(final_complete_archive))
-
     logger.info(f"COMPLETE BACKUP CREATED: {final_complete_archive}")
     logger.info("********************************************************************************")
     logger.info(" DO NOT DISCONNECT THE NOTEBOOK KERNEL YET!")

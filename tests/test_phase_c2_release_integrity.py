@@ -173,6 +173,54 @@ def test_interaction_plan_is_ppo_update_aligned(tmp_path):
         (100000, 100352),
         (150000, 151552),
     ]
+    assert runner.checkpoint_plan(300000)[-3:] == [
+        (200000, 200704),
+        (250000, 251904),
+        (300000, 301056),
+    ]
+
+
+class _ResumeModel:
+    n_steps = 2048
+    n_envs = 1
+
+    def __init__(self, interactions):
+        self.num_timesteps = interactions
+
+    def learn(self, total_timesteps, callback, reset_num_timesteps):
+        assert callback is None
+        assert reset_num_timesteps is False
+        self.num_timesteps += int(total_timesteps)
+        return self
+
+
+def test_resume_accepts_any_complete_rollout_boundary(tmp_path):
+    runner = PhaseC2Runner(
+        ROOT / "configs/rl_v3_phase_c2.json", tmp_path, model_type="M2", device="cpu"
+    )
+    runner.resume = True
+    runner.model = _ResumeModel(2048)
+    saved = []
+    runner.evaluate_and_save = lambda actual, requested: saved.append((requested, actual))
+
+    runner.run(25000)
+
+    assert runner.model.num_timesteps == 26624
+    assert saved == [(25000, 26624)]
+    assert runner.runtime_checkpoint_plan == [
+        {"requested_interactions": 25000, "completed_interactions": 26624}
+    ]
+
+
+def test_resume_rejects_partial_rollout_boundary(tmp_path):
+    runner = PhaseC2Runner(
+        ROOT / "configs/rl_v3_phase_c2.json", tmp_path, model_type="M2", device="cpu"
+    )
+    runner.resume = True
+    runner.model = _ResumeModel(2049)
+
+    with np.testing.assert_raises_regex(ValueError, "complete PPO rollout boundary"):
+        runner.run(25000)
 
 
 def test_phase_c2_reset_constructs_native_environment_once(monkeypatch):
