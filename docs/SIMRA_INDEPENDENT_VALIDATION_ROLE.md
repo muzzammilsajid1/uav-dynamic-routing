@@ -211,3 +211,11 @@ never inside — the active modeling work.
 - Caveat: checked evaluation/results/training_full_seed_011.json (this checkpoint's own training provenance record) for a pre-existing recorded hash of the checkpoint file itself. None exists -- only source_tree/sha256 and training_source_snapshot/sha256, which hash the codebase, not model weights. This verification confirms no corruption/tampering in transfer and matches Muzzammil's claim, but there was no independent pre-existing record to check the claim against. Recommend Phase 2 checkpoint releases record a hash at training time going forward.
 - File size 452,270 bytes.
 - UNBLOCKS: Phase A diagnostic regeneration.
+
+## Ledger Entry -- 2026-08-08 -- Phase A regeneration CONFIRMED (item 1 now fully COMPLETE)
+- Ran python -m rl_v3.run_phase_a with the checkpoint Muzzammil provided.
+- git status showed 5 files 'modified'. Investigated with git diff -w (plain git diff is unreliable on this repo -- Windows CRLF vs committed LF makes every line appear changed even when identical).
+- Both manifest JSONs: byte-identical with -w. Manifest generation is deterministic.
+- Both diagnostic CSVs: every row pair differs ONLY in mean_decision_latency_ms (expected wall-clock variance, not research-relevant). ALL substantive fields identical: success, failure_label, decisions, path_cost, initial_astar_cost, path_cost_gap, repeated_cell_count, dynamic_event_count, collision/timeout/oscillation flags.
+- phase_a_summary.json: git status confirmed clean, no change at all.
+- CONCLUSION: Phase A diagnostic results are CONFIRMED fully reproducible. Item 1 (reproduce project state) is now COMPLETE for both Phase A and Phase B.
