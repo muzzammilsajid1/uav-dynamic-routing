@@ -203,3 +203,11 @@ never inside — the active modeling work.
 - NOT ANSWERABLE from current data: training reward improvement, episode length reduction, success-in-training-vs-deterministic-eval gap, entropy collapse, early-stopped exploration. All require data not present in committed artifacts.
 - ACTION: request TensorBoard logs / reward-episode-length CSVs from Muzzammil, same pattern as prior blockers.
 - Headline finding for Bug/Muzzammil: 3 of 4 pilots peaked before their final checkpoint; P3 collapsed from 2/96 to 0/96. Worth asking whether best-checkpoint, not final-checkpoint, should be each pilot's reported result.
+
+## Ledger Entry -- 2026-08-08 -- Phase A DDQN checkpoint received and hash-verified
+- Muzzammil provided models/research/full/seed_011/02_dynamic_full_final.zip via commit d8d1fcf on branch rl-v3-c2-empty-multiscale.
+- Independently pulled the file bytes from that commit and computed SHA-256 myself: 8ea28bdfe6d68c138de0128f80cd862064a71a0b6af56cf3b3c38f4cd2d13ad7.
+- MATCHES exactly the hash Muzzammil reported.
+- Caveat: checked evaluation/results/training_full_seed_011.json (this checkpoint's own training provenance record) for a pre-existing recorded hash of the checkpoint file itself. None exists -- only source_tree/sha256 and training_source_snapshot/sha256, which hash the codebase, not model weights. This verification confirms no corruption/tampering in transfer and matches Muzzammil's claim, but there was no independent pre-existing record to check the claim against. Recommend Phase 2 checkpoint releases record a hash at training time going forward.
+- File size 452,270 bytes.
+- UNBLOCKS: Phase A diagnostic regeneration.
